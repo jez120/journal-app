@@ -28,7 +28,12 @@ export default function TodayPage() {
     const [yesterdayEntry, setYesterdayEntry] = useState<Entry | null>(null);
     const [todayEntry, setTodayEntry] = useState<Entry | null>(null);
     const [userProgress, setUserProgress] = useState<{ currentDay: number; streakCount: number; currentRank: string } | null>(null);
-    const [currentPrompt] = useState(() => prompts[Math.floor(Math.random() * prompts.length)]);
+
+    // Use deterministic prompt based on date to prevent hydration mismatch
+    const [currentPrompt] = useState(() => {
+        const dayOfYear = Math.floor((new Date().getTime() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
+        return prompts[dayOfYear % prompts.length];
+    });
 
     // Fetch yesterday's entry and user progress
     useEffect(() => {
