@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -14,43 +15,55 @@ export default function LoginPage() {
         setIsLoading(true);
         setError("");
 
-        // TODO: Implement actual authentication
-        setTimeout(() => {
-            setIsLoading(false);
+        try {
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError("Invalid email or password");
+                setIsLoading(false);
+                return;
+            }
+
+            // Redirect to today page
             window.location.href = "/today";
-        }, 1000);
+        } catch (err) {
+            console.error("Login error:", err);
+            setError("Something went wrong. Please try again.");
+            setIsLoading(false);
+        }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--background)]">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#1E3A5F] to-[#06B6D4]">
             <div className="w-full max-w-sm">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <Link href="/" className="inline-flex items-center gap-2">
-                        <span className="text-3xl">📔</span>
-                        <span className="text-2xl font-semibold">MindCamp</span>
+                    <Link href="/" className="inline-flex items-center gap-3">
+                        <img src="/icon.png" alt="Clarity Journal" width={40} height={40} className="rounded-lg" />
+                        <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </Link>
                 </div>
 
                 {/* Login Card */}
-                <div className="card p-6">
-                    <h1 className="text-xl font-bold text-center mb-1">Welcome back</h1>
-                    <p className="text-sm text-[var(--foreground-muted)] text-center mb-6">
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-2xl shadow-xl">
+                    <h1 className="text-xl font-bold text-center mb-1 text-white">Welcome back</h1>
+                    <p className="text-sm text-white/60 text-center mb-6">
                         Continue your journey
                     </p>
 
                     {error && (
-                        <div className="bg-[var(--danger-muted)] text-[var(--danger)] p-3 rounded-lg mb-4 text-sm">
+                        <div className="bg-red-500/20 text-red-200 p-3 rounded-lg mb-4 text-sm border border-red-500/30">
                             {error}
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-sm font-medium mb-1.5 text-[var(--foreground-muted)]"
-                            >
+                            <label htmlFor="email" className="block text-sm font-medium mb-1.5 text-white/80">
                                 Email
                             </label>
                             <input
@@ -58,17 +71,15 @@ export default function LoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="input-base"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all"
                                 placeholder="you@example.com"
                                 required
+                                disabled={isLoading}
                             />
                         </div>
 
                         <div>
-                            <label
-                                htmlFor="password"
-                                className="block text-sm font-medium mb-1.5 text-[var(--foreground-muted)]"
-                            >
+                            <label htmlFor="password" className="block text-sm font-medium mb-1.5 text-white/80">
                                 Password
                             </label>
                             <input
@@ -76,37 +87,28 @@ export default function LoginPage() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="input-base"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all"
                                 placeholder="••••••••"
                                 required
+                                disabled={isLoading}
                             />
                         </div>
 
                         <div className="flex items-center justify-end">
-                            <Link
-                                href="/forgot-password"
-                                className="text-sm text-[var(--primary)] hover:underline"
-                            >
+                            <Link href="/forgot-password" className="text-sm text-[#06B6D4] hover:text-[#22D3EE] transition-colors">
                                 Forgot password?
                             </Link>
                         </div>
 
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="btn-primary w-full"
-                        >
+                        <button type="submit" disabled={isLoading} className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             {isLoading ? "Logging in..." : "Log in"}
                         </button>
                     </form>
 
-                    <div className="mt-6 pt-6 border-t border-[var(--card-border)] text-center">
-                        <p className="text-sm text-[var(--foreground-muted)]">
-                            New to MindCamp?{" "}
-                            <Link
-                                href="/signup"
-                                className="text-[var(--primary)] font-medium hover:underline"
-                            >
+                    <div className="mt-6 pt-6 border-t border-white/10 text-center">
+                        <p className="text-sm text-white/60">
+                            New to Clarity Journal?{" "}
+                            <Link href="/signup" className="text-[#06B6D4] font-medium hover:text-[#22D3EE] transition-colors">
                                 Start free trial
                             </Link>
                         </p>

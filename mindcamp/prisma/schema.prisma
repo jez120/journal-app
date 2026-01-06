@@ -1,0 +1,96 @@
+// Prisma Schema for MindCamp Journal App
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ========================================
+// USER MODEL
+// ========================================
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String?
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptionStatus String    @default("guest")
+  subscriptionId     String?
+  trialEndsAt        DateTime?
+
+  programStartDate DateTime?
+  currentRank      String    @default("guest")
+  currentDay       Int       @default(0)
+  streakCount      Int       @default(0)
+  longestStreak    Int       @default(0)
+  graceTokens      Int       @default(2)
+  lastEntryDate    DateTime?
+
+  onboardingCompleted Boolean @default(false)
+  onboardingGoal      String?
+
+  entries  Entry[]
+  insights Insight[]
+
+  @@map("users")
+}
+
+// ========================================
+// ENTRY MODEL
+// ========================================
+model Entry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  entryDate   DateTime
+  content     String
+  reflection  String?
+  promptShown String?
+  wordCount   Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, entryDate])
+  @@map("entries")
+}
+
+// ========================================
+// INSIGHT MODEL
+// ========================================
+model Insight {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type    String
+  title   String
+  content String
+  data    Json?
+
+  triggeredAt DateTime  @default(now())
+  seenAt      DateTime?
+  dismissed   Boolean   @default(false)
+
+  @@map("insights")
+}
+
+// ========================================
+// PROMPT MODEL
+// ========================================
+model Prompt {
+  id       String  @id @default(uuid())
+  text     String
+  category String?
+  minDay   Int     @default(0)
+  goalTag  String?
+  active   Boolean @default(true)
+
+  @@map("prompts")
+}

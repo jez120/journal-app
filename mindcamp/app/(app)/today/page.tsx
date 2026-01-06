@@ -1,33 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-// Mock data for yesterday's entry
-const yesterdayEntry = {
-    date: "January 5, 2026",
-    content:
-        "Had a tough meeting with the client today. Felt unprepared and caught off guard by their feedback. Need to do better research next time. On the bright side, the team was supportive.",
-    reflection:
-        "I handled the pressure better than I expected, even though I was nervous.",
-};
-
-// Prompts for today
+// Prompts for different moods/contexts
 const prompts = [
     "What's on your mind right now?",
     "What are you grateful for today?",
     "What's one thing you learned recently?",
-    "How are you feeling emotionally?",
-    "What's challenging you today?",
+    "What challenged you today?",
+    "What made you smile today?",
 ];
 
+interface Entry {
+    content: string;
+    reflection?: string;
+    entryDate: string;
+}
+
 export default function TodayPage() {
+    const { data: session } = useSession();
     const [entry, setEntry] = useState("");
     const [reflection, setReflection] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [showInsight, setShowInsight] = useState(false);
+    const [error, setError] = useState("");
+    const [yesterdayEntry, setYesterdayEntry] = useState<Entry | null>(null);
+    const [todayEntry, setTodayEntry] = useState<Entry | null>(null);
+    const [userProgress, setUserProgress] = useState<{ currentDay: number; streakCount: number; currentRank: string } | null>(null);
+    const [currentPrompt] = useState(() => prompts[Math.floor(Math.random() * prompts.length)]);
 
-    const todayPrompt = prompts[0]; // Use deterministic prompt
+    // Fetch yesterday's entry and user progress
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                // Fetch yesterday's entry
+                const yesterdayRes = await fetch("/api/entries/yesterday");
+                if (yesterdayRes.ok) {
+                    const data = await yesterdayRes.json();
+                    setYesterdayEntry(data.entry);
+                }
+
+                // Fetch today's entry (in case already submitted)
+                const todayRes = await fetch("/api/entries/today");
+                if (todayRes.ok) {
+                    const data = await todayRes.json();
+                    if (data.entry) {
+                        setTodayEntry(data.entry);
+                        setEntry(data.entry.content || "");
+                        setReflection(data.entry.reflection || "");
+                    }
+                }
+
+                // Fetch user progress
+                const progressRes = await fetch("/api/progress");
+                if (progressRes.ok) {
+                    const data = await progressRes.json();
+                    setUserProgress(data);
+                }
+            } catch (err) {
+                console.error("Error fetching data:", err);
+            }
+        }
+
+        if (session) {
+            fetchData();
+        }
+    }, [session]);
+
     const wordCount = entry.trim().split(/\s+/).filter(Boolean).length;
     const minWords = 10;
     const isValid = wordCount >= minWords;
@@ -37,166 +77,180 @@ export default function TodayPage() {
         if (!isValid) return;
 
         setIsSubmitting(true);
+        setError("");
 
-        // TODO: Save to database
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        try {
+            const res = await fetch("/api/entries", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    content: entry,
+                    reflection: reflection || null,
+                    promptShown: currentPrompt,
+                }),
+            });
 
-        setIsSubmitting(false);
-        setIsSubmitted(true);
-        setShowInsight(true);
+            if (!res.ok) {
+                const data = await res.json();
+                setError(data.error || "Failed to save entry");
+                setIsSubmitting(false);
+                return;
+            }
+
+            setIsSubmitted(true);
+
+            // Refresh progress
+            const progressRes = await fetch("/api/progress");
+            if (progressRes.ok) {
+                const data = await progressRes.json();
+                setUserProgress(data);
+            }
+        } catch (err) {
+            console.error("Error saving entry:", err);
+            setError("Failed to save entry. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    const currentDay = userProgress?.currentDay || 1;
+    const streakCount = userProgress?.streakCount || 0;
+    const currentRank = userProgress?.currentRank || "member";
+
+    const getRankBadgeClass = () => {
+        switch (currentRank) {
+            case "guest": return "rank-badge rank-guest";
+            case "member": return "rank-badge rank-member";
+            case "regular": return "rank-badge rank-regular";
+            case "veteran": return "rank-badge rank-veteran";
+            case "finalweek": return "rank-badge rank-finalweek";
+            case "master": return "rank-badge rank-master";
+            default: return "rank-badge rank-member";
+        }
+    };
+
+    const getRankLabel = () => {
+        switch (currentRank) {
+            case "guest": return "Guest";
+            case "member": return "Member";
+            case "regular": return "Regular";
+            case "veteran": return "Veteran";
+            case "finalweek": return "Final Week";
+            case "master": return "Master";
+            default: return "Member";
+        }
     };
 
     if (isSubmitted) {
         return (
-            <div className="max-w-2xl mx-auto md:ml-68 animate-fade-in">
-                <div className="text-center py-12">
-                    {/* Success icon */}
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--success)] text-white text-3xl mb-6">
+            <div className="animate-fade-in">
+                <div className="text-center py-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--system-green)] text-white text-3xl mb-4">
                         ✓
                     </div>
-
-                    <h1 className="text-2xl font-bold mb-2">Entry saved</h1>
-                    <p className="text-[var(--foreground-muted)] mb-6">
-                        Day 15 complete · Streak: <span className="text-[var(--warning)] font-semibold">15 days</span> 🔥
+                    <h1 className="text-2xl font-bold mb-2 text-white">Entry saved</h1>
+                    <p className="text-white/60 mb-4">
+                        Day {currentDay} complete · Streak: <span className="text-[#FF9500] font-semibold">{streakCount} days</span> 🔥
                     </p>
-                    <p className="text-sm text-[var(--foreground-muted)] mb-8">
-                        Rank: <span className="rank-badge rank-regular">Regular</span>
-                    </p>
-
-                    {/* Insight card */}
-                    {showInsight && (
-                        <div className="card p-5 text-left mb-8 max-w-sm mx-auto">
-                            <div className="flex items-center gap-2 mb-3">
-                                <span className="text-lg">💡</span>
-                                <span className="font-semibold text-[var(--primary)]">Insight</span>
-                            </div>
-                            <p className="text-sm mb-2">
-                                You mentioned <strong>&quot;meeting&quot;</strong> 4 times this week.
-                            </p>
-                            <p className="text-xs text-[var(--foreground-muted)]">
-                                Last week: 1 time
-                            </p>
-                        </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="flex items-center justify-center gap-4">
-                        <a href="/history" className="btn-secondary">
-                            View History
-                        </a>
-                        <button
-                            onClick={() => {
-                                setIsSubmitted(false);
-                                setEntry("");
-                                setReflection("");
-                            }}
-                            className="btn-primary"
-                        >
-                            Done
-                        </button>
+                    <div className="inline-block mb-6">
+                        <span className={`${getRankBadgeClass()} bg-white/10 text-white`}>{getRankLabel()}</span>
                     </div>
+
+                    <button
+                        onClick={() => {
+                            setIsSubmitted(false);
+                        }}
+                        className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-3.5 rounded-xl transition-colors"
+                    >
+                        Done
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-2xl mx-auto md:ml-68">
+        <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold mb-1">Today</h1>
-                    <p className="text-sm text-[var(--foreground-muted)]">
-                        January 6, 2026 · Day 15
-                    </p>
+                    <h1 className="text-3xl font-bold text-white mb-1">Today</h1>
+                    <p className="text-white/60">{formattedDate} · Day {currentDay}</p>
                 </div>
-                <div className="rank-badge rank-regular">
-                    Regular
-                </div>
+                <span className={`${getRankBadgeClass()} bg-white/10 text-white/90 border border-white/20`}>{getRankLabel()}</span>
             </div>
 
             {/* Yesterday's entry */}
-            <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                    <span className="text-base">📖</span>
-                    <h2 className="font-semibold text-sm text-[var(--foreground-muted)] uppercase tracking-wide">
-                        Yesterday
-                    </h2>
-                </div>
-                <div className="card p-4">
-                    <p className="text-[var(--foreground)] text-sm leading-relaxed mb-3">
-                        &quot;{yesterdayEntry.content}&quot;
-                    </p>
-                    <div className="pt-3 border-t border-[var(--card-border)]">
-                        <p className="text-xs text-[var(--foreground-muted)] mb-1">
-                            Reflection:
-                        </p>
-                        <p className="text-sm text-[var(--foreground)] italic">
-                            &quot;{yesterdayEntry.reflection}&quot;
-                        </p>
+            {yesterdayEntry && (
+                <section>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span>📖</span>
+                        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Yesterday</h2>
                     </div>
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 p-4 rounded-xl">
+                        <p className="text-white/90 text-[15px] leading-relaxed mb-3">
+                            &quot;{yesterdayEntry.content}&quot;
+                        </p>
+                        {yesterdayEntry.reflection && (
+                            <div className="pt-3 border-t border-white/10">
+                                <p className="text-xs text-white/50 mb-1">Reflection:</p>
+                                <p className="text-sm text-white/80 italic">
+                                    &quot;{yesterdayEntry.reflection}&quot;
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            )}
+
+            {error && (
+                <div className="bg-[rgba(255,59,48,0.15)] text-[var(--system-red)] p-3 rounded-lg text-sm">
+                    {error}
                 </div>
-            </div>
+            )}
 
             {/* Today's entry form */}
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Prompt */}
-                <div className="mb-4">
+                <section>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="text-base">✏️</span>
-                        <h2 className="font-semibold text-sm text-[var(--foreground-muted)] uppercase tracking-wide">
-                            Today
-                        </h2>
+                        <span>✏️</span>
+                        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Today</h2>
                     </div>
-                    <p className="text-lg font-medium mb-3">
-                        {todayPrompt}
-                    </p>
+                    <p className="text-lg font-medium text-white mb-3">{currentPrompt}</p>
                     <textarea
                         value={entry}
                         onChange={(e) => setEntry(e.target.value)}
-                        className="input-base min-h-[140px] resize-none"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[140px] resize-none"
                         placeholder="Write your thoughts here..."
                     />
                     <div className="flex items-center justify-between mt-2 text-xs">
-                        <span className="text-[var(--foreground-muted)]">
-                            Min {minWords} words
-                        </span>
-                        <span
-                            className={
-                                isValid ? "text-[var(--success)]" : "text-[var(--foreground-muted)]"
-                            }
-                        >
+                        <span className="text-white/40">Min {minWords} words</span>
+                        <span className={isValid ? "text-[#34C759]" : "text-white/40"}>
                             {wordCount} words {isValid && "✓"}
                         </span>
                     </div>
-                </div>
+                </section>
 
                 {/* Reflection */}
-                <div className="mb-6">
+                <section>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="text-base">🪞</span>
-                        <h2 className="font-semibold text-sm text-[var(--foreground-muted)] uppercase tracking-wide">
-                            Reflect
-                        </h2>
+                        <span>🪞</span>
+                        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Reflect</h2>
                     </div>
-                    <p className="text-sm text-[var(--foreground-muted)] mb-3">
-                        How does today compare to yesterday?
-                    </p>
+                    <p className="text-sm text-white/60 mb-2">How does today compare to yesterday?</p>
                     <textarea
                         value={reflection}
                         onChange={(e) => setReflection(e.target.value)}
-                        className="input-base min-h-[80px] resize-none"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[80px] resize-none"
                         placeholder="Your reflection..."
                     />
-                </div>
+                </section>
 
-                {/* Submit button */}
-                <button
-                    type="submit"
-                    disabled={!isValid || isSubmitting}
-                    className="btn-primary w-full"
-                >
-                    {isSubmitting ? "Saving..." : "Save Entry"}
+                <button type="submit" disabled={!isValid || isSubmitting} className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isSubmitting ? "Saving..." : todayEntry ? "Update Entry" : "Save Entry"}
                 </button>
             </form>
         </div>
