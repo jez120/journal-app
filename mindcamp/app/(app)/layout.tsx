@@ -50,7 +50,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
     const userInitial = session?.user?.email?.[0]?.toUpperCase() || "?";
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#1E3A5F] to-[#06B6D4]">
+        <div className="min-h-screen">
             {/* Navigation Bar */}
             <header className="fixed top-0 left-0 right-0 z-50 bg-[#1E3A5F]/80 backdrop-blur-lg border-b border-white/10 h-[60px]">
                 <div className="nav-bar-inner container-app h-full flex items-center justify-between">
@@ -79,7 +79,10 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             </header>
 
             {/* Main content */}
-            <main className="pt-[80px] pb-[100px] min-h-screen container-app">
+            <main
+                className="pb-28 min-h-screen container-app"
+                style={{ paddingTop: "100px" }}
+            >
                 {children}
             </main>
 

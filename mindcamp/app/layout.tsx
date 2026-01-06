@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { InteractionGlow } from "@/components/InteractionGlow";
+import { FixedBackground } from "@/components/FixedBackground";
 
 export const metadata: Metadata = {
   title: "Clarity Journal - Build the habit of knowing yourself",
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
+        <FixedBackground />
         <InteractionGlow />
         {children}
       </body>

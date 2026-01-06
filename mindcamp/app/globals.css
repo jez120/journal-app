@@ -76,11 +76,12 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* Backgrounds */
-    --system-background: #000000;
-    --secondary-system-background: #1C1C1E;
-    --tertiary-system-background: #2C2C2E;
-    --grouped-background: #000000;
-    --secondary-grouped-background: #1C1C1E;
+    /* Backgrounds */
+    --system-background: #1E3A5F;
+    --secondary-system-background: rgba(255, 255, 255, 0.1);
+    --tertiary-system-background: rgba(255, 255, 255, 0.05);
+    --grouped-background: transparent;
+    --secondary-grouped-background: rgba(255, 255, 255, 0.1);
 
     /* Labels */
     --label: #FFFFFF;
@@ -141,6 +142,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-y: scroll;
   -webkit-tap-highlight-color: transparent;
 }
 
