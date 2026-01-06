@@ -3,273 +3,173 @@
 import { useState } from "react";
 import Link from "next/link";
 
-interface Question {
-    id: string;
-    question: string;
-    options: string[];
-}
+type Step = "goal" | "rules";
 
-const questions: Question[] = [
-    {
-        id: "occupation",
-        question: "What do you do?",
-        options: [
-            "Work full-time",
-            "Student",
-            "Freelance / Self-employed",
-            "Other",
-        ],
-    },
-    {
-        id: "journaling_experience",
-        question: "Have you tried journaling before?",
-        options: [
-            "Never",
-            "A few times, didn't stick",
-            "On and off for months",
-            "Yes, I journal regularly",
-        ],
-    },
-    {
-        id: "biggest_challenge",
-        question: "What's your biggest journaling challenge?",
-        options: [
-            "I forget to do it",
-            "I don't know what to write",
-            "I don't see the point",
-            "I can't find the time",
-        ],
-    },
-    {
-        id: "goal",
-        question: "What do you want from journaling?",
-        options: [
-            "Reduce stress & anxiety",
-            "Track personal growth",
-            "Build self-awareness",
-            "Process my thoughts",
-        ],
-    },
-    {
-        id: "commitment",
-        question: "Can you commit to 2 minutes a day?",
-        options: [
-            "Absolutely",
-            "I'll try my best",
-            "Only on weekdays",
-            "I'm not sure",
-        ],
-    },
-    {
-        id: "motivation",
-        question: "What motivates you most?",
-        options: [
-            "Streaks & consistency",
-            "Rankings & competition",
-            "Personal insights",
-            "Building good habits",
-        ],
-    },
+const goals = [
+    { id: "habit", icon: "🎯", label: "Build a journaling habit" },
+    { id: "understand", icon: "🔍", label: "Understand myself better" },
+    { id: "track", icon: "📈", label: "Track my progress" },
+    { id: "reflect", icon: "🧘", label: "Daily reflection practice" },
 ];
 
 export default function OnboardingPage() {
-    const [currentStep, setCurrentStep] = useState(0);
-    const [answers, setAnswers] = useState<Record<string, string>>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [step, setStep] = useState<Step>("goal");
+    const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const currentQuestion = questions[currentStep];
-    const isLastQuestion = currentStep === questions.length - 1;
-    const progress = ((currentStep + 1) / questions.length) * 100;
-
-    const handleSelect = (option: string) => {
-        setAnswers((prev) => ({
-            ...prev,
-            [currentQuestion.id]: option,
-        }));
-    };
-
-    const handleNext = () => {
-        if (isLastQuestion) {
-            handleSubmit();
-        } else {
-            setCurrentStep((prev) => prev + 1);
+    const handleContinue = () => {
+        if (step === "goal" && selectedGoal) {
+            setStep("rules");
+        } else if (step === "rules") {
+            handleStart();
         }
     };
 
-    const handleBack = () => {
-        if (currentStep > 0) {
-            setCurrentStep((prev) => prev - 1);
-        }
-    };
-
-    const handleSubmit = async () => {
-        setIsSubmitting(true);
-
-        // TODO: Save answers to database
-        console.log("Questionnaire answers:", answers);
+    const handleStart = async () => {
+        setIsLoading(true);
+        // TODO: Save goal to database
+        console.log("Selected goal:", selectedGoal);
 
         setTimeout(() => {
             window.location.href = "/today";
-        }, 1000);
+        }, 500);
     };
 
-    const selectedOption = answers[currentQuestion.id];
-
     return (
-        <div className="min-h-screen radial-glow grid-pattern flex items-center justify-center p-4">
-            <div className="w-full max-w-lg">
-                {/* Header */}
+        <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--background)]">
+            <div className="w-full max-w-md">
+                {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary-muted)] text-[var(--primary)] text-sm font-medium mb-6">
-                        <span>🎖️</span>
-                        <span>RECRUITMENT</span>
-                    </div>
-                    <h1 className="text-3xl font-bold mb-2">
-                        Question {currentStep + 1} of {questions.length}
-                    </h1>
-
-                    {/* Progress bar */}
-                    <div className="w-full h-2 bg-[var(--background-secondary)] rounded-full overflow-hidden mt-4">
-                        <div
-                            className="h-full bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] transition-all duration-500 ease-out"
-                            style={{ width: `${progress}%` }}
-                        />
+                    <div className="inline-flex items-center gap-2">
+                        <span className="text-3xl">📔</span>
+                        <span className="text-2xl font-semibold">MindCamp</span>
                     </div>
                 </div>
 
-                {/* Question Card */}
-                <div className="glass-card p-8">
-                    <h2 className="text-2xl font-bold mb-8 text-center">
-                        {currentQuestion.question}
-                    </h2>
-
-                    <div className="space-y-3">
-                        {currentQuestion.options.map((option) => (
-                            <button
-                                key={option}
-                                onClick={() => handleSelect(option)}
-                                className={`w-full p-4 rounded-xl text-left transition-all duration-200 ${selectedOption === option
-                                        ? "bg-[var(--primary-muted)] border-2 border-[var(--primary)] text-[var(--foreground)]"
-                                        : "bg-[var(--background-secondary)] border-2 border-transparent hover:border-[var(--glass-border)] text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
-                                    }`}
+                {step === "goal" && (
+                    <div className="animate-fade-in">
+                        {/* Skip link */}
+                        <div className="text-right mb-4">
+                            <Link
+                                href="/today"
+                                className="text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div
-                                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedOption === option
-                                                ? "border-[var(--primary)] bg-[var(--primary)]"
-                                                : "border-[var(--foreground-muted)]"
+                                Skip →
+                            </Link>
+                        </div>
+
+                        <div className="card p-8">
+                            <h1 className="text-2xl font-bold text-center mb-2">
+                                What brings you here?
+                            </h1>
+                            <p className="text-[var(--foreground-muted)] text-center mb-8">
+                                This helps us personalize your prompts
+                            </p>
+
+                            <div className="space-y-3">
+                                {goals.map((goal) => (
+                                    <button
+                                        key={goal.id}
+                                        onClick={() => setSelectedGoal(goal.id)}
+                                        className={`w-full p-4 rounded-xl text-left transition-all ${selectedGoal === goal.id
+                                                ? "bg-[var(--primary-muted)] border-2 border-[var(--primary)]"
+                                                : "bg-[var(--background-secondary)] border-2 border-transparent hover:border-[var(--card-border)]"
                                             }`}
                                     >
-                                        {selectedOption === option && (
-                                            <svg
-                                                className="w-3 h-3 text-white"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={3}
-                                                    d="M5 13l4 4L19 7"
-                                                />
-                                            </svg>
-                                        )}
-                                    </div>
-                                    <span className="font-medium">{option}</span>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xl">{goal.icon}</span>
+                                            <span className="font-medium">{goal.label}</span>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
 
-                    {/* Navigation */}
-                    <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--glass-border)]">
-                        <button
-                            onClick={handleBack}
-                            disabled={currentStep === 0}
-                            className={`flex items-center gap-2 font-medium transition-colors ${currentStep === 0
-                                    ? "text-[var(--foreground-muted)] opacity-50 cursor-not-allowed"
-                                    : "text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
-                                }`}
-                        >
-                            <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                            <button
+                                onClick={handleContinue}
+                                disabled={!selectedGoal}
+                                className="btn-primary w-full mt-8"
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M15 19l-7-7 7-7"
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {step === "rules" && (
+                    <div className="animate-fade-in">
+                        <div className="card p-8">
+                            <h1 className="text-2xl font-bold text-center mb-2">
+                                Here&apos;s how MindCamp works
+                            </h1>
+                            <p className="text-[var(--foreground-muted)] text-center mb-8">
+                                Simple rules for lasting results
+                            </p>
+
+                            <div className="space-y-6">
+                                <RuleItem
+                                    icon="📝"
+                                    title="Write 2-3 sentences daily"
+                                    description="Under 2 minutes. Consistency over quantity."
                                 />
-                            </svg>
-                            Back
-                        </button>
+                                <RuleItem
+                                    icon="📖"
+                                    title="Read yesterday's entry first"
+                                    description="Builds continuity and self-awareness."
+                                />
+                                <RuleItem
+                                    icon="📊"
+                                    title="See patterns emerge"
+                                    description="Insights from your own words over time."
+                                />
+                                <RuleItem
+                                    icon="⚠️"
+                                    title="Miss days = lose progress"
+                                    description="Grace tokens help if you slip up."
+                                />
+                            </div>
+
+                            <div className="mt-8 pt-6 border-t border-[var(--card-border)] text-center">
+                                <p className="text-[var(--foreground-muted)] mb-4">
+                                    Ready to start?
+                                </p>
+                                <button
+                                    onClick={handleContinue}
+                                    disabled={isLoading}
+                                    className="btn-primary w-full"
+                                >
+                                    {isLoading ? "Starting..." : "Yes, let's go"}
+                                </button>
+                            </div>
+                        </div>
 
                         <button
-                            onClick={handleNext}
-                            disabled={!selectedOption || isSubmitting}
-                            className={`btn-primary flex items-center gap-2 ${!selectedOption
-                                    ? "opacity-50 cursor-not-allowed"
-                                    : ""
-                                }`}
+                            onClick={() => setStep("goal")}
+                            className="w-full text-center mt-4 text-sm text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
                         >
-                            {isSubmitting ? (
-                                <>
-                                    <svg
-                                        className="animate-spin h-5 w-5"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        />
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        />
-                                    </svg>
-                                    Starting...
-                                </>
-                            ) : (
-                                <>
-                                    {isLastQuestion ? "Begin Training" : "Next"}
-                                    <svg
-                                        className="w-5 h-5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9 5l7 7-7 7"
-                                        />
-                                    </svg>
-                                </>
-                            )}
+                            ← Back
                         </button>
                     </div>
-                </div>
+                )}
+            </div>
+        </div>
+    );
+}
 
-                {/* Skip option */}
-                <p className="text-center mt-6 text-sm text-[var(--foreground-muted)]">
-                    <Link
-                        href="/today"
-                        className="hover:text-[var(--foreground)] transition-colors underline"
-                    >
-                        Skip for now
-                    </Link>
-                </p>
+function RuleItem({
+    icon,
+    title,
+    description,
+}: {
+    icon: string;
+    title: string;
+    description: string;
+}) {
+    return (
+        <div className="flex items-start gap-4">
+            <div className="text-2xl flex-shrink-0">{icon}</div>
+            <div>
+                <p className="font-medium">{title}</p>
+                <p className="text-sm text-[var(--foreground-muted)]">{description}</p>
             </div>
         </div>
     );

@@ -5,130 +5,130 @@ const ranks = [
         name: "Guest",
         days: "Day 0-3",
         description: "Free trial",
-        unlocks: "Full access preview",
+        unlocks: "Basic writing",
         completed: true,
     },
     {
-        name: "Recruit",
+        name: "Member",
         days: "Day 4-14",
         description: "Build foundation",
-        unlocks: "Basic insights",
+        unlocks: "Week view",
         completed: true,
     },
     {
-        name: "Soldier",
+        name: "Regular",
         days: "Day 15-30",
         description: "Establish routine",
         unlocks: "Keyword tracking",
         active: true,
     },
     {
-        name: "Officer",
+        name: "Veteran",
         days: "Day 31-56",
         description: "Deep patterns",
         unlocks: "Month comparisons",
     },
     {
-        name: "Hell Week",
+        name: "Final Week",
         days: "Day 57-63",
-        description: "Final test",
-        unlocks: "Challenge mode",
-        hellWeek: true,
+        description: "The challenge",
+        unlocks: "Harder prompts",
+        finalWeek: true,
     },
     {
-        name: "Commander",
+        name: "Master",
         days: "Day 64+",
         description: "Full access",
         unlocks: "All analytics",
-        commander: true,
+        master: true,
     },
 ];
 
 const stats = [
-    { label: "Current Streak", value: "12 days", icon: "🔥" },
-    { label: "Longest Streak", value: "12 days", icon: "🏆" },
-    { label: "Total Entries", value: "15", icon: "📝" },
+    { label: "Current Streak", value: "15 days", icon: "🔥" },
+    { label: "Longest Streak", value: "15 days", icon: "🏆" },
+    { label: "Total Entries", value: "18", icon: "📝" },
     { label: "Grace Tokens", value: "2 left", icon: "🎟️" },
 ];
 
 export default function ProgressPage() {
-    const currentDay = 12;
+    const currentDay = 15;
     const totalDays = 63;
     const progressPercent = (currentDay / totalDays) * 100;
 
     return (
         <div className="max-w-2xl mx-auto md:ml-68">
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-1">Your Journey</h1>
-                <p className="text-[var(--foreground-muted)]">
-                    Day {currentDay} of Training
+            <div className="mb-6">
+                <h1 className="text-2xl font-bold mb-1">Progress</h1>
+                <p className="text-sm text-[var(--foreground-muted)]">
+                    Day {currentDay} of your journey
                 </p>
             </div>
 
             {/* Current rank card */}
-            <div className="glass-card p-6 mb-8">
-                <div className="flex items-center justify-between mb-6">
+            <div className="card p-5 mb-6">
+                <div className="flex items-center justify-between mb-4">
                     <div>
-                        <p className="text-sm text-[var(--foreground-muted)] mb-1">
-                            CURRENT RANK
+                        <p className="text-xs text-[var(--foreground-muted)] uppercase tracking-wide mb-1">
+                            Current Rank
                         </p>
-                        <div className="rank-badge rank-soldier text-lg">
-                            🎖️ Soldier
+                        <div className="rank-badge rank-regular text-base">
+                            Regular
                         </div>
                     </div>
                     <div className="text-right">
-                        <p className="text-sm text-[var(--foreground-muted)] mb-1">
-                            TIME IN RANK
+                        <p className="text-xs text-[var(--foreground-muted)] uppercase tracking-wide mb-1">
+                            Day
                         </p>
-                        <p className="text-xl font-bold">Day 12</p>
+                        <p className="text-2xl font-bold">{currentDay}</p>
                     </div>
                 </div>
 
                 {/* Progress bar */}
-                <div className="mb-3">
-                    <div className="flex items-center justify-between text-sm text-[var(--foreground-muted)] mb-2">
-                        <span>Progress to Commander</span>
+                <div className="mb-2">
+                    <div className="flex items-center justify-between text-xs text-[var(--foreground-muted)] mb-1">
+                        <span>Progress to Master</span>
                         <span>{currentDay}/{totalDays} days</span>
                     </div>
-                    <div className="w-full h-3 bg-[var(--background-secondary)] rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-[var(--background-secondary)] rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] rounded-full transition-all duration-500"
+                            className="h-full bg-[var(--primary)] rounded-full transition-all duration-500"
                             style={{ width: `${progressPercent}%` }}
                         />
                     </div>
                 </div>
 
-                <p className="text-sm text-[var(--foreground-muted)]">
-                    🎯 18 days until Officer rank
+                <p className="text-xs text-[var(--foreground-muted)]">
+                    🎯 15 days until Veteran rank
                 </p>
             </div>
 
             {/* Stats grid */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-2 gap-3 mb-6">
                 {stats.map((stat) => (
-                    <div key={stat.label} className="glass-card p-4">
+                    <div key={stat.label} className="card p-4">
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xl">{stat.icon}</span>
-                            <span className="text-sm text-[var(--foreground-muted)]">
+                            <span className="text-lg">{stat.icon}</span>
+                            <span className="text-xs text-[var(--foreground-muted)]">
                                 {stat.label}
                             </span>
                         </div>
-                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className="text-xl font-bold">{stat.value}</p>
                     </div>
                 ))}
             </div>
 
             {/* Roadmap */}
-            <div className="glass-card p-6">
-                <h2 className="text-xl font-bold mb-6">Training Roadmap</h2>
+            <div className="card p-5">
+                <h2 className="text-lg font-semibold mb-5">Your Roadmap</h2>
 
                 <div className="space-y-4">
                     {ranks.map((rank, index) => (
                         <div
                             key={rank.name}
-                            className={`flex items-start gap-4 ${rank.completed
-                                    ? "opacity-60"
+                            className={`flex items-start gap-3 ${rank.completed
+                                    ? "opacity-50"
                                     : rank.active
                                         ? ""
                                         : "opacity-40"
@@ -137,14 +137,14 @@ export default function ProgressPage() {
                             {/* Timeline indicator */}
                             <div className="flex flex-col items-center">
                                 <div
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${rank.completed
+                                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${rank.completed
                                             ? "bg-[var(--success)] text-white"
                                             : rank.active
                                                 ? "bg-[var(--primary)] text-white"
-                                                : rank.hellWeek
-                                                    ? "bg-[var(--primary-muted)] text-[var(--primary)]"
-                                                    : rank.commander
-                                                        ? "bg-[var(--accent-muted)] text-[var(--accent)]"
+                                                : rank.finalWeek
+                                                    ? "bg-[var(--warning-muted)] text-[var(--warning)]"
+                                                    : rank.master
+                                                        ? "rank-master"
                                                         : "bg-[var(--background-secondary)] text-[var(--foreground-muted)]"
                                         }`}
                                 >
@@ -170,7 +170,7 @@ export default function ProgressPage() {
                                 </div>
                                 {index < ranks.length - 1 && (
                                     <div
-                                        className={`w-0.5 h-12 ${rank.completed
+                                        className={`w-0.5 h-10 ${rank.completed
                                                 ? "bg-[var(--success)]"
                                                 : "bg-[var(--background-secondary)]"
                                             }`}
@@ -179,27 +179,24 @@ export default function ProgressPage() {
                             </div>
 
                             {/* Rank info */}
-                            <div className="flex-1 pb-4">
-                                <div className="flex items-center gap-3 mb-1">
+                            <div className="flex-1 pb-2">
+                                <div className="flex items-center gap-2 mb-0.5">
                                     <span
-                                        className={`font-bold ${rank.active ? "text-[var(--primary)]" : ""
+                                        className={`font-semibold text-sm ${rank.active ? "text-[var(--primary)]" : ""
                                             }`}
                                     >
                                         {rank.name}
                                     </span>
-                                    <span className="text-sm text-[var(--foreground-muted)]">
+                                    <span className="text-xs text-[var(--foreground-muted)]">
                                         {rank.days}
                                     </span>
                                     {rank.active && (
-                                        <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--primary-muted)] text-[var(--primary)] font-medium">
-                                            CURRENT
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--primary-muted)] text-[var(--primary)] font-medium">
+                                            NOW
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-sm text-[var(--foreground-muted)] mb-1">
-                                    {rank.description}
-                                </p>
-                                <p className="text-sm text-[var(--foreground-muted)]">
+                                <p className="text-xs text-[var(--foreground-muted)]">
                                     Unlocks: {rank.unlocks}
                                 </p>
                             </div>

@@ -1,20 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
 export const metadata: Metadata = {
-  title: "MindCamp - Bootcamp for Your Brain",
-  description: "Journal daily or lose your rank. Build lasting journaling habits with bootcamp structure and discovery mechanics.",
-  keywords: ["journal", "journaling", "mindfulness", "self-improvement", "habit", "streak"],
+  title: "MindCamp - Build the habit of knowing yourself",
+  description: "A simple daily journal that helps you reflect, track patterns, and build consistency. 2 minutes a day, real insights over time.",
+  keywords: ["journal", "journaling", "mindfulness", "self-improvement", "habit", "daily journal"],
   authors: [{ name: "MindCamp" }],
   openGraph: {
-    title: "MindCamp - Bootcamp for Your Brain",
-    description: "Journal daily or lose your rank.",
+    title: "MindCamp - Build the habit of knowing yourself",
+    description: "A simple daily journal for reflection and self-discovery.",
     type: "website",
   },
 };
@@ -25,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased`}>
+    <html lang="en">
+      <body className="font-sans antialiased">
         {children}
       </body>
     </html>

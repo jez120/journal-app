@@ -15,27 +15,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             {/* Header */}
-            <header className="fixed top-0 left-0 right-0 z-50 glass-card !rounded-none border-x-0 border-t-0">
+            <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-lg border-b border-[var(--card-border)]">
                 <div className="container-app">
                     <div className="flex items-center justify-between h-16">
                         <Link href="/today" className="flex items-center gap-2">
-                            <span className="text-2xl">🎖️</span>
-                            <span className="font-bold text-xl tracking-tight">MindCamp</span>
+                            <span className="text-2xl">📔</span>
+                            <span className="font-semibold text-xl">MindCamp</span>
                         </Link>
 
                         {/* Streak indicator */}
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--primary-muted)]">
-                                <span className="text-lg fire-glow">🔥</span>
-                                <span className="font-bold text-[var(--primary)]">12</span>
+                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--warning-muted)]">
+                                <span className="text-lg">🔥</span>
+                                <span className="font-bold text-[var(--warning)]">12</span>
                             </div>
 
                             {/* User menu */}
-                            <div className="relative">
-                                <button className="w-9 h-9 rounded-full bg-[var(--background-secondary)] border border-[var(--glass-border)] flex items-center justify-center text-sm font-medium hover:border-[var(--primary)] transition-colors">
-                                    JD
-                                </button>
-                            </div>
+                            <button className="w-9 h-9 rounded-full bg-[var(--background-secondary)] border border-[var(--card-border)] flex items-center justify-center text-sm font-medium hover:border-[var(--primary)] transition-colors">
+                                JD
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -47,7 +45,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </main>
 
             {/* Bottom navigation (mobile) */}
-            <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card !rounded-none border-x-0 border-b-0 md:hidden">
+            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-lg border-t border-[var(--card-border)] md:hidden">
                 <div className="flex items-center justify-around h-16">
                     {navItems.map((item) => (
                         <Link
@@ -74,7 +72,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${pathname === item.href
                                     ? "bg-[var(--primary-muted)] text-[var(--primary)]"
-                                    : "text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--glass-bg)]"
+                                    : "text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--background-secondary)]"
                                 }`}
                         >
                             <span className="text-xl">{item.icon}</span>
@@ -85,23 +83,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
                 {/* Rank badge */}
                 <div className="mt-auto">
-                    <div className="glass-card p-4">
+                    <div className="card p-4">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="rank-badge rank-soldier">
-                                🎖️ Soldier
+                            <div className="rank-badge rank-regular">
+                                Regular
                             </div>
                         </div>
                         <div className="text-sm text-[var(--foreground-muted)]">
-                            Day 12 of Training
+                            Day 15 of your journey
                         </div>
                         <div className="w-full h-2 bg-[var(--background-secondary)] rounded-full mt-2 overflow-hidden">
                             <div
                                 className="h-full bg-[var(--success)] rounded-full"
-                                style={{ width: "40%" }}
+                                style={{ width: "24%" }}
                             />
                         </div>
                         <p className="text-xs text-[var(--foreground-muted)] mt-2">
-                            18 days until Officer rank
+                            15 days until Veteran rank
                         </p>
                     </div>
                 </div>

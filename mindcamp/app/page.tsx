@@ -11,14 +11,14 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen radial-glow grid-pattern">
+    <div className="min-h-screen">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glass-card !rounded-none border-x-0 border-t-0">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-lg border-b border-[var(--card-border)]">
         <div className="container-app">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🎖️</span>
-              <span className="font-bold text-xl tracking-tight">MindCamp</span>
+              <span className="text-2xl">📔</span>
+              <span className="font-semibold text-xl">MindCamp</span>
             </div>
             <div className="flex items-center gap-4">
               <Link
@@ -27,7 +27,7 @@ export default function LandingPage() {
               >
                 Log in
               </Link>
-              <Link href="/signup" className="btn-primary !py-3 !px-6 text-sm">
+              <Link href="/signup" className="btn-primary !py-2.5 !px-5 text-sm">
                 Start Free
               </Link>
             </div>
@@ -36,38 +36,38 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="pt-32 pb-20 relative z-10">
+      <main className="pt-28 pb-20">
         <div className="container-app">
           <div
-            className={`max-w-4xl mx-auto text-center transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            className={`max-w-3xl mx-auto text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
           >
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary-muted)] text-[var(--primary)] text-sm font-medium mb-8">
-              <span className="animate-pulse">🔥</span>
-              <span>Build habits that stick</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--primary-muted)] text-[var(--primary)] text-sm font-medium mb-6">
+              <span>✨</span>
+              <span>Build lasting habits</span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Bootcamp for{" "}
-              <span className="gradient-text">your brain.</span>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-[var(--foreground)]">
+              Build the habit of{" "}
+              <span className="text-[var(--primary)]">knowing yourself.</span>
             </h1>
 
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-[var(--foreground-muted)] mb-10 max-w-2xl mx-auto leading-relaxed">
-              Journal daily or lose your rank. Build lasting habits with bootcamp
-              structure, streaks, and insights from your own data.
+            <p className="text-lg md:text-xl text-[var(--foreground-muted)] mb-10 max-w-xl mx-auto leading-relaxed">
+              A simple daily journal that helps you reflect, track patterns, and
+              build consistency. 2 minutes a day, real insights over time.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link href="/signup" className="btn-primary text-lg w-full sm:w-auto">
                 Start Free Trial
               </Link>
-              <button className="btn-secondary text-lg w-full sm:w-auto">
+              <Link href="#how-it-works" className="btn-secondary text-lg w-full sm:w-auto">
                 See how it works
-              </button>
+              </Link>
             </div>
 
             {/* Trust indicators */}
@@ -88,112 +88,107 @@ export default function LandingPage() {
                 <svg className="w-5 h-5 text-[var(--success)]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span>Cancel anytime</span>
+                <span>2 minutes per day</span>
               </div>
             </div>
           </div>
 
-          {/* Feature Cards */}
+          {/* How it works */}
           <div
-            className={`grid md:grid-cols-3 gap-6 mt-24 transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            id="how-it-works"
+            className={`mt-24 transition-all duration-700 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
           >
-            <FeatureCard
-              icon="📖"
-              title="Forced Reflection"
-              description="Read yesterday's entry before writing today's. Build a continuous narrative of your life."
-            />
-            <FeatureCard
-              icon="🎖️"
-              title="Rank Progression"
-              description="Advance through ranks: Recruit → Soldier → Officer → Commander. Miss days? Lose your progress."
-            />
-            <FeatureCard
-              icon="🔍"
-              title="Discovery Engine"
-              description="Surface patterns from your own data. See what words you use most and how your writing changes over time."
-            />
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
+              How it works
+            </h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              <FeatureCard
+                icon="📖"
+                title="Read yesterday"
+                description="Start each session by reading what you wrote yesterday. This builds continuity and self-awareness."
+              />
+              <FeatureCard
+                icon="✏️"
+                title="Write today"
+                description="Answer a simple prompt with 2-3 sentences. Takes under 2 minutes. Consistency over quantity."
+              />
+              <FeatureCard
+                icon="💡"
+                title="See patterns"
+                description="Over time, discover insights from your own words. What themes keep appearing? What's changing?"
+              />
+            </div>
           </div>
 
           {/* Progression Preview */}
           <div
-            className={`mt-24 glass-card p-8 md:p-12 transition-all duration-1000 delay-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            className={`mt-24 card p-8 md:p-10 transition-all duration-700 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
           >
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
               Your 63-Day Journey
             </h2>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               <ProgressStep
                 day="Day 0-3"
                 rank="Guest"
                 description="Free trial"
-                active={false}
               />
-              <ProgressArrow />
               <ProgressStep
                 day="Day 4-14"
-                rank="Recruit"
-                description="Build foundation"
-                active={false}
+                rank="Member"
+                description="Week view"
               />
-              <ProgressArrow />
               <ProgressStep
                 day="Day 15-30"
-                rank="Soldier"
-                description="Unlock insights"
-                active={false}
+                rank="Regular"
+                description="Keyword tracking"
               />
-              <ProgressArrow />
               <ProgressStep
                 day="Day 31-56"
-                rank="Officer"
-                description="Advanced features"
-                active={false}
+                rank="Veteran"
+                description="Month compare"
               />
-              <ProgressArrow />
               <ProgressStep
                 day="Day 57-63"
-                rank="Hell Week"
-                description="Final test"
-                active={false}
-                hellWeek
+                rank="Final Week"
+                description="The challenge"
+                highlight
               />
-              <ProgressArrow />
               <ProgressStep
                 day="Day 64+"
-                rank="Commander"
-                description="Full access forever"
-                active={false}
-                commander
+                rank="Master"
+                description="Full access"
+                master
               />
             </div>
           </div>
 
           {/* Social Proof */}
           <div
-            className={`mt-24 text-center transition-all duration-1000 delay-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            className={`mt-24 text-center transition-all duration-700 delay-400 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
           >
             <p className="text-[var(--foreground-muted)] mb-8">
-              Join thousands building unbreakable journaling habits
+              Join thousands building lasting journaling habits
             </p>
             <div className="flex flex-wrap justify-center gap-8 md:gap-16">
-              <Stat value="10,000+" label="Active users" />
+              <Stat value="10K+" label="Active users" />
               <Stat value="2.5M" label="Entries written" />
-              <Stat value="68%" label="Complete training" />
+              <Stat value="68%" label="Complete journey" />
             </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[var(--glass-border)] py-8 relative z-10">
+      <footer className="border-t border-[var(--card-border)] py-8">
         <div className="container-app">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-xl">🎖️</span>
-              <span className="font-bold">MindCamp</span>
+              <span className="text-xl">📔</span>
+              <span className="font-semibold">MindCamp</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-[var(--foreground-muted)]">
               <Link href="/privacy" className="hover:text-[var(--foreground)] transition-colors">
@@ -207,7 +202,7 @@ export default function LandingPage() {
               </Link>
             </div>
             <p className="text-sm text-[var(--foreground-muted)]">
-              © 2026 MindCamp. All rights reserved.
+              © 2026 MindCamp
             </p>
           </div>
         </div>
@@ -226,10 +221,10 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="glass-card p-6 hover:scale-[1.02] transition-transform duration-300">
-      <div className="text-4xl mb-4">{icon}</div>
-      <h3 className="text-xl font-bold mb-2">{title}</h3>
-      <p className="text-[var(--foreground-muted)] leading-relaxed">{description}</p>
+    <div className="card p-6 hover:shadow-lg transition-shadow">
+      <div className="text-3xl mb-4">{icon}</div>
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-[var(--foreground-muted)] text-sm leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -238,41 +233,29 @@ function ProgressStep({
   day,
   rank,
   description,
-  active,
-  hellWeek,
-  commander,
+  highlight,
+  master,
 }: {
   day: string;
   rank: string;
   description: string;
-  active: boolean;
-  hellWeek?: boolean;
-  commander?: boolean;
+  highlight?: boolean;
+  master?: boolean;
 }) {
   return (
-    <div className={`text-center flex-1 ${active ? "opacity-100" : "opacity-70"}`}>
+    <div className="text-center">
       <div
-        className={`inline-block px-4 py-2 rounded-lg text-sm font-bold mb-2 ${commander
-            ? "bg-[var(--accent-muted)] text-[var(--accent)]"
-            : hellWeek
-              ? "bg-[var(--primary-muted)] text-[var(--primary)]"
-              : "bg-[var(--glass-bg)] text-[var(--foreground)]"
+        className={`inline-block px-3 py-1.5 rounded-full text-xs font-semibold mb-2 ${master
+            ? "rank-master"
+            : highlight
+              ? "rank-finalweek"
+              : "bg-[var(--background-secondary)] text-[var(--foreground-muted)]"
           }`}
       >
         {rank}
       </div>
-      <p className="text-xs text-[var(--foreground-muted)] mb-1">{day}</p>
-      <p className="text-xs text-[var(--foreground-muted)] hidden md:block">{description}</p>
-    </div>
-  );
-}
-
-function ProgressArrow() {
-  return (
-    <div className="hidden md:flex items-center justify-center text-[var(--foreground-muted)]">
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
+      <p className="text-xs text-[var(--foreground-muted)]">{day}</p>
+      <p className="text-xs text-[var(--foreground-muted)] mt-1 hidden md:block">{description}</p>
     </div>
   );
 }
@@ -280,7 +263,7 @@ function ProgressArrow() {
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="text-center">
-      <div className="text-3xl md:text-4xl font-bold gradient-text">{value}</div>
+      <div className="text-3xl md:text-4xl font-bold text-[var(--primary)]">{value}</div>
       <div className="text-sm text-[var(--foreground-muted)] mt-1">{label}</div>
     </div>
   );

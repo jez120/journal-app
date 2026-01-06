@@ -1,50 +1,66 @@
 @import "tailwindcss";
 
-/* MindCamp Design System */
+/* MindCamp Design System v1.1 - iOS Neutral Theme */
+
 :root {
-  /* Dark theme by default */
-  --background: #0a0a0f;
-  --background-secondary: #12121a;
-  --background-tertiary: #1a1a24;
-  --foreground: #f5f5f7;
-  --foreground-muted: #8b8b99;
-  
-  /* Brand colors - Military/Bootcamp inspired */
-  --primary: #e63946;
-  --primary-hover: #ff4d5a;
-  --primary-muted: rgba(230, 57, 70, 0.15);
-  
-  /* Accent - Gold for ranks and achievements */
-  --accent: #ffd700;
-  --accent-muted: rgba(255, 215, 0, 0.15);
-  
-  /* Status colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
-  --gradient-dark: linear-gradient(180deg, #0a0a0f 0%, #1a1a24 100%);
-  --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-  
-  /* Glass effects */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  
+  /* Light mode (default) - iOS semantic colors */
+  --background: #FFFFFF;
+  --background-secondary: #F2F2F7;
+  --background-tertiary: #E5E5EA;
+  --foreground: #000000;
+  --foreground-secondary: #3C3C43;
+  --foreground-muted: #8E8E93;
+
+  /* iOS System Colors */
+  --primary: #007AFF;
+  --primary-hover: #0056CC;
+  --primary-muted: rgba(0, 122, 255, 0.12);
+
+  --success: #34C759;
+  --success-muted: rgba(52, 199, 89, 0.12);
+
+  --warning: #FF9500;
+  --warning-muted: rgba(255, 149, 0, 0.12);
+
+  --danger: #FF3B30;
+  --danger-muted: rgba(255, 59, 48, 0.12);
+
+  /* Accent for achievements */
+  --accent: #AF52DE;
+  --accent-muted: rgba(175, 82, 222, 0.12);
+
+  /* Card & Surface */
+  --card-bg: #FFFFFF;
+  --card-border: rgba(0, 0, 0, 0.08);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
   /* Spacing */
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --background-secondary: #1C1C1E;
+    --background-tertiary: #2C2C2E;
+    --foreground: #FFFFFF;
+    --foreground-secondary: #EBEBF5;
+    --foreground-muted: #8E8E93;
+
+    --card-bg: #1C1C1E;
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -58,134 +74,89 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   min-height: 100vh;
-  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
-/* Glass Card */
-.glass-card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+/* iOS-style Card */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--card-shadow);
 }
 
-/* Primary Button */
+/* Primary Button - iOS style */
 .btn-primary {
-  background: var(--gradient-primary);
+  background: var(--primary);
   color: white;
   font-weight: 600;
-  padding: 16px 32px;
+  padding: 14px 24px;
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
   font-size: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(230, 57, 70, 0.4);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(230, 57, 70, 0.5);
+  background: var(--primary-hover);
+  transform: scale(1.02);
 }
 
 .btn-primary:active {
-  transform: translateY(0);
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Secondary Button */
 .btn-secondary {
-  background: var(--glass-bg);
+  background: var(--background-secondary);
   color: var(--foreground);
   font-weight: 600;
-  padding: 16px 32px;
+  padding: 14px 24px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--card-border);
   cursor: pointer;
   font-size: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--background-tertiary);
 }
 
 /* Streak Fire Effect */
 .fire-glow {
-  text-shadow: 0 0 20px rgba(230, 57, 70, 0.8),
-               0 0 40px rgba(230, 57, 70, 0.6),
-               0 0 60px rgba(230, 57, 70, 0.4);
-  animation: firePulse 2s ease-in-out infinite;
+  color: var(--warning);
 }
 
-@keyframes firePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-/* Floating animation */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Gradient text */
-.gradient-text {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Grid pattern overlay */
-.grid-pattern {
-  background-image: 
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 50px 50px;
-}
-
-/* Radial glow background */
-.radial-glow {
-  position: relative;
-}
-
-.radial-glow::before {
-  content: '';
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(230, 57, 70, 0.15) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Input styles */
+/* Input styles - iOS */
 .input-base {
   background: var(--background-secondary);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  padding: 14px 18px;
+  padding: 14px 16px;
   color: var(--foreground);
   font-size: 1rem;
   transition: all 0.2s ease;
@@ -202,59 +173,45 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--foreground-muted);
 }
 
-/* Rank badge styles */
+/* Rank badges - Neutral naming */
 .rank-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 100px;
   font-size: 0.875rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .rank-guest {
-  background: var(--glass-bg);
+  background: var(--background-secondary);
   color: var(--foreground-muted);
-  border: 1px solid var(--glass-border);
 }
 
-.rank-recruit {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+.rank-member {
+  background: var(--primary-muted);
+  color: var(--primary);
 }
 
-.rank-soldier {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+.rank-regular {
+  background: var(--success-muted);
+  color: var(--success);
 }
 
-.rank-officer {
-  background: rgba(139, 92, 246, 0.15);
-  color: #a78bfa;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-}
-
-.rank-commander {
+.rank-veteran {
   background: var(--accent-muted);
   color: var(--accent);
-  border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
-/* Page transitions */
-.page-enter {
-  opacity: 0;
-  transform: translateY(10px);
+.rank-finalweek {
+  background: var(--warning-muted);
+  color: var(--warning);
 }
 
-.page-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.3s, transform 0.3s;
+.rank-master {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000;
 }
 
 /* Responsive container */
@@ -262,7 +219,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 20px;
 }
 
 @media (max-width: 768px) {
@@ -288,10 +245,35 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--glass-border);
+  background: var(--foreground-muted);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--foreground-secondary);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

@@ -6,8 +6,8 @@ import { useState } from "react";
 const mockEntries = [
     {
         id: "1",
-        date: "2026-01-05",
-        displayDate: "Today · January 5, 2026",
+        date: "2026-01-06",
+        displayDate: "Today · January 6, 2026",
         content:
             "Feeling good after completing the project. Tomorrow I need to start planning Q2. The team meeting went well and everyone seems aligned on the goals.",
         reflection:
@@ -15,8 +15,8 @@ const mockEntries = [
     },
     {
         id: "2",
-        date: "2026-01-04",
-        displayDate: "Yesterday · January 4, 2026",
+        date: "2026-01-05",
+        displayDate: "Yesterday · January 5, 2026",
         content:
             "Had a tough meeting with client. Felt unprepared and caught off guard by their feedback. Need to do better research next time. On the bright side, the team was supportive.",
         reflection:
@@ -24,26 +24,26 @@ const mockEntries = [
     },
     {
         id: "3",
-        date: "2026-01-03",
-        displayDate: "January 3, 2026",
+        date: "2026-01-04",
+        displayDate: "January 4, 2026",
         content:
             "Started the new project today. Excited but also nervous about the timeline. The scope seems manageable if we stay focused.",
         reflection: "New beginnings always feel exciting. I hope this momentum continues.",
     },
     {
         id: "4",
-        date: "2026-01-02",
-        displayDate: "January 2, 2026",
+        date: "2026-01-03",
+        displayDate: "January 3, 2026",
         content:
             "Back to work after the break. Feeling refreshed and ready to tackle everything. Had some good ideas during my time off.",
         reflection: "Rest really does help with perspective.",
     },
     {
         id: "5",
-        date: "2026-01-01",
-        displayDate: "January 1, 2026",
+        date: "2026-01-02",
+        displayDate: "January 2, 2026",
         content:
-            "New year, new goals. I want to be more consistent this year. Starting with journaling every day.",
+            "New year resolutions on my mind. I want to be more consistent this year. Starting with journaling every day.",
         reflection: "Felt hopeful about the year ahead.",
     },
 ];
@@ -69,19 +69,19 @@ export default function HistoryPage() {
     return (
         <div className="max-w-2xl mx-auto md:ml-68">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold mb-1">History</h1>
-                    <p className="text-[var(--foreground-muted)]">
+                    <h1 className="text-2xl font-bold mb-1">History</h1>
+                    <p className="text-sm text-[var(--foreground-muted)]">
                         {mockEntries.length} entries
                     </p>
                 </div>
                 <button
                     onClick={handleExport}
-                    className="btn-secondary flex items-center gap-2"
+                    className="btn-secondary flex items-center gap-2 !py-2 !px-4 text-sm"
                 >
                     <svg
-                        className="w-5 h-5"
+                        className="w-4 h-4"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -98,27 +98,27 @@ export default function HistoryPage() {
             </div>
 
             {/* Entries list */}
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {mockEntries.map((entry) => (
-                    <div key={entry.id} className="glass-card overflow-hidden">
+                    <div key={entry.id} className="card overflow-hidden">
                         <button
                             onClick={() => toggleEntry(entry.id)}
-                            className="w-full p-5 text-left"
+                            className="w-full p-4 text-left"
                         >
                             <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
-                                    <p className="text-sm text-[var(--foreground-muted)] mb-2">
+                                    <p className="text-xs text-[var(--foreground-muted)] mb-2">
                                         {entry.displayDate}
                                     </p>
                                     <p
-                                        className={`text-[var(--foreground)] ${expandedEntry === entry.id ? "" : "line-clamp-2"
+                                        className={`text-sm text-[var(--foreground)] ${expandedEntry === entry.id ? "" : "line-clamp-2"
                                             }`}
                                     >
                                         &quot;{entry.content}&quot;
                                     </p>
                                 </div>
                                 <svg
-                                    className={`w-5 h-5 text-[var(--foreground-muted)] flex-shrink-0 transition-transform ${expandedEntry === entry.id ? "rotate-180" : ""
+                                    className={`w-4 h-4 text-[var(--foreground-muted)] flex-shrink-0 transition-transform ${expandedEntry === entry.id ? "rotate-180" : ""
                                         }`}
                                     fill="none"
                                     viewBox="0 0 24 24"
@@ -135,12 +135,12 @@ export default function HistoryPage() {
                         </button>
 
                         {expandedEntry === entry.id && (
-                            <div className="px-5 pb-5 pt-0 border-t border-[var(--glass-border)]">
-                                <div className="pt-4">
-                                    <p className="text-sm text-[var(--foreground-muted)] mb-2">
+                            <div className="px-4 pb-4 pt-0 border-t border-[var(--card-border)]">
+                                <div className="pt-3">
+                                    <p className="text-xs text-[var(--foreground-muted)] mb-1">
                                         Reflection:
                                     </p>
-                                    <p className="text-[var(--foreground)] italic">
+                                    <p className="text-sm text-[var(--foreground)] italic">
                                         &quot;{entry.reflection}&quot;
                                     </p>
                                 </div>
@@ -151,8 +151,8 @@ export default function HistoryPage() {
             </div>
 
             {/* Load more */}
-            <div className="text-center mt-8">
-                <button className="text-[var(--primary)] hover:text-[var(--primary-hover)] font-medium transition-colors">
+            <div className="text-center mt-6">
+                <button className="text-[var(--primary)] hover:underline text-sm font-medium">
                     Load more entries...
                 </button>
             </div>
