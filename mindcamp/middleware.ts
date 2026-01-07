@@ -1,38 +1,43 @@
-import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default withAuth(
-    function middleware(req) {
-        // Middleware runs after auth check
+export async function middleware(request: NextRequest) {
+    const path = request.nextUrl.pathname;
+
+    // Public paths - no auth required
+    const publicPaths = ["/", "/login", "/signup", "/privacy", "/terms", "/paywall", "/onboarding"];
+
+    // Check if path is public
+    if (publicPaths.includes(path)) {
         return NextResponse.next();
-    },
-    {
-        callbacks: {
-            authorized: ({ token, req }) => {
-                const path = req.nextUrl.pathname;
-
-                // Public paths - no auth required
-                const publicPaths = ["/", "/login", "/signup", "/privacy", "/terms", "/paywall"];
-                if (publicPaths.includes(path)) {
-                    return true;
-                }
-
-                // API auth routes are public
-                if (path.startsWith("/api/auth")) {
-                    return true;
-                }
-
-                // Webhook routes are public (Stripe needs to call them)
-                if (path.startsWith("/api/webhooks")) {
-                    return true;
-                }
-
-                // All other paths require auth
-                return !!token;
-            },
-        },
     }
-);
+
+    // API auth routes are public
+    if (path.startsWith("/api/auth")) {
+        return NextResponse.next();
+    }
+
+    // Webhook routes are public (Stripe needs to call them)
+    if (path.startsWith("/api/webhooks")) {
+        return NextResponse.next();
+    }
+
+    // Check for auth token
+    const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    // Redirect to login if not authenticated
+    if (!token) {
+        const loginUrl = new URL("/login", request.url);
+        loginUrl.searchParams.set("callbackUrl", path);
+        return NextResponse.redirect(loginUrl);
+    }
+
+    return NextResponse.next();
+}
 
 export const config = {
     matcher: [
