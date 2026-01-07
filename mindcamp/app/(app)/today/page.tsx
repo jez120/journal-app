@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { YesterdayIcon, TodayIcon, ReflectIcon } from "@/components/JournalIcons";
+import { InsightsContainer } from "@/components/InsightCard";
+
+interface Insight {
+    type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement";
+    title: string;
+    content: string;
+}
 
 // Prompts for different moods/contexts
 const prompts = [
@@ -29,6 +36,7 @@ export default function TodayPage() {
     const [yesterdayEntry, setYesterdayEntry] = useState<Entry | null>(null);
     const [todayEntry, setTodayEntry] = useState<Entry | null>(null);
     const [userProgress, setUserProgress] = useState<{ currentDay: number; streakCount: number; currentRank: string } | null>(null);
+    const [insights, setInsights] = useState<Insight[]>([]);
 
     // Use deterministic prompt based on date to prevent hydration mismatch
     const [currentPrompt] = useState(() => {
@@ -113,6 +121,17 @@ export default function TodayPage() {
                 const data = await progressRes.json();
                 setUserProgress(data);
             }
+
+            // Generate and fetch insights
+            try {
+                const insightsRes = await fetch("/api/insights", { method: "POST" });
+                if (insightsRes.ok) {
+                    const insightsData = await insightsRes.json();
+                    setInsights(insightsData.insights || []);
+                }
+            } catch (insightErr) {
+                console.error("Error fetching insights:", insightErr);
+            }
         } catch (err) {
             console.error("Error saving entry:", err);
             setError("Failed to save entry. Please try again.");
@@ -153,8 +172,8 @@ export default function TodayPage() {
 
     if (isSubmitted) {
         return (
-            <div className="animate-fade-in">
-                <div className="text-center py-8">
+            <div className="animate-fade-in space-y-6">
+                <div className="text-center py-6">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--system-green)] text-white text-3xl mb-4">
                         ✓
                     </div>
@@ -162,19 +181,30 @@ export default function TodayPage() {
                     <p className="text-white/60 mb-4">
                         Day {currentDay} complete · Streak: <span className="text-[#FF9500] font-semibold">{streakCount} days</span> 🔥
                     </p>
-                    <div className="inline-block mb-6">
+                    <div className="inline-block mb-4">
                         <span className={`${getRankBadgeClass()} bg-white/10 text-white`}>{getRankLabel()}</span>
                     </div>
-
-                    <button
-                        onClick={() => {
-                            setIsSubmitted(false);
-                        }}
-                        className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-3.5 rounded-xl transition-colors"
-                    >
-                        Done
-                    </button>
                 </div>
+
+                {/* Insights Section */}
+                {insights.length > 0 && (
+                    <InsightsContainer
+                        insights={insights}
+                        onDismiss={(index) => {
+                            setInsights(prev => prev.filter((_, i) => i !== index));
+                        }}
+                    />
+                )}
+
+                <button
+                    onClick={() => {
+                        setIsSubmitted(false);
+                        setInsights([]);
+                    }}
+                    className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-3.5 rounded-xl transition-colors"
+                >
+                    Done
+                </button>
             </div>
         );
     }
