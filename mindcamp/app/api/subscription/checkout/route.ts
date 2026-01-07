@@ -7,6 +7,10 @@ import prisma from "@/lib/db";
 // POST /api/subscription/checkout - Create Stripe checkout session
 export async function POST(request: Request) {
     try {
+        if (!stripe) {
+            return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+        }
+
         const session = await getServerSession(authOptions);
 
         if (!session?.user?.id) {
