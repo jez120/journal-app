@@ -36,6 +36,9 @@ export default withAuth(
 
 export const config = {
     matcher: [
-        "/((?!_next/static|_next/image|favicon.ico).*)",
+        // Match all paths except:
+        // - _next (Next.js assets)
+        // - static files with common extensions
+        "/((?!_next/static|_next/image|favicon.ico|icon.png|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$|.*\\.webp$|.*\\.ico$).*)",
     ],
 };

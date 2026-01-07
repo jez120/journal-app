@@ -2,19 +2,28 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import {
+    AppLogo,
+    HabitIcon,
+    UnderstandIcon,
+    TrackIcon,
+    MeditateIcon,
+    WriteIcon,
+    ReadIcon,
+    InsightsIcon,
+    WarningIcon
+} from "@/components/JournalIcons";
 
 type Step = "goal" | "rules";
 
 const goals = [
-    { id: "habit", icon: "🎯", label: "Build a journaling habit" },
-    { id: "understand", icon: "🔍", label: "Understand myself better" },
-    { id: "track", icon: "📈", label: "Track my progress" },
-    { id: "reflect", icon: "🧘", label: "Daily reflection practice" },
+    { id: "habit", Icon: HabitIcon, label: "Build a journaling habit" },
+    { id: "understand", Icon: UnderstandIcon, label: "Understand myself better" },
+    { id: "track", Icon: TrackIcon, label: "Track my progress" },
+    { id: "reflect", Icon: MeditateIcon, label: "Daily reflection practice" },
 ];
 
 export default function OnboardingPage() {
-    const { data: session } = useSession();
     const [step, setStep] = useState<Step>("goal");
     const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -54,9 +63,9 @@ export default function OnboardingPage() {
             <div className="w-full max-w-md">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center gap-2">
-                        <span className="text-3xl">📔</span>
-                        <span className="text-2xl font-semibold">Clarity Journal</span>
+                    <div className="inline-flex items-center gap-3">
+                        <AppLogo className="w-10 h-10" />
+                        <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </div>
                 </div>
 
@@ -79,12 +88,12 @@ export default function OnboardingPage() {
                                         key={goal.id}
                                         onClick={() => setSelectedGoal(goal.id)}
                                         className={`w-full p-4 rounded-xl text-left transition-all ${selectedGoal === goal.id
-                                                ? "bg-[rgba(0,122,255,0.15)] border-2 border-[var(--accent-color)]"
-                                                : "bg-[var(--tertiary-fill)] border-2 border-transparent"
+                                            ? "bg-[rgba(0,122,255,0.15)] border-2 border-[var(--accent-color)]"
+                                            : "bg-[var(--tertiary-fill)] border-2 border-transparent"
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <span className="text-xl">{goal.icon}</span>
+                                            <goal.Icon className="w-7 h-7" />
                                             <span className="font-medium">{goal.label}</span>
                                         </div>
                                     </button>
@@ -105,10 +114,10 @@ export default function OnboardingPage() {
                             <p className="text-[var(--secondary-label)] text-center mb-8">Simple rules for lasting results</p>
 
                             <div className="space-y-6">
-                                <RuleItem icon="📝" title="Write 2-3 sentences daily" description="Under 2 minutes. Consistency over quantity." />
-                                <RuleItem icon="📖" title="Read yesterday's entry first" description="Builds continuity and self-awareness." />
-                                <RuleItem icon="📊" title="See patterns emerge" description="Insights from your own words over time." />
-                                <RuleItem icon="⚠️" title="Miss days = lose progress" description="Grace tokens help if you slip up." />
+                                <RuleItem Icon={WriteIcon} title="Write 2-3 sentences daily" description="Under 2 minutes. Consistency over quantity." />
+                                <RuleItem Icon={ReadIcon} title="Read yesterday's entry first" description="Builds continuity and self-awareness." />
+                                <RuleItem Icon={InsightsIcon} title="See patterns emerge" description="Insights from your own words over time." />
+                                <RuleItem Icon={WarningIcon} title="Miss days = lose progress" description="Grace tokens help if you slip up." />
                             </div>
 
                             <div className="mt-8 pt-6 border-t border-[var(--separator)] text-center">
@@ -129,10 +138,12 @@ export default function OnboardingPage() {
     );
 }
 
-function RuleItem({ icon, title, description }: { icon: string; title: string; description: string }) {
+function RuleItem({ Icon, title, description }: { Icon: React.ComponentType<{ className?: string }>; title: string; description: string }) {
     return (
         <div className="flex items-start gap-4">
-            <div className="text-2xl flex-shrink-0">{icon}</div>
+            <div className="flex-shrink-0">
+                <Icon className="w-8 h-8" />
+            </div>
             <div>
                 <p className="font-medium">{title}</p>
                 <p className="text-sm text-[var(--secondary-label)]">{description}</p>

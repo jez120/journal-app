@@ -75,16 +75,16 @@ export default function ProgressPage() {
 
             {/* Roadmap */}
             <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl">
-                <h2 className="font-semibold text-white mb-4">Your Roadmap</h2>
+                <h2 className="font-semibold text-white mb-4">Your Journey</h2>
                 <div className="space-y-3">
                     {ranks.map((rank, index) => (
-                        <div key={rank.name} className={`flex items-start gap-3 ${rank.completed ? "opacity-50" : rank.active ? "" : "opacity-40"}`}>
+                        <div key={rank.name} className={`flex items-start gap-3 ${rank.completed ? "opacity-80" : rank.active ? "" : "opacity-60"}`}>
                             <div className="flex flex-col items-center">
                                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${rank.completed ? "bg-[#34C759] text-white"
                                     : rank.active ? "bg-[#E05C4D] text-white"
                                         : rank.finalWeek ? "bg-[#FF9500]/20 text-[#FF9500]"
                                             : rank.master ? "bg-gradient-to-r from-yellow-400 to-orange-400 text-black"
-                                                : "bg-white/10 text-white/60"
+                                                : "bg-white/10 text-white/80"
                                     }`}>
                                     {rank.completed ? "✓" : rank.active ? "●" : index + 1}
                                 </div>
@@ -93,10 +93,10 @@ export default function ProgressPage() {
                             <div className="flex-1 pb-1">
                                 <div className="flex items-center gap-2">
                                     <span className={`font-medium text-sm ${rank.active ? "text-[#E05C4D]" : "text-white"}`}>{rank.name}</span>
-                                    <span className="text-xs text-white/50">{rank.days}</span>
+                                    <span className="text-xs text-white/70">{rank.days}</span>
                                     {rank.active && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#E05C4D]/20 text-[#E05C4D] font-medium">NOW</span>}
                                 </div>
-                                <p className="text-xs text-white/60">Unlocks: {rank.unlocks}</p>
+                                <p className="text-xs text-white/80">Unlocks: {rank.unlocks}</p>
                             </div>
                         </div>
                     ))}

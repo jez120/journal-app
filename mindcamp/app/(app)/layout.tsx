@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SessionProvider, useSession, signOut } from "next-auth/react";
 
@@ -53,9 +54,9 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="min-h-screen">
             {/* Navigation Bar */}
             <header className="fixed top-0 left-0 right-0 z-50 bg-[#1E3A5F]/80 backdrop-blur-lg border-b border-white/10 h-[60px]">
-                <div className="nav-bar-inner container-app h-full flex items-center justify-between">
+                <div className="h-full container-app flex items-center justify-between">
                     <Link href="/today" className="flex items-center gap-3">
-                        <img src="/icon.png" alt="Clarity Journal" width={32} height={32} className="rounded-lg" />
+                        <Image src="/icon.png" alt="Clarity Journal" width={32} height={32} className="rounded-lg" unoptimized />
                         <span className="font-semibold text-xl text-white">Clarity Journal</span>
                     </Link>
 

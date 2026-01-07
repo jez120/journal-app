@@ -76,7 +76,7 @@ function PaywallContent() {
                         <button
                             onClick={() => handleSubscribe("monthly")}
                             disabled={isLoading !== null}
-                            className="btn-secondary w-full"
+                            className="w-full bg-white/10 text-[#06B6D4] font-semibold py-3.5 rounded-xl transition-opacity hover:opacity-85 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             {isLoading === "monthly" ? "Loading..." : "Choose Monthly"}
                         </button>

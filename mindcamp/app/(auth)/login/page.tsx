@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 
@@ -43,7 +44,7 @@ export default function LoginPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <img src="/icon.png" alt="Clarity Journal" width={40} height={40} className="rounded-lg" />
+                        <Image src="/icon.png" alt="Clarity Journal" width={40} height={40} className="rounded-lg" unoptimized />
                         <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </Link>
                 </div>
@@ -51,7 +52,7 @@ export default function LoginPage() {
                 {/* Login Card */}
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-2xl shadow-xl">
                     <h1 className="text-xl font-bold text-center mb-1 text-white">Welcome back</h1>
-                    <p className="text-sm text-white/60 text-center mb-6">
+                    <p className="text-sm text-white/85 text-center mb-6">
                         Continue your journey
                     </p>
 
@@ -63,7 +64,7 @@ export default function LoginPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium mb-1.5 text-white/80">
+                            <label htmlFor="email" className="block text-sm font-medium mb-1.5 text-white/90">
                                 Email
                             </label>
                             <input
@@ -71,7 +72,7 @@ export default function LoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all"
+                                className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all"
                                 placeholder="you@example.com"
                                 required
                                 disabled={isLoading}
@@ -79,7 +80,7 @@ export default function LoginPage() {
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium mb-1.5 text-white/80">
+                            <label htmlFor="password" className="block text-sm font-medium mb-1.5 text-white/90">
                                 Password
                             </label>
                             <input
@@ -87,7 +88,7 @@ export default function LoginPage() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all"
+                                className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all"
                                 placeholder="••••••••"
                                 required
                                 disabled={isLoading}
@@ -95,7 +96,7 @@ export default function LoginPage() {
                         </div>
 
                         <div className="flex items-center justify-end">
-                            <Link href="/forgot-password" className="text-sm text-[#06B6D4] hover:text-[#22D3EE] transition-colors">
+                            <Link href="/forgot-password" className="text-sm text-[#22D3EE] hover:text-[#67E8F9] transition-colors min-h-[44px] flex items-center">
                                 Forgot password?
                             </Link>
                         </div>
@@ -105,10 +106,10 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <div className="mt-6 pt-6 border-t border-white/10 text-center">
-                        <p className="text-sm text-white/60">
+                    <div className="mt-6 pt-6 border-t border-white/15 text-center">
+                        <p className="text-sm text-white/85">
                             New to Clarity Journal?{" "}
-                            <Link href="/signup" className="text-[#06B6D4] font-medium hover:text-[#22D3EE] transition-colors">
+                            <Link href="/signup" className="text-[#22D3EE] font-medium hover:text-[#67E8F9] transition-colors">
                                 Start free trial
                             </Link>
                         </p>

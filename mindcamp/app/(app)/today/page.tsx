@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { YesterdayIcon, TodayIcon, ReflectIcon } from "@/components/JournalIcons";
 
 // Prompts for different moods/contexts
 const prompts = [
@@ -75,11 +76,12 @@ export default function TodayPage() {
 
     const wordCount = entry.trim().split(/\s+/).filter(Boolean).length;
     const minWords = 10;
-    const isValid = wordCount >= minWords;
+    const isShort = wordCount > 0 && wordCount < minWords;
+    const hasContent = entry.trim().length > 0;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isValid) return;
+        if (!hasContent) return;
 
         setIsSubmitting(true);
         setError("");
@@ -92,6 +94,7 @@ export default function TodayPage() {
                     content: entry,
                     reflection: reflection || null,
                     promptShown: currentPrompt,
+                    isLowSignal: isShort, // Tag short entries for insights weighting
                 }),
             });
 
@@ -182,7 +185,7 @@ export default function TodayPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-1">Today</h1>
-                    <p className="text-white/60">{formattedDate} · Day {currentDay}</p>
+                    <p className="text-white/85">{formattedDate} · Day {currentDay}</p>
                 </div>
                 <span className={`${getRankBadgeClass()} bg-white/10 text-white/90 border border-white/20`}>{getRankLabel()}</span>
             </div>
@@ -191,8 +194,8 @@ export default function TodayPage() {
             {yesterdayEntry && (
                 <section>
                     <div className="flex items-center gap-2 mb-2">
-                        <span>📖</span>
-                        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Yesterday</h2>
+                        <YesterdayIcon className="w-6 h-6" />
+                        <h2 className="text-sm font-semibold text-white/85 uppercase tracking-wide">Yesterday</h2>
                     </div>
                     <div className="bg-white/10 backdrop-blur-sm border border-white/20 p-4 rounded-xl">
                         <p className="text-white/90 text-[15px] leading-relaxed mb-3">
@@ -200,7 +203,7 @@ export default function TodayPage() {
                         </p>
                         {yesterdayEntry.reflection && (
                             <div className="pt-3 border-t border-white/10">
-                                <p className="text-xs text-white/50 mb-1">Reflection:</p>
+                                <p className="text-xs text-white/75 mb-1">Reflection:</p>
                                 <p className="text-sm text-white/80 italic">
                                     &quot;{yesterdayEntry.reflection}&quot;
                                 </p>
@@ -221,20 +224,24 @@ export default function TodayPage() {
                 {/* Prompt */}
                 <section>
                     <div className="flex items-center gap-2 mb-2">
-                        <span>✏️</span>
-                        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Today</h2>
+                        <TodayIcon className="w-6 h-6" />
+                        <h2 className="text-sm font-semibold text-white/85 uppercase tracking-wide">Today</h2>
                     </div>
                     <p className="text-lg font-medium text-white mb-3">{currentPrompt}</p>
                     <textarea
                         value={entry}
                         onChange={(e) => setEntry(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[140px] resize-none"
+                        className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[140px] resize-none"
                         placeholder="Write your thoughts here..."
                     />
                     <div className="flex items-center justify-between mt-2 text-xs">
-                        <span className="text-white/40">Min {minWords} words</span>
-                        <span className={isValid ? "text-[#34C759]" : "text-white/40"}>
-                            {wordCount} words {isValid && "✓"}
+                        {isShort ? (
+                            <span className="text-amber-400">💡 Add one more sentence for better insights</span>
+                        ) : (
+                            <span className="text-white/70">Write freely...</span>
+                        )}
+                        <span className={wordCount >= minWords ? "text-[#34C759]" : "text-white/70"}>
+                            {wordCount} words {wordCount >= minWords && "✓"}
                         </span>
                     </div>
                 </section>
@@ -242,19 +249,19 @@ export default function TodayPage() {
                 {/* Reflection */}
                 <section>
                     <div className="flex items-center gap-2 mb-2">
-                        <span>🪞</span>
-                        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Reflect</h2>
+                        <ReflectIcon className="w-6 h-6" />
+                        <h2 className="text-sm font-semibold text-white/85 uppercase tracking-wide">Reflect</h2>
                     </div>
-                    <p className="text-sm text-white/60 mb-2">How does today compare to yesterday?</p>
+                    <p className="text-sm text-white/85 mb-2">How does today compare to yesterday?</p>
                     <textarea
                         value={reflection}
                         onChange={(e) => setReflection(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[80px] resize-none"
+                        className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[80px] resize-none"
                         placeholder="Your reflection..."
                     />
                 </section>
 
-                <button type="submit" disabled={!isValid || isSubmitting} className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <button type="submit" disabled={!hasContent || isSubmitting} className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     {isSubmitting ? "Saving..." : todayEntry ? "Update Entry" : "Save Entry"}
                 </button>
             </form>
