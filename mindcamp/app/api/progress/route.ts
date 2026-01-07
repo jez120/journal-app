@@ -51,7 +51,7 @@ export async function GET() {
 
         // Convert entries to activity map
         const activityMap: Record<string, number> = {};
-        entries.forEach((entry) => {
+        entries.forEach((entry: { entryDate: Date; wordCount: number | null }) => {
             const dateStr = entry.entryDate.toISOString().split("T")[0];
             activityMap[dateStr] = 3; // 3 = complete entry
         });
