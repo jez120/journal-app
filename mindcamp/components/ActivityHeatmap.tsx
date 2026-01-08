@@ -91,15 +91,23 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
             weeks.push(week);
         }
 
-        // Build month labels
+        // Reverse weeks so most recent is on the left
+        weeks.reverse();
+        // Also reverse each week so days are in correct order
+        weeks.forEach(week => week.reverse());
+
+        // Build month labels (for reversed order)
         const monthLabels: { label: string; weekIndex: number }[] = [];
         weeks.forEach((week, weekIndex) => {
-            const firstDayOfWeek = week[0];
-            if (firstDayOfWeek.getDate() <= 7) {
-                const monthName = MONTHS[firstDayOfWeek.getMonth()];
-                const year = firstDayOfWeek.getFullYear();
+            const lastDayOfWeek = week[0]; // After reversing, this is the last day of the original week
+            if (lastDayOfWeek.getDate() >= 24 || weekIndex === 0) { // Show month at end of month or first
+                const monthName = MONTHS[lastDayOfWeek.getMonth()];
+                const year = lastDayOfWeek.getFullYear();
                 const label = monthName === "Jan" ? `${monthName} ${year}` : monthName;
-                monthLabels.push({ label, weekIndex });
+                // Avoid duplicate labels
+                if (monthLabels.length === 0 || monthLabels[monthLabels.length - 1].label !== label) {
+                    monthLabels.push({ label, weekIndex });
+                }
             }
         });
 
