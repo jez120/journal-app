@@ -285,12 +285,15 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
             {viewMode === "month" && renderMonthView()}
 
             {/* Legend */}
-            <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-white/50">
-                <span>Less</span>
-                {[0, 1, 2, 3].map((level) => (
-                    <div key={level} className={`w-3 h-3 rounded-[2px] ${getLevelColor(level)}`} />
-                ))}
-                <span>More</span>
+            <div className="flex items-center justify-end gap-3 mt-3 text-[10px] text-white/50">
+                <div className="flex items-center gap-1">
+                    <div className={`w-3 h-3 rounded-[2px] ${getLevelColor(0)}`} />
+                    <span>No entry</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <div className={`w-3 h-3 rounded-[2px] ${getLevelColor(3)}`} />
+                    <span>Entry logged</span>
+                </div>
             </div>
 
             {/* Tooltip */}
