@@ -1,35 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-// Generate mock activity data deterministically to prevent hydration mismatch
-function generateMockData(): Map<string, number> {
-    const data = new Map<string, number>();
-    const today = new Date();
-
-    for (let i = 0; i < 365; i++) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split("T")[0];
-
-        // Use a simple deterministic hash of the index for "randomness"
-        const pseudoRandom = Math.abs(Math.sin(i * 9999));
-
-        if (i < 15) {
-            data.set(dateStr, 3);
-        } else if (i < 20) {
-            data.set(dateStr, pseudoRandom > 0.3 ? 3 : 0);
-        } else if (i < 60) {
-            if (pseudoRandom > 0.6) data.set(dateStr, 3);
-            else if (pseudoRandom > 0.4) data.set(dateStr, 2);
-            else if (pseudoRandom > 0.2) data.set(dateStr, 1);
-            else data.set(dateStr, 0);
-        } else {
-            data.set(dateStr, 0);
-        }
-    }
-    return data;
-}
+import { useState, useEffect } from "react";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -37,11 +8,37 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 type ViewMode = "year" | "month";
 
 export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
-    const [activityData] = useState(() => generateMockData());
+    const [activityData, setActivityData] = useState<Map<string, number>>(new Map());
     const [hoveredDay, setHoveredDay] = useState<{ date: string; level: number; x: number; y: number } | null>(null);
     const [viewMode, setViewMode] = useState<ViewMode>("year");
 
     const today = new Date();
+
+    // Fetch real entry data
+    useEffect(() => {
+        async function fetchEntries() {
+            try {
+                const res = await fetch("/api/entries?limit=365");
+                if (res.ok) {
+                    const data = await res.json();
+                    const map = new Map<string, number>();
+
+                    // Mark dates that have entries
+                    for (const entry of data.entries || []) {
+                        const dateStr = new Date(entry.entryDate).toISOString().split("T")[0];
+                        // Level 3 = complete (any entry counts as complete)
+                        map.set(dateStr, 3);
+                    }
+
+                    setActivityData(map);
+                }
+            } catch (err) {
+                console.error("Error fetching entries for heatmap:", err);
+            }
+        }
+
+        fetchEntries();
+    }, []);
 
     const getLevelColor = (level: number) => {
         switch (level) {
@@ -77,12 +74,18 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
     // ========== YEAR VIEW ==========
     const renderYearView = () => {
         const weeks: Date[][] = [];
-        const startDate = new Date(today);
-        startDate.setDate(startDate.getDate() - 364);
+        const currentYear = today.getFullYear();
+
+        // Start from Jan 1 of current year
+        const startDate = new Date(currentYear, 0, 1);
+        // Adjust to start of week (Sunday)
         startDate.setDate(startDate.getDate() - startDate.getDay());
 
+        // End at Dec 31 of current year or today, whichever is earlier
+        const endDate = new Date(currentYear, 11, 31);
+
         let currentDate = new Date(startDate);
-        while (currentDate <= today) {
+        while (currentDate <= endDate) {
             const week: Date[] = [];
             for (let i = 0; i < 7; i++) {
                 week.push(new Date(currentDate));
@@ -91,23 +94,15 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
             weeks.push(week);
         }
 
-        // Reverse weeks so most recent is on the left
-        weeks.reverse();
-        // Also reverse each week so days are in correct order
-        weeks.forEach(week => week.reverse());
-
-        // Build month labels (for reversed order)
+        // Build month labels (left to right, Jan to Dec)
         const monthLabels: { label: string; weekIndex: number }[] = [];
         weeks.forEach((week, weekIndex) => {
-            const lastDayOfWeek = week[0]; // After reversing, this is the last day of the original week
-            if (lastDayOfWeek.getDate() >= 24 || weekIndex === 0) { // Show month at end of month or first
-                const monthName = MONTHS[lastDayOfWeek.getMonth()];
-                const year = lastDayOfWeek.getFullYear();
-                const label = monthName === "Jan" ? `${monthName} ${year}` : monthName;
-                // Avoid duplicate labels
-                if (monthLabels.length === 0 || monthLabels[monthLabels.length - 1].label !== label) {
-                    monthLabels.push({ label, weekIndex });
-                }
+            const firstDayOfWeek = week[0];
+            // Show label at start of each month
+            if (firstDayOfWeek.getDate() <= 7 && firstDayOfWeek.getFullYear() === currentYear) {
+                const monthName = MONTHS[firstDayOfWeek.getMonth()];
+                const label = firstDayOfWeek.getMonth() === 0 ? `${monthName} ${currentYear}` : monthName;
+                monthLabels.push({ label, weekIndex });
             }
         });
 
