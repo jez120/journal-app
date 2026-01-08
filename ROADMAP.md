@@ -1,6 +1,6 @@
 # MindCamp - Implementation Roadmap
 
-> **Last Updated**: January 7, 2026
+> **Last Updated**: January 8, 2026
 
 ---
 
@@ -11,13 +11,13 @@
 │  CURRENT PHASE: Phase 5 - Final Testing                 │
 │  NEXT STEP: Launch!                                     │
 │                                                         │
-│  ██████████████████████████████████████████████░  98%   │
+│  █████████████████████████████████████████████████  99% │
 │                                                         │
 │  ✅ Frontend (18/18) - iOS semantic colors, tab bar     │
-│  ✅ Backend (21/21) - Auth, DB, entries, streaks done   │
+│  ✅ Backend (22/22) - Auth, DB, entries, password reset │
 │  ✅ Payments (11/11) - Stripe setup, paywall, beta mode │
 │  ✅ Insights (10/10) - Full insights with sentiment     │
-│  ✅ Polish (12/14) - Export, settings, legal done       │
+│  ✅ Polish (15/16) - Export, settings, domain, email    │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -69,6 +69,7 @@
 - [x] Create tables (users, entries, insights)
 - [x] Set up Prisma ORM
 - [x] Configure environment variables
+- [x] Add resetToken and resetTokenExpiry fields for password reset
 
 ### 2.2 Authentication ✅
 - [x] Install NextAuth.js
@@ -78,6 +79,7 @@
 - [x] Connect signup/login forms
 - [x] Implement session management
 - [x] Add protected routes (middleware)
+- [x] Password reset flow (forgot-password + reset-password pages)
 
 ### 2.3 Entry Management ✅
 - [x] Create entries API endpoints
@@ -151,29 +153,69 @@
 - [x] Account deletion
 - [x] Password change
 
-### 5.3 Final Polish
+### 5.3 Final Polish ✅
 - [x] Loading states for all pages
 - [x] Error handling
 - [ ] Mobile responsive testing
 - [x] Accessibility review (WCAG AA)
+- [x] Hide Reflect section on Day 1 (no previous entries)
+- [x] Updated signup/landing page messaging (3-day trial clarity)
 
 ### 5.4 Testing
 - [x] Playwright E2E tests (19 tests)
 - [ ] Unit tests for API routes
 
-### 5.5 Deployment & Hosting
+### 5.5 Deployment & Hosting ✅
 - [x] Vercel project setup
 - [x] Connect GitHub repository
 - [x] Configure environment variables (production)
-- [ ] Supabase production database
-- [ ] Domain setup (custom domain)
+- [x] Supabase production database
+- [x] Custom domain setup (arpe.uk)
 - [x] SSL certificate (automatic via Vercel)
 
-### 5.6 Legal & Launch ✅
+### 5.6 Email Integration (Resend) ✅
+- [x] Resend account created
+- [x] Domain verified (arpe.uk) with DNS records
+- [x] Password reset email template
+- [x] lib/email.ts utility
+- [x] POST /api/auth/forgot-password endpoint
+- [x] POST /api/auth/reset-password endpoint
+
+### 5.7 Legal & Launch
 - [x] Privacy policy page
 - [x] Terms of service page
 - [ ] Final production testing
 - [ ] Launch!
+
+---
+
+## Infrastructure Summary
+
+### Domain & DNS (Cloudflare)
+- **Domain**: arpe.uk
+- **DNS Provider**: Cloudflare
+- **Records configured**:
+  - A record: `@` → `216.198.79.1` (Vercel)
+  - CNAME record: `www` → `cname.vercel-dns.com`
+  - TXT record: `resend._domainkey` (DKIM for email)
+  - MX record: `send` → `feedback-smtp.eu-west-1.amazonses.com`
+  - TXT record: `send` → `v=spf1 include:amazonses.com ~all`
+
+### Vercel Environment Variables
+| Variable | Type | Description |
+|----------|------|-------------|
+| `DATABASE_URL` | Connection String | Supabase PostgreSQL database connection |
+| `NEXTAUTH_URL` | URL | Production URL (https://arpe.uk) |
+| `NEXTAUTH_SECRET` | Secret | Session encryption key for NextAuth.js |
+| `RESEND_API_KEY` | API Key | Resend email service API key |
+| `EMAIL_FROM` | Email | Sender address (Clarity Journal <noreply@arpe.uk>) |
+| `STRIPE_SECRET_KEY` | API Key | Stripe payment processing API key |
+
+### Email Service (Resend)
+- **Provider**: Resend (resend.com)
+- **Verified Domain**: arpe.uk
+- **Sender**: noreply@arpe.uk
+- **Features**: Password reset emails
 
 ---
 

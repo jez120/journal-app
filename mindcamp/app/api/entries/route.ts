@@ -55,9 +55,6 @@ export async function POST(request: Request) {
         }
 
         const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
-        if (wordCount < 10) {
-            return NextResponse.json({ error: "Entry must be at least 10 words" }, { status: 400 });
-        }
 
         // Get today's date (UTC midnight)
         const today = new Date();
