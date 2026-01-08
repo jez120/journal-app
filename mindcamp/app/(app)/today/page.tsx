@@ -275,20 +275,22 @@ export default function TodayPage() {
                     </div>
                 </section>
 
-                {/* Reflection */}
-                <section>
-                    <div className="flex items-center gap-2 mb-2">
-                        <ReflectIcon className="w-6 h-6" />
-                        <h2 className="text-sm font-semibold text-white/85 uppercase tracking-wide">Reflect</h2>
-                    </div>
-                    <p className="text-sm text-white/85 mb-2">How does today compare to yesterday?</p>
-                    <textarea
-                        value={reflection}
-                        onChange={(e) => setReflection(e.target.value)}
-                        className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[80px] resize-none"
-                        placeholder="Your reflection..."
-                    />
-                </section>
+                {/* Reflection - Only show if there's a previous entry to compare to */}
+                {yesterdayEntry && (
+                    <section>
+                        <div className="flex items-center gap-2 mb-2">
+                            <ReflectIcon className="w-6 h-6" />
+                            <h2 className="text-sm font-semibold text-white/85 uppercase tracking-wide">Reflect</h2>
+                        </div>
+                        <p className="text-sm text-white/85 mb-2">How does today compare to yesterday?</p>
+                        <textarea
+                            value={reflection}
+                            onChange={(e) => setReflection(e.target.value)}
+                            className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[80px] resize-none"
+                            placeholder="Your reflection..."
+                        />
+                    </section>
+                )}
 
                 <button type="submit" disabled={!hasContent || isSubmitting} className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     {isSubmitting ? "Saving..." : todayEntry ? "Update Entry" : "Save Entry"}

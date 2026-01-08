@@ -9,6 +9,8 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { email } = body;
 
+        console.log("[forgot-password] Request for email:", email);
+
         if (!email) {
             return NextResponse.json({ error: "Email is required" }, { status: 400 });
         }
@@ -18,8 +20,11 @@ export async function POST(request: Request) {
             where: { email: email.toLowerCase() },
         });
 
+        console.log("[forgot-password] User found:", !!user);
+
         // Always return success to prevent email enumeration
         if (!user) {
+            console.log("[forgot-password] No user found, returning success without sending email");
             return NextResponse.json({ success: true });
         }
 
@@ -36,8 +41,12 @@ export async function POST(request: Request) {
             },
         });
 
+        console.log("[forgot-password] Token saved, sending email...");
+
         // Send email
         const emailResult = await sendPasswordResetEmail(email, resetToken);
+
+        console.log("[forgot-password] Email result:", emailResult);
 
         if (!emailResult.success) {
             console.error("Failed to send reset email:", emailResult.error);
