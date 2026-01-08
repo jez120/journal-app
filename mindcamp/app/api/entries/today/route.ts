@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
-// GET /api/entries/today - Get today's entry
+// GET /api/entries/today - Get all of today's entries
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
@@ -16,18 +16,18 @@ export async function GET() {
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
 
-        const entry = await prisma.entry.findUnique({
+        // Return all entries for today (ordered by newest first)
+        const entries = await prisma.entry.findMany({
             where: {
-                userId_entryDate: {
-                    userId,
-                    entryDate: today,
-                },
+                userId,
+                entryDate: today,
             },
+            orderBy: { createdAt: "desc" },
         });
 
-        return NextResponse.json({ entry });
+        return NextResponse.json({ entries });
     } catch (error) {
-        console.error("Error fetching today's entry:", error);
+        console.error("Error fetching today's entries:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }

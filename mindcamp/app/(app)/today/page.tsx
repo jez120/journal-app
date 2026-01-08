@@ -22,9 +22,11 @@ const prompts = [
 ];
 
 interface Entry {
+    id: string;
     content: string;
     reflection?: string;
     entryDate: string;
+    createdAt: string;
 }
 
 export default function TodayPage() {
@@ -36,7 +38,7 @@ export default function TodayPage() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [error, setError] = useState("");
     const [yesterdayEntry, setYesterdayEntry] = useState<Entry | null>(null);
-    const [todayEntry, setTodayEntry] = useState<Entry | null>(null);
+    const [todayEntries, setTodayEntries] = useState<Entry[]>([]);
     const [userProgress, setUserProgress] = useState<{ currentDay: number; streakCount: number; currentRank: string } | null>(null);
     const [insights, setInsights] = useState<Insight[]>([]);
 
@@ -57,15 +59,11 @@ export default function TodayPage() {
                     setYesterdayEntry(data.entry);
                 }
 
-                // Fetch today's entry (in case already submitted)
+                // Fetch today's entries (multiple allowed)
                 const todayRes = await fetch("/api/entries/today");
                 if (todayRes.ok) {
                     const data = await todayRes.json();
-                    if (data.entry) {
-                        setTodayEntry(data.entry);
-                        setEntry(data.entry.content || "");
-                        setReflection(data.entry.reflection || "");
-                    }
+                    setTodayEntries(data.entries || []);
                 }
 
                 // Fetch user progress
@@ -115,7 +113,16 @@ export default function TodayPage() {
                 return;
             }
 
-            setIsSubmitted(true);
+            // Clear form and refresh entries
+            setEntry("");
+            setReflection("");
+
+            // Refresh today's entries to show new entry
+            const todayRes = await fetch("/api/entries/today");
+            if (todayRes.ok) {
+                const data = await todayRes.json();
+                setTodayEntries(data.entries || []);
+            }
 
             // Refresh progress
             const progressRes = await fetch("/api/progress");
@@ -172,41 +179,14 @@ export default function TodayPage() {
         }
     };
 
-    if (isSubmitted) {
-        return (
-            <div className="animate-fade-in space-y-6">
-                <div className="text-center py-6">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--system-green)] text-white text-3xl mb-4">
-                        ✓
-                    </div>
-                    <h1 className="text-2xl font-bold mb-2 text-white">Entry saved</h1>
-                    <p className="text-white/60 mb-4">
-                        Day {currentDay} complete · Streak: <span className="text-[#FF9500] font-semibold">{streakCount} days</span> 🔥
-                    </p>
-                    <div className="inline-block mb-4">
-                        <span className={`${getRankBadgeClass()} bg-white/10 text-white`}>{getRankLabel()}</span>
-                    </div>
-                </div>
-
-                {/* Insights Section */}
-                {insights.length > 0 && (
-                    <InsightsContainer
-                        insights={insights}
-                        onDismiss={(index) => {
-                            setInsights(prev => prev.filter((_, i) => i !== index));
-                        }}
-                    />
-                )}
-
-                <button
-                    onClick={() => router.push("/progress")}
-                    className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-3.5 rounded-xl transition-colors"
-                >
-                    Done
-                </button>
-            </div>
-        );
-    }
+    // Format time for entry cards
+    const formatTime = (dateString: string) => {
+        return new Date(dateString).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true
+        });
+    };
 
     return (
         <div className="space-y-6">
@@ -218,6 +198,44 @@ export default function TodayPage() {
                 </div>
                 <span className={`${getRankBadgeClass()} bg-white/10 text-white/90 border border-white/20`}>{getRankLabel()}</span>
             </div>
+
+            {/* Insights Section (shown when available) */}
+            {insights.length > 0 && (
+                <InsightsContainer
+                    insights={insights}
+                    onDismiss={(index) => {
+                        setInsights(prev => prev.filter((_, i) => i !== index));
+                    }}
+                />
+            )}
+
+            {/* Today's previous entries */}
+            {todayEntries.length > 0 && (
+                <section>
+                    <div className="flex items-center gap-2 mb-2">
+                        <TodayIcon className="w-6 h-6" />
+                        <h2 className="text-sm font-semibold text-white/85 uppercase tracking-wide">Today&apos;s Entries</h2>
+                        <span className="text-xs text-white/50">({todayEntries.length})</span>
+                    </div>
+                    <div className="space-y-3">
+                        {todayEntries.map((e) => (
+                            <div key={e.id} className="bg-white/10 backdrop-blur-sm border border-white/20 p-4 rounded-xl">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-white/50">{formatTime(e.createdAt)}</span>
+                                </div>
+                                <p className="text-white/90 text-[15px] leading-relaxed">
+                                    {e.content}
+                                </p>
+                                {e.reflection && (
+                                    <div className="pt-2 mt-2 border-t border-white/10">
+                                        <p className="text-sm text-white/70 italic">{e.reflection}</p>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Yesterday's entry */}
             {yesterdayEntry && (
@@ -293,7 +311,7 @@ export default function TodayPage() {
                 )}
 
                 <button type="submit" disabled={!hasContent || isSubmitting} className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    {isSubmitting ? "Saving..." : todayEntry ? "Update Entry" : "Save Entry"}
+                    {isSubmitting ? "Saving..." : "Save Entry"}
                 </button>
             </form>
         </div>

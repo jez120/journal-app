@@ -60,26 +60,17 @@ export async function POST(request: Request) {
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
 
-        // Check if entry already exists for today
-        const existingEntry = await prisma.entry.findUnique({
+        // Check if this is the first entry of the day (for streak tracking)
+        const todayEntries = await prisma.entry.findMany({
             where: {
-                userId_entryDate: {
-                    userId,
-                    entryDate: today,
-                },
+                userId,
+                entryDate: today,
             },
+            take: 1,
         });
+        const isFirstEntryOfDay = todayEntries.length === 0;
 
-        if (existingEntry) {
-            // Update existing entry
-            const updated = await prisma.entry.update({
-                where: { id: existingEntry.id },
-                data: { content, reflection, promptShown, wordCount },
-            });
-            return NextResponse.json(updated);
-        }
-
-        // Create new entry
+        // Always create new entry (multiple entries per day allowed)
         const entry = await prisma.entry.create({
             data: {
                 userId,
@@ -91,8 +82,10 @@ export async function POST(request: Request) {
             },
         });
 
-        // Update user streak
-        await updateUserStreak(userId);
+        // Update user streak only on first entry of the day
+        if (isFirstEntryOfDay) {
+            await updateUserStreak(userId);
+        }
 
         return NextResponse.json(entry, { status: 201 });
     } catch (error) {
@@ -112,13 +105,11 @@ async function updateUserStreak(userId: string) {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    // Check if there was an entry yesterday
-    const yesterdayEntry = await prisma.entry.findUnique({
+    // Check if there was an entry yesterday (any entry counts)
+    const yesterdayEntry = await prisma.entry.findFirst({
         where: {
-            userId_entryDate: {
-                userId,
-                entryDate: yesterday,
-            },
+            userId,
+            entryDate: yesterday,
         },
     });
 
