@@ -137,7 +137,7 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
                                         return (
                                             <div
                                                 key={dayIndex}
-                                                className={`w-[10px] h-[10px] rounded-[2px] cursor-pointer ${isFuture ? "bg-transparent" : getLevelColor(level)}`}
+                                                className={`w-[10px] h-[10px] rounded-[2px] cursor-pointer ${isFuture ? "bg-white/5" : getLevelColor(level)}`}
                                                 onMouseEnter={(e) => {
                                                     if (!isFuture) {
                                                         const rect = e.currentTarget.getBoundingClientRect();
