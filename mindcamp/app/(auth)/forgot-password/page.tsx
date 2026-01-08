@@ -7,16 +7,30 @@ export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError("");
 
-        // Simulate sending email (in production, this would call an API)
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            const res = await fetch("/api/auth/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            });
 
-        setSubmitted(true);
-        setIsLoading(false);
+            if (!res.ok) {
+                throw new Error("Failed to send reset email");
+            }
+
+            setSubmitted(true);
+        } catch {
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -49,6 +63,10 @@ export default function ForgotPasswordPage() {
                                 />
                             </div>
 
+                            {error && (
+                                <p className="text-red-400 text-sm">{error}</p>
+                            )}
+
                             <button
                                 type="submit"
                                 disabled={isLoading}
@@ -70,9 +88,6 @@ export default function ForgotPasswordPage() {
                         </h2>
                         <p className="text-white/60 text-sm mb-6">
                             If an account exists for <span className="text-white/80">{email}</span>, you&apos;ll receive password reset instructions shortly.
-                        </p>
-                        <p className="text-white/50 text-xs mb-4">
-                            Note: Email sending is being set up. For now, please contact support to reset your password.
                         </p>
                     </div>
                 )}
