@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
-// GET /api/entries/yesterday - Get yesterday's entry
+// GET /api/entries/yesterday - Get yesterday's entry (first one if multiple)
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
@@ -17,13 +17,12 @@ export async function GET() {
         yesterday.setUTCHours(0, 0, 0, 0);
         yesterday.setDate(yesterday.getDate() - 1);
 
-        const entry = await prisma.entry.findUnique({
+        const entry = await prisma.entry.findFirst({
             where: {
-                userId_entryDate: {
-                    userId,
-                    entryDate: yesterday,
-                },
+                userId,
+                entryDate: yesterday,
             },
+            orderBy: { createdAt: "desc" },
         });
 
         return NextResponse.json({ entry });
