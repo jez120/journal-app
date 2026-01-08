@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { YesterdayIcon, TodayIcon, ReflectIcon } from "@/components/JournalIcons";
 import { InsightsContainer } from "@/components/InsightCard";
 
@@ -28,6 +29,7 @@ interface Entry {
 
 export default function TodayPage() {
     const { data: session } = useSession();
+    const router = useRouter();
     const [entry, setEntry] = useState("");
     const [reflection, setReflection] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -197,10 +199,7 @@ export default function TodayPage() {
                 )}
 
                 <button
-                    onClick={() => {
-                        setIsSubmitted(false);
-                        setInsights([]);
-                    }}
+                    onClick={() => router.push("/progress")}
                     className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-3.5 rounded-xl transition-colors"
                 >
                     Done

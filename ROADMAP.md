@@ -8,16 +8,16 @@
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  CURRENT PHASE: Phase 3 - Payments Complete!            │
-│  NEXT STEP: Phase 4 - AI Insights                       │
+│  CURRENT PHASE: Phase 4 - Basic Insights Complete!      │
+│  NEXT STEP: Phase 5 - Polish & Launch                   │
 │                                                         │
-│  ██████████████████████████████████████░░░░  85% MVP    │
+│  ██████████████████████████████████████████░░  92% MVP  │
 │                                                         │
 │  ✅ Frontend (18/18) - iOS semantic colors, tab bar     │
 │  ✅ Backend (21/21) - Auth, DB, entries, streaks done   │
 │  ✅ Payments (11/11) - Stripe setup, paywall, beta mode │
-│  ⏳ Insights (0/10)                                     │
-│  ⏳ Polish (2/12) - Accessibility fixes complete        │
+│  ✅ Insights (6/10) - Keywords, milestones, compare     │
+│  ⏳ Polish (5/14) - Accessibility fixes complete        │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -123,13 +123,13 @@
 
 ## Phase 4: Insights & Discovery
 
-### 4.1 Basic Insights
-- [ ] Keyword frequency analysis
-- [ ] Streak milestone detection
-- [ ] Week comparison logic
-- [ ] Insight storage in database
-- [ ] GET /api/insights endpoint
-- [ ] Display insights after entry save
+### 4.1 Basic Insights ✅
+- [x] Keyword frequency analysis
+- [x] Streak milestone detection
+- [x] Week comparison logic
+- [x] Insight storage in database
+- [x] GET /api/insights endpoint
+- [x] Display insights after entry save
 
 ### 4.2 Advanced Insights (Later)
 - [ ] Day-of-week patterns
@@ -206,7 +206,7 @@
 | 1. Frontend | ✅ Complete | 20/20 |
 | 2. Backend | ✅ Complete | 21/21 |
 | 3. Payments | ✅ Complete | 11/11 |
-| 4. Insights | ⏳ Next | 0/10 |
+| 4. Insights | ✅ Basic Complete | 6/10 |
 | 5. Polish | ⏳ In Progress | 5/14 |
 
-**Overall MVP Progress: ~85%**
+**Overall MVP Progress: ~92%**
