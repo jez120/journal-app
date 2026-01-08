@@ -4,10 +4,31 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SessionProvider, useSession, signOut } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 function AppLayoutInner({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { data: session } = useSession();
+    const [streakCount, setStreakCount] = useState(0);
+
+    // Fetch user progress for streak
+    useEffect(() => {
+        async function fetchProgress() {
+            try {
+                const res = await fetch("/api/progress");
+                if (res.ok) {
+                    const data = await res.json();
+                    setStreakCount(data.streakCount || 0);
+                }
+            } catch (err) {
+                console.error("Error fetching progress:", err);
+            }
+        }
+
+        if (session) {
+            fetchProgress();
+        }
+    }, [session, pathname]); // Re-fetch when pathname changes (navigation)
 
     const tabs = [
         { href: "/today", label: "Today", icon: "pencil.line" },
@@ -64,7 +85,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                         {/* Streak indicator */}
                         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 border border-white/10">
                             <span className="text-base">🔥</span>
-                            <span className="text-sm font-semibold text-[#FFC107]">0</span>
+                            <span className="text-sm font-semibold text-[#FFC107]">{streakCount}</span>
                         </div>
 
                         {/* Profile */}
