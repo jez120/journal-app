@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 interface Insight {
-    type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement";
+    type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement" | "sentiment" | "dayofweek";
     title: string;
     content: string;
 }
@@ -53,6 +53,20 @@ export default function InsightCard({ insight, onDismiss }: InsightCardProps) {
                     border: "border-purple-500/20",
                     icon: "🔮",
                     iconBg: "bg-purple-500/20",
+                };
+            case "sentiment":
+                return {
+                    bg: "bg-pink-500/10",
+                    border: "border-pink-500/20",
+                    icon: "💭",
+                    iconBg: "bg-pink-500/20",
+                };
+            case "dayofweek":
+                return {
+                    bg: "bg-cyan-500/10",
+                    border: "border-cyan-500/20",
+                    icon: "📅",
+                    iconBg: "bg-cyan-500/20",
                 };
             case "encouragement":
             default:

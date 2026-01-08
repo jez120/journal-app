@@ -4,6 +4,7 @@ interface EntryData {
     content: string;
     wordCount: number;
     entryDate: Date;
+    createdAt?: Date;
 }
 
 interface UserProgress {
@@ -14,7 +15,7 @@ interface UserProgress {
 }
 
 export interface InsightResult {
-    type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement";
+    type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement" | "sentiment" | "dayofweek";
     title: string;
     content: string;
     data?: Record<string, unknown>;
@@ -38,6 +39,25 @@ const STOP_WORDS = new Set([
     "feel", "feeling", "felt", "make", "made", "thing", "things", "lot", "much",
     "even", "still", "way", "because", "if", "while", "though", "one", "two",
 ]);
+
+// Positive and negative sentiment words
+const POSITIVE_WORDS = new Set([
+    "happy", "grateful", "thankful", "excited", "love", "loved", "amazing", "wonderful",
+    "great", "good", "best", "joy", "joyful", "blessed", "peaceful", "calm", "relaxed",
+    "proud", "accomplished", "successful", "hopeful", "optimistic", "positive", "motivated",
+    "inspired", "creative", "energetic", "confident", "satisfied", "content", "beautiful",
+    "fantastic", "awesome", "brilliant", "excellent", "perfect", "delighted", "thrilled",
+]);
+
+const NEGATIVE_WORDS = new Set([
+    "sad", "angry", "frustrated", "anxious", "worried", "stressed", "tired", "exhausted",
+    "disappointed", "upset", "hurt", "lonely", "scared", "afraid", "nervous", "overwhelmed",
+    "depressed", "hopeless", "stuck", "confused", "lost", "failed", "failure", "regret",
+    "guilty", "ashamed", "embarrassed", "annoyed", "irritated", "terrible", "awful", "bad",
+    "horrible", "miserable", "unhappy", "painful", "difficult", "hard", "struggling",
+]);
+
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 /**
  * Analyze keywords in entries to find frequently used meaningful words
@@ -158,6 +178,158 @@ export function compareWeeks(entries: EntryData[]): InsightResult | null {
 }
 
 /**
+ * Analyze day-of-week patterns
+ */
+export function analyzeDayOfWeek(entries: EntryData[]): InsightResult | null {
+    if (entries.length < 7) return null;
+
+    const dayCount: number[] = [0, 0, 0, 0, 0, 0, 0];
+    const dayWordCount: number[] = [0, 0, 0, 0, 0, 0, 0];
+
+    for (const entry of entries) {
+        const day = new Date(entry.entryDate).getDay();
+        dayCount[day]++;
+        dayWordCount[day] += entry.wordCount;
+    }
+
+    // Find the day with most entries
+    let maxDay = 0;
+    let maxCount = dayCount[0];
+    for (let i = 1; i < 7; i++) {
+        if (dayCount[i] > maxCount) {
+            maxDay = i;
+            maxCount = dayCount[i];
+        }
+    }
+
+    // Only show if there's a clear pattern (at least 2 entries on that day)
+    if (maxCount < 2) return null;
+
+    // Find day with highest average word count
+    let bestWritingDay = 0;
+    let bestAvg = 0;
+    for (let i = 0; i < 7; i++) {
+        if (dayCount[i] > 0) {
+            const avg = dayWordCount[i] / dayCount[i];
+            if (avg > bestAvg) {
+                bestAvg = avg;
+                bestWritingDay = i;
+            }
+        }
+    }
+
+    // Return the more interesting insight
+    if (bestWritingDay !== maxDay && bestAvg > 50) {
+        return {
+            type: "dayofweek",
+            title: `${DAY_NAMES[bestWritingDay]}s Are Your Best! 📝`,
+            content: `Your ${DAY_NAMES[bestWritingDay]} entries average ${Math.round(bestAvg)} words - your most reflective day.`,
+            data: { day: DAY_NAMES[bestWritingDay], avgWords: Math.round(bestAvg) },
+        };
+    }
+
+    return {
+        type: "dayofweek",
+        title: `${DAY_NAMES[maxDay]} Writer 📅`,
+        content: `You've written ${maxCount} entries on ${DAY_NAMES[maxDay]}s. It seems to be your natural journaling day!`,
+        data: { day: DAY_NAMES[maxDay], count: maxCount },
+    };
+}
+
+/**
+ * Analyze sentiment in recent entries
+ */
+export function analyzeSentiment(entries: EntryData[]): InsightResult | null {
+    if (entries.length < 2) return null;
+
+    let positiveCount = 0;
+    let negativeCount = 0;
+    const positiveWords: string[] = [];
+    const negativeWords: string[] = [];
+
+    for (const entry of entries) {
+        const words = entry.content.toLowerCase().split(/\s+/);
+        for (const word of words) {
+            const cleanWord = word.replace(/[^a-z]/g, "");
+            if (POSITIVE_WORDS.has(cleanWord)) {
+                positiveCount++;
+                if (!positiveWords.includes(cleanWord)) positiveWords.push(cleanWord);
+            }
+            if (NEGATIVE_WORDS.has(cleanWord)) {
+                negativeCount++;
+                if (!negativeWords.includes(cleanWord)) negativeWords.push(cleanWord);
+            }
+        }
+    }
+
+    const total = positiveCount + negativeCount;
+    if (total < 3) return null; // Not enough sentiment words
+
+    const positiveRatio = positiveCount / total;
+
+    if (positiveRatio > 0.7) {
+        return {
+            type: "sentiment",
+            title: "Positive Outlook! ☀️",
+            content: `Your recent entries have a positive tone. Words like "${positiveWords.slice(0, 3).join(", ")}" appear frequently.`,
+            data: { ratio: positiveRatio, words: positiveWords.slice(0, 5) },
+        };
+    }
+
+    if (positiveRatio < 0.3 && negativeCount > 3) {
+        return {
+            type: "sentiment",
+            title: "Processing Challenges 💙",
+            content: `You're working through some tough feelings. Journaling about it is healthy - keep going.`,
+            data: { ratio: positiveRatio, words: negativeWords.slice(0, 5) },
+        };
+    }
+
+    return null;
+}
+
+/**
+ * Compare months (if enough data)
+ */
+export function compareMonths(entries: EntryData[]): InsightResult | null {
+    const now = new Date();
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+    const thisMonth = entries.filter(e => new Date(e.entryDate) >= thisMonthStart);
+    const lastMonth = entries.filter(
+        e => new Date(e.entryDate) >= lastMonthStart && new Date(e.entryDate) < thisMonthStart
+    );
+
+    if (thisMonth.length < 3 || lastMonth.length < 3) return null;
+
+    const thisMonthWords = thisMonth.reduce((sum, e) => sum + e.wordCount, 0);
+    const lastMonthWords = lastMonth.reduce((sum, e) => sum + e.wordCount, 0);
+
+    const improvement = ((thisMonthWords - lastMonthWords) / lastMonthWords) * 100;
+
+    if (improvement > 20) {
+        return {
+            type: "comparison",
+            title: "Growing Deeper! 🌱",
+            content: `You've written ${Math.round(improvement)}% more words this month compared to last. Your reflections are expanding!`,
+            data: { improvement: Math.round(improvement), thisMonth: thisMonthWords, lastMonth: lastMonthWords },
+        };
+    }
+
+    if (thisMonth.length > lastMonth.length) {
+        return {
+            type: "comparison",
+            title: "More Entries This Month! 📚",
+            content: `${thisMonth.length} entries so far this month vs ${lastMonth.length} last month. Great momentum!`,
+            data: { thisMonthCount: thisMonth.length, lastMonthCount: lastMonth.length },
+        };
+    }
+
+    return null;
+}
+
+/**
  * Generate encouragement based on progress
  */
 export function generateEncouragement(progress: UserProgress): InsightResult {
@@ -196,9 +368,21 @@ export function generateInsights(
     const milestone = detectMilestones(progress);
     if (milestone) insights.push(milestone);
 
+    // Check for sentiment patterns
+    const sentiment = analyzeSentiment(entries);
+    if (sentiment) insights.push(sentiment);
+
     // Check for week comparison
     const comparison = compareWeeks(entries);
     if (comparison) insights.push(comparison);
+
+    // Check for month comparison
+    const monthComparison = compareMonths(entries);
+    if (monthComparison && !comparison) insights.push(monthComparison);
+
+    // Check for day-of-week patterns
+    const dayPattern = analyzeDayOfWeek(entries);
+    if (dayPattern) insights.push(dayPattern);
 
     // Check for keyword patterns
     const keywords = analyzeKeywords(entries);
@@ -209,5 +393,7 @@ export function generateInsights(
         insights.push(generateEncouragement(progress));
     }
 
-    return insights;
+    // Limit to top 3 insights to avoid overwhelming user
+    return insights.slice(0, 3);
 }
+

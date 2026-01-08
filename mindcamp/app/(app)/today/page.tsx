@@ -7,7 +7,7 @@ import { YesterdayIcon, TodayIcon, ReflectIcon } from "@/components/JournalIcons
 import { InsightsContainer } from "@/components/InsightCard";
 
 interface Insight {
-    type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement";
+    type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement" | "sentiment" | "dayofweek";
     title: string;
     content: string;
 }
