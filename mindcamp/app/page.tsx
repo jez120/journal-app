@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-
+import { YesterdayIcon, TodayIcon, TrackIcon } from "@/components/JournalIcons";
 export default function LandingPage() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -105,17 +105,17 @@ export default function LandingPage() {
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               <FeatureCard
-                icon="📖"
+                icon={<YesterdayIcon className="w-10 h-10" />}
                 title="Read yesterday"
                 description="Start each session by reading what you wrote yesterday. This builds continuity and self-awareness."
               />
               <FeatureCard
-                icon="✏️"
+                icon={<TodayIcon className="w-10 h-10" />}
                 title="Write today"
                 description="Answer a simple prompt with 2-3 sentences. Takes under 2 minutes. Consistency over quantity."
               />
               <FeatureCard
-                icon="💡"
+                icon={<TrackIcon className="w-10 h-10" />}
                 title="See patterns"
                 description="Over time, discover insights from your own words. What themes keep appearing? What's changing?"
               />
@@ -217,13 +217,13 @@ function FeatureCard({
   title,
   description,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   description: string;
 }) {
   return (
     <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl hover:bg-white/15 transition-colors">
-      <div className="text-3xl mb-4">{icon}</div>
+      <div className="mb-4">{icon}</div>
       <h3 className="text-lg font-semibold mb-2 text-white">{title}</h3>
       <p className="text-white/70 text-sm leading-relaxed">{description}</p>
     </div>
