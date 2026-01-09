@@ -167,9 +167,122 @@
 - [x] Updated signup/landing page messaging (3-day trial clarity)
 - [x] Activity heatmap (calendar year view with legend)
 
-### 5.4 Testing
-- [x] Playwright E2E tests (19 tests)
-- [ ] Unit tests for API routes
+### 5.4 Testing Plan
+
+#### A. User Journey Tests (Full Progression)
+
+**Day 1-3: Guest Phase (Free Trial)**
+- [ ] Sign up → redirects to onboarding
+- [ ] Onboarding completes → Today page shows Day 1
+- [ ] Write first entry → streak shows 1, Day 1
+- [ ] Next day shows Day 2, yesterday's entry visible
+- [ ] Day 3 shows trial expiring warning
+- [ ] Day 4 triggers paywall (cannot write without subscription)
+
+**Day 4-14: Member Phase**
+- [ ] Subscribe → paywall dismissed, can write
+- [ ] Day counter continues correctly (4, 5, 6...)
+- [ ] Streak maintained with consecutive entries
+- [ ] Miss a day → streak resets to 0
+- [ ] Grace token available → use token → streak preserved
+- [ ] Week view unlocked (after Day 7)
+
+**Day 15-30: Regular Phase**
+- [ ] Rank changes to "Regular" on Day 15
+- [ ] Keyword tracking visible in insights
+- [ ] Writing patterns shown
+
+**Day 31-56: Veteran Phase**
+- [ ] Rank changes to "Veteran" on Day 31
+- [ ] Month comparison insights available
+- [ ] Historical data visible in heatmap
+
+**Day 57-63: Final Week Challenge**
+- [ ] Rank changes to "Final Week" on Day 57
+- [ ] Harder prompts appear (if implemented)
+- [ ] Challenge pass requirements active
+
+**Day 64+: Master Phase**
+- [ ] Rank changes to "Master" on Day 64
+- [ ] Full access to all features unlocked
+- [ ] Lifetime access granted
+
+#### B. Core Mechanics Tests
+
+**Entry System**
+- [ ] Create single entry → saved to local IndexedDB
+- [ ] Create multiple entries same day → all saved
+- [ ] Entry syncs date to server (metadata only)
+- [ ] Entry content stays local (never sent to server)
+- [ ] View today's entries → all shown with timestamps
+- [ ] View yesterday's entry → displayed correctly
+
+**Streak System**
+- [ ] First entry → streak = 1
+- [ ] Consecutive day entry → streak increments
+- [ ] Miss a day → streak resets to 0
+- [ ] Use grace token → streak preserved
+- [ ] No grace tokens left → streak resets
+- [ ] Longest streak tracked separately
+
+**Day Counter**
+- [ ] Day 1 set on signup (programStartDate)
+- [ ] Day increments each calendar day
+- [ ] Day counter independent of streak
+- [ ] Existing user with null programStartDate → auto-fixed
+
+**Rank Progression**
+- [ ] Day 1-3: Guest
+- [ ] Day 4-14: Member
+- [ ] Day 15-30: Regular
+- [ ] Day 31-56: Veteran
+- [ ] Day 57-63: Final Week
+- [ ] Day 64+: Master
+
+#### C. Payment Tests
+
+- [ ] Start trial → 3 days free
+- [ ] Cancel before Day 4 → no charge
+- [ ] Subscribe on Day 4 → access restored
+- [ ] Recurring payment → subscription active
+- [ ] Cancel subscription → read-only mode after period
+- [ ] Resubscribe → full access restored
+
+#### D. Local Storage Tests
+
+- [ ] New entry saved to IndexedDB
+- [ ] App reload → entries persist
+- [ ] Export → JSON file downloads
+- [ ] Import backup → entries restored
+- [ ] Clear browser data → entries lost (expected)
+- [ ] Install as PWA → storage more persistent
+
+#### E. Edge Cases
+
+- [ ] Sign up at 11:59 PM → Day 2 at midnight
+- [ ] Write entry at 11:59 PM → counts for today
+- [ ] Switch timezones → data consistent
+- [ ] Very long entry (5000+ words) → handles gracefully
+- [ ] Empty entry → prevented (validation)
+- [ ] Offline attempt → graceful error message
+- [ ] Session expired → redirect to login
+- [ ] Password reset flow → email sent → reset works
+
+#### F. Cross-Device Tests
+
+- [ ] Login on new device → metadata synced
+- [ ] Entries NOT synced (local only) → expected
+- [ ] Import backup on new device → entries restored
+- [ ] PWA on mobile → works correctly
+- [ ] PWA on desktop → works correctly
+
+#### G. Insight Tests
+
+- [ ] After entry → insights generated
+- [ ] Keyword frequency accurate
+- [ ] Streak milestones detected
+- [ ] Week comparisons shown (after 2 weeks)
+- [ ] Sentiment analysis displayed
 
 ### 5.5 Deployment & Hosting ✅
 - [x] Vercel project setup
