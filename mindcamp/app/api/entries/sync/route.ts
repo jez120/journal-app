@@ -60,41 +60,50 @@ async function updateUserStreak(userId: string) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return;
 
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    // Check if there was an entry yesterday
-    const yesterdayEntry = await prisma.entry.findFirst({
-        where: {
-            userId,
-            entryDate: yesterday,
-        },
+    // Get all unique entry dates for this user, sorted descending
+    const entries = await prisma.entry.findMany({
+        where: { userId },
+        select: { entryDate: true },
+        orderBy: { entryDate: 'desc' },
     });
 
-    let newStreakCount = user.streakCount;
-    let newCurrentDay = user.currentDay;
+    if (entries.length === 0) return;
 
-    if (yesterdayEntry || user.streakCount === 0) {
-        // Continue or start streak
-        newStreakCount = user.streakCount + 1;
-        newCurrentDay = user.currentDay + 1;
-    } else {
-        // Streak broken, restart at 1
-        newStreakCount = 1;
+    // Create a set of date strings for fast lookup
+    const entryDates = new Set(
+        entries.map(e => e.entryDate.toISOString().split('T')[0])
+    );
+
+    // Calculate consecutive streak from today backwards
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    const todayStr = today.toISOString().split('T')[0];
+
+    let currentStreak = 0;
+    let checkDate = new Date(today);
+
+    // Start from today and count backwards while entries exist
+    while (true) {
+        const dateStr = checkDate.toISOString().split('T')[0];
+        if (entryDates.has(dateStr)) {
+            currentStreak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+            break;
+        }
     }
 
-    // Update user
+    // Get the newest entry date for lastEntryDate
+    const latestEntryDate = entries[0].entryDate;
+
+    // Update user with correctly calculated streak
     await prisma.user.update({
         where: { id: userId },
         data: {
-            streakCount: newStreakCount,
-            currentDay: newCurrentDay,
-            lastEntryDate: today,
-            longestStreak: Math.max(user.longestStreak, newStreakCount),
-            currentRank: calculateRank(newCurrentDay),
+            streakCount: currentStreak,
+            lastEntryDate: latestEntryDate,
+            longestStreak: Math.max(user.longestStreak, currentStreak),
+            currentRank: calculateRank(user.currentDay),
             // Set program start date on first entry
             ...(user.programStartDate === null && { programStartDate: today }),
         },
