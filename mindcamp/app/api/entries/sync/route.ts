@@ -95,6 +95,8 @@ async function updateUserStreak(userId: string) {
             lastEntryDate: today,
             longestStreak: Math.max(user.longestStreak, newStreakCount),
             currentRank: calculateRank(newCurrentDay),
+            // Set program start date on first entry
+            ...(user.programStartDate === null && { programStartDate: today }),
         },
     });
 }

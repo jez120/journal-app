@@ -31,6 +31,18 @@ export async function GET() {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
+        // Calculate actual day number from program start (if set)
+        let actualDay = user.currentDay;
+        if (user.programStartDate) {
+            const now = new Date();
+            now.setUTCHours(0, 0, 0, 0);
+            const start = new Date(user.programStartDate);
+            start.setUTCHours(0, 0, 0, 0);
+            const diffTime = now.getTime() - start.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            actualDay = diffDays + 1; // Day 1 on start date
+        }
+
         // Get total entries count
         const totalEntries = await prisma.entry.count({ where: { userId } });
 
@@ -58,6 +70,7 @@ export async function GET() {
 
         return NextResponse.json({
             ...user,
+            currentDay: actualDay, // Override with calculated day
             totalEntries,
             activityMap,
         });
