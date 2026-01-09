@@ -102,11 +102,35 @@ export async function GET() {
             }
         }
 
+        // Calculate ACTUAL longest streak from all entries
+        const sortedDates = Array.from(entryDates).sort();
+        let longestStreak = 0;
+        let tempStreak = 0;
+        let prevDate: Date | null = null;
+
+        for (const dateStr of sortedDates) {
+            const currDate = new Date(dateStr);
+            if (prevDate) {
+                const diffMs = currDate.getTime() - prevDate.getTime();
+                const diffDays = diffMs / (1000 * 60 * 60 * 24);
+                if (diffDays === 1) {
+                    tempStreak++;
+                } else {
+                    longestStreak = Math.max(longestStreak, tempStreak);
+                    tempStreak = 1;
+                }
+            } else {
+                tempStreak = 1;
+            }
+            prevDate = currDate;
+        }
+        longestStreak = Math.max(longestStreak, tempStreak);
+
         return NextResponse.json({
             ...user,
             currentDay: actualDay, // Override with calculated day
             streakCount: currentStreak, // Override with calculated streak
-            longestStreak: Math.max(user.longestStreak, currentStreak),
+            longestStreak: longestStreak, // Override with calculated longest streak
             totalEntries,
             activityMap,
         });

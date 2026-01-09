@@ -13,9 +13,9 @@
 | A: User Journey | 10 | 7 | 1 | 0 | 2 |
 | B: Authentication | 10 | 3 | 1 | 0 | 6 |
 | C: Core Mechanics | 10 | 9 | 0 | 1 | 0 |
-| D: Streak & Progression | 6 | 5 | 1 | 0 | 0 |
+| D: Streak & Progression | 6 | 6 | 0 | 0 | 0 |
 | H: UI/UX | 6 | 6 | 0 | 0 | 0 |
-| **TOTAL** | **42** | **30** | **3** | **1** | **8** |
+| **TOTAL** | **42** | **31** | **2** | **1** | **8** |
 
 ---
 
@@ -25,7 +25,7 @@
 |----|---------|----------|-------------|--------|
 | BUG-001 | UJ-004 | **LOW** | Password "12345678" accepted (8 chars = valid). Validation works correctly. Consider stronger password policy. | 🟡 WONTFIX |
 | BUG-002 | AUTH-004 | **CRITICAL** | Protected routes not enforced - middleware.ts was disabled | ✅ FIXED (deployed) |
-| BUG-003 | STREAK-006 | **HIGH** | Streak counts total days with entries (4) instead of consecutive days (2). Gaps in entries don't reset streak. | 🔴 OPEN |
+| BUG-003 | STREAK-006 | **HIGH** | Streak counts total days with entries instead of consecutive days. | ✅ FIXED (deployed) |
 
 ---
 
@@ -358,12 +358,12 @@
 ---
 
 ### STREAK-006: Streak resets after missed day
-- **Status:** ❌ FAIL - BUG-003
+- **Status:** ✅ PASS (after fix)
 - **Priority:** High
-- **Expected:** Streak resets to 0 if no entry previous day
-- **Actual:** Streak shows 4 (total days) instead of 2 (consecutive days). Gap on Jan 7 did not reset streak.
-- **Evidence:** [Screenshot](file:///Users/arkadiuszpeter/.gemini/antigravity/brain/064f4d3c-14ea-4623-ac17-434e8794a444/streak_and_yesterday_verification_1767993684353.png)
-- **Bug:** Streak counter counts ALL days with entries, not consecutive days
+- **Expected:** Streak resets if no entry previous day (count consecutive days only)
+- **Actual:** Streak correctly shows 2 (Jan 8-9 consecutive). Gap on Jan 7 properly resets count.
+- **Evidence:** [Screenshot](file:///Users/arkadiuszpeter/.gemini/antigravity/brain/064f4d3c-14ea-4623-ac17-434e8794a444/final_progress_verified_1767994614002.png)
+- **Fix:** BUG-003 fixed - streak now calculates on-the-fly from consecutive days
 
 ---
 
