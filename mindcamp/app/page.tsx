@@ -106,7 +106,7 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-3 gap-6">
               <FeatureCard
                 icon={<YesterdayIcon className="w-10 h-10" />}
-                title="Read yesterday"
+                title="Yesterday's Entry"
                 description="Start each session by reading what you wrote yesterday. This builds continuity and self-awareness."
               />
               <FeatureCard
