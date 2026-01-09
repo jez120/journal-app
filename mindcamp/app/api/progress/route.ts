@@ -82,14 +82,34 @@ export async function GET() {
 
         // Convert entries to activity map
         const activityMap: Record<string, number> = {};
+        const entryDates = new Set<string>();
         entries.forEach((entry: { entryDate: Date; wordCount: number | null }) => {
             const dateStr = entry.entryDate.toISOString().split("T")[0];
             activityMap[dateStr] = 3; // 3 = complete entry
+            entryDates.add(dateStr);
         });
+
+        // Calculate consecutive streak from today backwards (on-the-fly)
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        let currentStreak = 0;
+        let checkDate = new Date(today);
+
+        while (true) {
+            const dateStr = checkDate.toISOString().split("T")[0];
+            if (entryDates.has(dateStr)) {
+                currentStreak++;
+                checkDate.setDate(checkDate.getDate() - 1);
+            } else {
+                break;
+            }
+        }
 
         return NextResponse.json({
             ...user,
             currentDay: actualDay, // Override with calculated day
+            streakCount: currentStreak, // Override with calculated streak
+            longestStreak: Math.max(user.longestStreak, currentStreak),
             totalEntries,
             activityMap,
         });
