@@ -1,4 +1,4 @@
-export const MIN_WORDS = 10;
+export const MIN_WORDS = 1;
 
 export function calculateRankFromStreak(streak: number): string {
     if (streak >= 64) return "master";

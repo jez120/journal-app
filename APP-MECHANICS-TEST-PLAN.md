@@ -4,7 +4,7 @@
 
 ## Scope
 - Validate streak-based rank progression from Day 1 to Day 64.
-- Verify completion rules (min words/sentences, 1 completion per day).
+- Verify completion rules (non-empty entry, 1 completion per day).
 - Verify streak reset and grace token behavior.
 - Verify UI displays Current Streak and Total Completed Days distinctly.
 
@@ -14,7 +14,7 @@
 - Ability to simulate consecutive days (debug API or time-travel fixture).
 
 ## Mechanics Definitions
-- **Completed Day**: User taps Save on an entry that meets the minimum rule (>=10 words or >=2 sentences).
+- **Completed Day**: User taps Save on any non-empty entry.
 - **One completion per day**: Multiple entries do not add extra completions.
 - **Rank**: Based on current streak (consecutive completed days).
 - **Total Completed Days**: Lifetime completions, never decreases.
@@ -103,6 +103,6 @@ For each day below, perform one valid entry save and verify rank, streak, and pr
 - **RST-002 Grace token**: Skip one day + consume grace -> streak preserved; rank unchanged.
 
 ## Completion Rule Tests
-- **CMP-001 Min rule**: Entry below min words/sentences does NOT count toward streak.
+- **CMP-001 Empty entry**: Cannot save empty entry; no streak change.
 - **CMP-002 Multiple entries**: Second entry same day does NOT increase streak or total days.
 - **CMP-003 Delete last entry**: Removing the only entry for a day removes that completion and updates streak/rank accordingly.

@@ -34,7 +34,7 @@
 
 ## App Mechanics (Canonical)
 
-- **Completed Day:** A day counts only when the user taps **Save** on an entry that meets the minimum rule (e.g., >=10 words or >=2 sentences).
+- **Completed Day:** A day counts when the user taps **Save** on any non-empty entry.
 - **One completion per day:** Multiple entries still count as a single completed day.
 - **Streak-driven ranks:** Rank is based on **current consecutive-day streak** only.
   - Guest = streak 0-3
@@ -228,7 +228,7 @@
 #### B. Core Mechanics Tests
 
 **Entry System**
-- [ ] Create single entry that meets minimum rule → saves and counts as completed day
+- [ ] Create single non-empty entry → saves and counts as completed day
 - [ ] Create multiple entries same day → all saved, still counts as one completed day
 - [ ] Entry syncs date/metadata to server (no content)
 - [ ] Entry content stays local (never sent to server)
@@ -244,7 +244,7 @@
 - [ ] Longest streak tracked separately
 
 **Total Completed Days**
-- [ ] Increments only on completed day (Save + min rule)
+- [ ] Increments only on completed day (Save)
 - [ ] Never decreases
 - [ ] Independent of current streak
 - [ ] Existing user with null totals → auto-fixed
