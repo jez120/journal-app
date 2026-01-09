@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { getAllEntries, exportEntries, importEntries, LocalEntry } from "@/lib/localDb";
 
 interface Entry {
     id: string;
@@ -9,6 +10,7 @@ interface Entry {
     content: string;
     reflection?: string;
     wordCount?: number;
+    createdAt: string;
 }
 
 export default function HistoryPage() {
@@ -17,6 +19,7 @@ export default function HistoryPage() {
     const [loading, setLoading] = useState(true);
     const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
     const [exporting, setExporting] = useState(false);
+    const [importing, setImporting] = useState(false);
 
     useEffect(() => {
         fetchEntries();
@@ -24,11 +27,16 @@ export default function HistoryPage() {
 
     const fetchEntries = async () => {
         try {
-            const res = await fetch("/api/entries");
-            if (res.ok) {
-                const data = await res.json();
-                setEntries(data.entries || []);
-            }
+            // Fetch entries from local IndexedDB
+            const localEntries = await getAllEntries();
+            setEntries(localEntries.map(e => ({
+                id: e.id,
+                entryDate: e.date,
+                content: e.content,
+                reflection: e.reflection,
+                wordCount: e.wordCount,
+                createdAt: e.createdAt,
+            })));
         } catch (error) {
             console.error("Failed to fetch entries:", error);
         } finally {
@@ -40,23 +48,41 @@ export default function HistoryPage() {
         setExpandedEntry(expandedEntry === id ? null : id);
     };
 
-    const handleExport = async (format: "json" | "csv") => {
+    const handleExport = async () => {
         setExporting(true);
         try {
-            const res = await fetch(`/api/entries/export?format=${format}`);
-            if (res.ok) {
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `clarity-journal-export.${format}`;
-                a.click();
-                URL.revokeObjectURL(url);
-            }
+            const jsonData = await exportEntries();
+            const blob = new Blob([jsonData], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `clarity-journal-backup-${new Date().toISOString().split("T")[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Export failed:", error);
         } finally {
             setExporting(false);
+        }
+    };
+
+    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setImporting(true);
+        try {
+            const jsonData = await file.text();
+            const count = await importEntries(jsonData);
+            alert(`Successfully imported ${count} entries`);
+            await fetchEntries(); // Refresh list
+        } catch (error) {
+            console.error("Import failed:", error);
+            alert("Import failed. Please check the file format.");
+        } finally {
+            setImporting(false);
+            // Reset file input
+            e.target.value = "";
         }
     };
 
@@ -95,19 +121,22 @@ export default function HistoryPage() {
                 </div>
                 <div className="flex gap-2">
                     <button
-                        onClick={() => handleExport("json")}
+                        onClick={handleExport}
                         disabled={exporting || entries.length === 0}
                         className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] disabled:opacity-50"
                     >
-                        {exporting ? "..." : "JSON"}
+                        {exporting ? "..." : "Export"}
                     </button>
-                    <button
-                        onClick={() => handleExport("csv")}
-                        disabled={exporting || entries.length === 0}
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] disabled:opacity-50"
-                    >
-                        {exporting ? "..." : "CSV"}
-                    </button>
+                    <label className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] cursor-pointer flex items-center">
+                        {importing ? "..." : "Import"}
+                        <input
+                            type="file"
+                            accept=".json"
+                            onChange={handleImport}
+                            className="hidden"
+                            disabled={importing}
+                        />
+                    </label>
                 </div>
             </div>
 

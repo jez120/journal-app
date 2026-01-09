@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getAllEntries } from "@/lib/localDb";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -14,24 +15,20 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
 
     const today = new Date();
 
-    // Fetch real entry data
+    // Fetch entry dates from local IndexedDB
     useEffect(() => {
         async function fetchEntries() {
             try {
-                const res = await fetch("/api/entries?limit=365");
-                if (res.ok) {
-                    const data = await res.json();
-                    const map = new Map<string, number>();
+                const entries = await getAllEntries();
+                const map = new Map<string, number>();
 
-                    // Mark dates that have entries
-                    for (const entry of data.entries || []) {
-                        const dateStr = new Date(entry.entryDate).toISOString().split("T")[0];
-                        // Level 3 = complete (any entry counts as complete)
-                        map.set(dateStr, 3);
-                    }
-
-                    setActivityData(map);
+                // Mark dates that have entries
+                for (const entry of entries) {
+                    // Level 3 = complete (any entry counts as complete)
+                    map.set(entry.date, 3);
                 }
+
+                setActivityData(map);
             } catch (err) {
                 console.error("Error fetching entries for heatmap:", err);
             }

@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { YesterdayIcon, TodayIcon, ReflectIcon } from "@/components/JournalIcons";
 import { InsightsContainer } from "@/components/InsightCard";
+import { addEntry, getEntriesByDate, getTodayDateString, LocalEntry } from "@/lib/localDb";
 
 interface Insight {
     type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement" | "sentiment" | "dayofweek";
@@ -48,25 +49,40 @@ export default function TodayPage() {
         return prompts[dayOfYear % prompts.length];
     });
 
-    // Fetch yesterday's entry and user progress
+    // Fetch entries from local storage and user progress from server
     useEffect(() => {
         async function fetchData() {
             try {
-                // Fetch yesterday's entry
-                const yesterdayRes = await fetch("/api/entries/yesterday");
-                if (yesterdayRes.ok) {
-                    const data = await yesterdayRes.json();
-                    setYesterdayEntry(data.entry);
+                // Get today's date string
+                const todayStr = getTodayDateString();
+
+                // Fetch today's entries from local IndexedDB
+                const localTodayEntries = await getEntriesByDate(todayStr);
+                setTodayEntries(localTodayEntries.map(e => ({
+                    id: e.id,
+                    content: e.content,
+                    reflection: e.reflection,
+                    entryDate: e.date,
+                    createdAt: e.createdAt,
+                })));
+
+                // Fetch yesterday's entries from local IndexedDB
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split("T")[0];
+                const yesterdayEntries = await getEntriesByDate(yesterdayStr);
+                if (yesterdayEntries.length > 0) {
+                    const first = yesterdayEntries[0];
+                    setYesterdayEntry({
+                        id: first.id,
+                        content: first.content,
+                        reflection: first.reflection,
+                        entryDate: first.date,
+                        createdAt: first.createdAt,
+                    });
                 }
 
-                // Fetch today's entries (multiple allowed)
-                const todayRes = await fetch("/api/entries/today");
-                if (todayRes.ok) {
-                    const data = await todayRes.json();
-                    setTodayEntries(data.entries || []);
-                }
-
-                // Fetch user progress
+                // Fetch user progress from server (metadata only)
                 const progressRes = await fetch("/api/progress");
                 if (progressRes.ok) {
                     const data = await progressRes.json();
@@ -95,43 +111,49 @@ export default function TodayPage() {
         setError("");
 
         try {
-            const res = await fetch("/api/entries", {
+            const todayStr = getTodayDateString();
+
+            // Save entry to local IndexedDB
+            const newEntry = await addEntry({
+                date: todayStr,
+                content: entry,
+                reflection: reflection || undefined,
+                promptShown: currentPrompt,
+                wordCount,
+            });
+
+            // Sync date to server for streak tracking (content not sent)
+            const res = await fetch("/api/entries/sync", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    content: entry,
-                    reflection: reflection || null,
-                    promptShown: currentPrompt,
-                    isLowSignal: isShort, // Tag short entries for insights weighting
-                }),
+                body: JSON.stringify({ date: todayStr }),
             });
 
             if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to save entry");
-                setIsSubmitting(false);
-                return;
+                console.warn("Failed to sync entry date to server");
             }
 
-            // Clear form and refresh entries
+            // Clear form
             setEntry("");
             setReflection("");
 
-            // Refresh today's entries to show new entry
-            const todayRes = await fetch("/api/entries/today");
-            if (todayRes.ok) {
-                const data = await todayRes.json();
-                setTodayEntries(data.entries || []);
-            }
+            // Add new entry to list
+            setTodayEntries(prev => [{
+                id: newEntry.id,
+                content: newEntry.content,
+                reflection: newEntry.reflection,
+                entryDate: newEntry.date,
+                createdAt: newEntry.createdAt,
+            }, ...prev]);
 
-            // Refresh progress
+            // Refresh progress from server
             const progressRes = await fetch("/api/progress");
             if (progressRes.ok) {
                 const data = await progressRes.json();
                 setUserProgress(data);
             }
 
-            // Generate and fetch insights
+            // Generate insights
             try {
                 const insightsRes = await fetch("/api/insights", { method: "POST" });
                 if (insightsRes.ok) {
