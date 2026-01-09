@@ -102,7 +102,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
 
             {/* Main content */}
             <main
-                className="pb-28 min-h-screen container-app"
+                className="pb-36 min-h-screen container-app"
                 style={{ paddingTop: "100px" }}
             >
                 {children}
