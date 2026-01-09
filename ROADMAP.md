@@ -32,6 +32,24 @@
 
 ---
 
+## App Mechanics (Canonical)
+
+- **Completed Day:** A day counts only when the user taps **Save** on an entry that meets the minimum rule (e.g., >=10 words or >=2 sentences).
+- **One completion per day:** Multiple entries still count as a single completed day.
+- **Streak-driven ranks:** Rank is based on **current consecutive-day streak** only.
+  - Guest = streak 0-3
+  - Member = 4-14
+  - Regular = 15-30
+  - Veteran = 31-56
+  - Final Week = 57-63
+  - Master = 64+
+- **Missed day:** Streak resets unless a grace token is used.
+- **UI must show two numbers:** Current Streak (drives rank) and Total Completed Days (lifetime, never decreases).
+- **64-day framing:** Habit automaticity varies; one large study found a median ~66 days (range ~18-254). "64-day challenge" is credible framing, not a guarantee.
+- **Light gamification:** Use ranks, milestones, streak feedback, and optional prompts (SDT). Avoid heavy points/leaderboards (overjustification risk). Keep action easy + triggered (Fogg).
+
+---
+
 ## Phase 1: Frontend Foundation ✅
 
 ### 1.1 Project Setup ✅
@@ -94,9 +112,9 @@
 - [x] Multiple entries per day support
 
 ### 2.4 Progress & Streaks ✅
-- [x] Streak calculation logic
-- [x] Day counter logic
-- [x] Rank progression logic
+- [x] Streak = consecutive completed days (not calendar days)
+- [x] Total Completed Days tracked separately (lifetime)
+- [x] Rank progression based on current streak
 - [x] Grace token system
 - [x] GET /api/progress endpoint
 - [x] Connect Progress page to API
@@ -210,34 +228,34 @@
 #### B. Core Mechanics Tests
 
 **Entry System**
-- [ ] Create single entry → saved to local IndexedDB
-- [ ] Create multiple entries same day → all saved
-- [ ] Entry syncs date to server (metadata only)
+- [ ] Create single entry that meets minimum rule → saves and counts as completed day
+- [ ] Create multiple entries same day → all saved, still counts as one completed day
+- [ ] Entry syncs date/metadata to server (no content)
 - [ ] Entry content stays local (never sent to server)
 - [ ] View today's entries → all shown with timestamps
 - [ ] View yesterday's entry → displayed correctly
 
 **Streak System**
-- [ ] First entry → streak = 1
-- [ ] Consecutive day entry → streak increments
-- [ ] Miss a day → streak resets to 0
+- [ ] First completed day → streak = 1
+- [ ] Consecutive completed day → streak increments
+- [ ] Miss a day → streak resets (unless grace used)
 - [ ] Use grace token → streak preserved
 - [ ] No grace tokens left → streak resets
 - [ ] Longest streak tracked separately
 
-**Day Counter**
-- [ ] Day 1 set on signup (programStartDate)
-- [ ] Day increments each calendar day
-- [ ] Day counter independent of streak
-- [ ] Existing user with null programStartDate → auto-fixed
+**Total Completed Days**
+- [ ] Increments only on completed day (Save + min rule)
+- [ ] Never decreases
+- [ ] Independent of current streak
+- [ ] Existing user with null totals → auto-fixed
 
 **Rank Progression**
-- [ ] Day 1-3: Guest
-- [ ] Day 4-14: Member
-- [ ] Day 15-30: Regular
-- [ ] Day 31-56: Veteran
-- [ ] Day 57-63: Final Week
-- [ ] Day 64+: Master
+- [ ] Streak 0-3: Guest
+- [ ] Streak 4-14: Member
+- [ ] Streak 15-30: Regular
+- [ ] Streak 31-56: Veteran
+- [ ] Streak 57-63: Final Week
+- [ ] Streak 64+: Master
 
 #### C. Payment Tests
 

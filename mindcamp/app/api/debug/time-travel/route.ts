@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { calculateRankFromStreak } from "@/lib/mechanics";
 
 // POST /api/debug/time-travel - Advance or set user's day
 // DEV ONLY - Blocked in production via middleware
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { action, days, targetDay } = body;
+        const { action, days, targetDay, targetStreak, targetTotalDays } = body;
 
         const { default: prisma } = await import("@/lib/db");
 
@@ -38,36 +39,33 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        let newDay = user.currentDay || 1;
+        let newTotalDays = user.currentDay || 0;
 
         if (action === "advance" && days) {
-            newDay = (user.currentDay || 1) + days;
+            newTotalDays = (user.currentDay || 0) + days;
         } else if (action === "set" && targetDay !== undefined) {
-            newDay = targetDay;
-        } else {
+            newTotalDays = targetDay;
+        } else if (targetTotalDays !== undefined) {
+            newTotalDays = targetTotalDays;
+        } else if (action) {
             return NextResponse.json({ error: "Invalid action" }, { status: 400 });
         }
 
-        // Calculate new rank based on day
-        let newRank = "guest";
-        if (newDay >= 64) newRank = "master";
-        else if (newDay >= 57) newRank = "final_week";
-        else if (newDay >= 31) newRank = "veteran";
-        else if (newDay >= 15) newRank = "regular";
-        else if (newDay >= 4) newRank = "member";
+        const newStreak = typeof targetStreak === "number" ? targetStreak : newTotalDays;
+        const newRank = calculateRankFromStreak(newStreak);
 
         // Calculate new program start date (so day count is correct)
         const newStartDate = new Date();
-        newStartDate.setDate(newStartDate.getDate() - newDay);
+        newStartDate.setDate(newStartDate.getDate() - newTotalDays);
 
         // Update user
         const updatedUser = await prisma.user.update({
             where: { id: session.user.id },
             data: {
-                currentDay: newDay,
+                currentDay: newTotalDays,
                 programStartDate: newStartDate,
                 currentRank: newRank,
-                streakCount: newDay, // Assume perfect streak
+                streakCount: newStreak,
                 lastEntryDate: new Date(), // Mark as wrote today
             },
         });

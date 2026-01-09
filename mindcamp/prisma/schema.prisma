@@ -40,6 +40,7 @@ model User {
 
   entries  Entry[]
   insights Insight[]
+  graceDays GraceDay[]
 
   @@map("users")
 }
@@ -97,4 +98,18 @@ model Prompt {
   active   Boolean @default(true)
 
   @@map("prompts")
+}
+
+// ========================================
+// GRACE DAY MODEL
+// ========================================
+model GraceDay {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([userId, date])
+  @@map("grace_days")
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { calculateRankFromStreak } from "@/lib/mechanics";
 
 // POST /api/debug/generate-entries - Create fake entries for testing
 // DEV ONLY
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
             data: {
                 currentDay: count,
                 programStartDate: newStartDate,
-                currentRank: count >= 64 ? "master" : count >= 57 ? "final_week" : count >= 31 ? "veteran" : "regular",
+                currentRank: calculateRankFromStreak(count),
                 streakCount: count,
                 longestStreak: count,
                 lastEntryDate: today,

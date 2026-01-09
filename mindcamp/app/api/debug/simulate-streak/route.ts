@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
+import { calculateRankFromStreak } from "@/lib/mechanics";
 
 // POST /api/debug/simulate-streak - Create entries to simulate a specific streak
 // DEV ONLY - For testing rank mechanics
@@ -20,14 +21,22 @@ export async function POST(request: Request) {
 
         const userId = session.user.id;
         const body = await request.json();
-        const { streak } = body;
+        const { streak, skipOffsets = [] } = body;
 
         if (typeof streak !== "number" || streak < 0) {
             return NextResponse.json({ error: "Invalid streak value" }, { status: 400 });
         }
 
+        if (!Array.isArray(skipOffsets) || skipOffsets.some((value) => typeof value !== "number" || value < 0)) {
+            return NextResponse.json({ error: "Invalid skipOffsets value" }, { status: 400 });
+        }
+
         // Delete all existing entries for this user
         await prisma.entry.deleteMany({
+            where: { userId },
+        });
+
+        await prisma.graceDay.deleteMany({
             where: { userId },
         });
 
@@ -38,6 +47,7 @@ export async function POST(request: Request) {
 
             const entries = [];
             for (let i = 0; i < streak; i++) {
+                if (skipOffsets.includes(i)) continue;
                 const entryDate = new Date(today);
                 entryDate.setDate(today.getDate() - i);
                 entries.push({
@@ -48,26 +58,54 @@ export async function POST(request: Request) {
                 });
             }
 
-            await prisma.entry.createMany({
-                data: entries,
-            });
+            if (entries.length > 0) {
+                await prisma.entry.createMany({
+                    data: entries,
+                });
+            }
         }
 
-        // Calculate expected rank
-        const calculateRank = (s: number): string => {
-            if (s >= 64) return "master";
-            if (s >= 57) return "finalweek";
-            if (s >= 31) return "veteran";
-            if (s >= 15) return "regular";
-            if (s >= 4) return "member";
-            return "guest";
-        };
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+
+        const entries = await prisma.entry.findMany({
+            where: { userId },
+            select: { entryDate: true },
+            orderBy: { entryDate: "desc" },
+        });
+
+        const entryDates = new Set(entries.map((e) => e.entryDate.toISOString().split("T")[0]));
+        let currentStreak = 0;
+        const checkDate = new Date(today);
+
+        while (true) {
+            const dateStr = checkDate.toISOString().split("T")[0];
+            if (!entryDates.has(dateStr)) break;
+            currentStreak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+        }
+
+        const expectedRank = calculateRankFromStreak(currentStreak);
+        const totalCompletedDays = entryDates.size;
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                streakCount: currentStreak,
+                currentDay: totalCompletedDays,
+                currentRank: expectedRank,
+                longestStreak: Math.max(currentStreak, 0),
+                lastEntryDate: entries[0]?.entryDate ?? null,
+            },
+        });
 
         return NextResponse.json({
             success: true,
-            streak,
-            expectedRank: calculateRank(streak),
-            entriesCreated: streak,
+            streak: currentStreak,
+            targetDays: streak,
+            skipOffsets,
+            expectedRank,
+            entriesCreated: totalCompletedDays,
         });
     } catch (error) {
         console.error("Simulate streak error:", error);

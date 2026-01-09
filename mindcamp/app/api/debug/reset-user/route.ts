@@ -28,6 +28,11 @@ export async function POST() {
             where: { userId: session.user.id },
         });
 
+        // Delete all grace days
+        await prisma.graceDay.deleteMany({
+            where: { userId: session.user.id },
+        });
+
         // Reset user to fresh state
         await prisma.user.update({
             where: { id: session.user.id },

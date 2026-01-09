@@ -68,7 +68,7 @@ export default function ProgressPage() {
         member: "bg-blue-500",
         regular: "bg-[#E05C4D]",
         veteran: "bg-purple-500",
-        final_week: "bg-[#FF9500]",
+        finalweek: "bg-[#FF9500]",
         master: "bg-gradient-to-r from-yellow-400 to-orange-400",
     };
 
@@ -144,7 +144,7 @@ export default function ProgressPage() {
                     {allRanks.map((rank, index) => {
                         const isCompleted = index < currentRankIndex;
                         const isActive = index === currentRankIndex;
-                        const isFinalWeek = rank.key === "final_week";
+                        const isFinalWeek = rank.key === "finalweek";
                         const isMaster = rank.key === "master";
 
                         return (

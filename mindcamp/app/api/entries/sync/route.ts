@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
+import { MIN_WORDS, calculateRankFromStreak } from "@/lib/mechanics";
 
 // POST /api/entries/sync - Sync entry date to server for streak tracking
 // Content is NOT sent - stays local on device
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
 
         const userId = session.user.id;
         const body = await request.json();
-        const { date } = body; // YYYY-MM-DD format
+        const { date, wordCount, meetsMinimum } = body; // YYYY-MM-DD format
 
         if (!date) {
             return NextResponse.json({ error: "Date is required" }, { status: 400 });
@@ -25,11 +26,17 @@ export async function POST(request: Request) {
         const entryDate = new Date(date);
         entryDate.setUTCHours(0, 0, 0, 0);
 
-        // Check if we already have an entry record for this date
+        const reportedWordCount = typeof wordCount === "number" ? wordCount : null;
+        const qualifies =
+            meetsMinimum === true ||
+            (reportedWordCount !== null && reportedWordCount >= MIN_WORDS);
+
+        // Check if we already have a qualifying entry record for this date
         const existingEntry = await prisma.entry.findFirst({
             where: {
                 userId,
                 entryDate,
+                wordCount: { gte: MIN_WORDS },
             },
         });
 
@@ -40,12 +47,14 @@ export async function POST(request: Request) {
                     userId,
                     entryDate,
                     content: "[stored locally]", // Placeholder - actual content on device
-                    wordCount: 0,
+                    wordCount: reportedWordCount ?? 0,
                 },
             });
 
-            // Update user streak
-            await updateUserStreak(userId);
+            if (qualifies) {
+                // Update user streak only for qualifying entries
+                await updateUserStreak(userId);
+            }
         }
 
         return NextResponse.json({ success: true });
@@ -60,9 +69,9 @@ async function updateUserStreak(userId: string) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return;
 
-    // Get all unique entry dates for this user, sorted descending
+    // Get all unique qualifying entry dates for this user, sorted descending
     const entries = await prisma.entry.findMany({
-        where: { userId },
+        where: { userId, wordCount: { gte: MIN_WORDS } },
         select: { entryDate: true },
         orderBy: { entryDate: 'desc' },
     });
@@ -73,6 +82,13 @@ async function updateUserStreak(userId: string) {
     const entryDates = new Set(
         entries.map(e => e.entryDate.toISOString().split('T')[0])
     );
+
+    const graceDays = await prisma.graceDay.findMany({
+        where: { userId },
+        select: { date: true },
+    });
+    const graceDates = new Set(graceDays.map((g) => g.date.toISOString().split("T")[0]));
+    const streakDates = new Set<string>([...entryDates, ...graceDates]);
 
     // Calculate consecutive streak from today backwards
     const today = new Date();
@@ -85,7 +101,7 @@ async function updateUserStreak(userId: string) {
     // Start from today and count backwards while entries exist
     while (true) {
         const dateStr = checkDate.toISOString().split('T')[0];
-        if (entryDates.has(dateStr)) {
+        if (streakDates.has(dateStr)) {
             currentStreak++;
             checkDate.setDate(checkDate.getDate() - 1);
         } else {
@@ -96,6 +112,9 @@ async function updateUserStreak(userId: string) {
     // Get the newest entry date for lastEntryDate
     const latestEntryDate = entries[0].entryDate;
 
+    // Calculate total completed days (unique qualifying entry dates)
+    const totalCompletedDays = entryDates.size;
+
     // Update user with correctly calculated streak
     await prisma.user.update({
         where: { id: userId },
@@ -103,19 +122,10 @@ async function updateUserStreak(userId: string) {
             streakCount: currentStreak,
             lastEntryDate: latestEntryDate,
             longestStreak: Math.max(user.longestStreak, currentStreak),
-            currentRank: calculateRank(user.currentDay),
+            currentRank: calculateRankFromStreak(currentStreak),
+            currentDay: totalCompletedDays,
             // Set program start date on first entry
             ...(user.programStartDate === null && { programStartDate: today }),
         },
     });
-}
-
-// Helper: Calculate rank from day
-function calculateRank(day: number): string {
-    if (day >= 64) return "master";
-    if (day >= 57) return "finalweek";
-    if (day >= 31) return "veteran";
-    if (day >= 15) return "regular";
-    if (day >= 4) return "member";
-    return "guest";
 }

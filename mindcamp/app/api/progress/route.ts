@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
+import { MIN_WORDS, calculateRankFromStreak, getNextRankInfo } from "@/lib/mechanics";
 
 // GET /api/progress - Get user progress data
 export async function GET() {
@@ -36,7 +37,7 @@ export async function GET() {
 
         // Always get first entry date for accurate day calculation
         const firstEntry = await prisma.entry.findFirst({
-            where: { userId },
+            where: { userId, wordCount: { gte: MIN_WORDS } },
             orderBy: { entryDate: 'asc' },
             select: { entryDate: true },
         });
@@ -62,6 +63,28 @@ export async function GET() {
         // Get total entries count
         const totalEntries = await prisma.entry.count({ where: { userId } });
 
+        // Total completed days = unique qualifying days across all entries
+        const allEntryDates = await prisma.entry.findMany({
+            where: { userId, wordCount: { gte: MIN_WORDS } },
+            select: { entryDate: true },
+            distinct: ["entryDate"],
+        });
+        const totalCompletedDays = allEntryDates.length;
+
+        const allEntryDateStrings = new Set(
+            allEntryDates.map((e) => e.entryDate.toISOString().split("T")[0])
+        );
+
+        const graceDays = await prisma.graceDay.findMany({
+            where: { userId },
+            select: { date: true },
+        });
+        const graceDateStrings = new Set(
+            graceDays.map((g) => g.date.toISOString().split("T")[0])
+        );
+
+        const streakDateStrings = new Set<string>([...allEntryDateStrings, ...graceDateStrings]);
+
         // Get activity data for heatmap (last 365 days)
         const oneYearAgo = new Date();
         oneYearAgo.setDate(oneYearAgo.getDate() - 365);
@@ -70,6 +93,7 @@ export async function GET() {
             where: {
                 userId,
                 entryDate: { gte: oneYearAgo },
+                wordCount: { gte: MIN_WORDS },
             },
             select: {
                 entryDate: true,
@@ -79,15 +103,10 @@ export async function GET() {
 
         // Convert entries to activity map
         const activityMap: Record<string, number> = {};
-        const entryDates = new Set<string>();
         entries.forEach((entry: { entryDate: Date; wordCount: number | null }) => {
             const dateStr = entry.entryDate.toISOString().split("T")[0];
             activityMap[dateStr] = 3; // 3 = complete entry
-            entryDates.add(dateStr);
         });
-
-        // Total completed days = unique days with entries (never decreases)
-        const totalCompletedDays = entryDates.size;
 
         // Calculate consecutive streak from today backwards (on-the-fly)
         const today = new Date();
@@ -97,7 +116,7 @@ export async function GET() {
 
         while (true) {
             const dateStr = checkDate.toISOString().split("T")[0];
-            if (entryDates.has(dateStr)) {
+            if (streakDateStrings.has(dateStr)) {
                 currentStreak++;
                 checkDate.setDate(checkDate.getDate() - 1);
             } else {
@@ -106,7 +125,7 @@ export async function GET() {
         }
 
         // Calculate ACTUAL longest streak from all entries
-        const sortedDates = Array.from(entryDates).sort();
+        const sortedDates = Array.from(streakDateStrings).sort();
         let longestStreak = 0;
         let tempStreak = 0;
         let prevDate: Date | null = null;
@@ -129,29 +148,8 @@ export async function GET() {
         }
         longestStreak = Math.max(longestStreak, tempStreak);
 
-        // Calculate rank based on CURRENT STREAK (not calendar days)
-        // Guest = 0-3, Member = 4-14, Regular = 15-30, Veteran = 31-56, Final Week = 57-63, Master = 64+
-        const calculateRank = (streak: number): string => {
-            if (streak >= 64) return "master";
-            if (streak >= 57) return "finalweek";
-            if (streak >= 31) return "veteran";
-            if (streak >= 15) return "regular";
-            if (streak >= 4) return "member";
-            return "guest";
-        };
-
-        // Days until next rank
-        const calculateDaysUntilNextRank = (streak: number): { nextRank: string; daysNeeded: number } | null => {
-            if (streak >= 64) return null; // Already Master
-            if (streak >= 57) return { nextRank: "Master", daysNeeded: 64 - streak };
-            if (streak >= 31) return { nextRank: "Final Week", daysNeeded: 57 - streak };
-            if (streak >= 15) return { nextRank: "Veteran", daysNeeded: 31 - streak };
-            if (streak >= 4) return { nextRank: "Regular", daysNeeded: 15 - streak };
-            return { nextRank: "Member", daysNeeded: 4 - streak };
-        };
-
-        const currentRank = calculateRank(currentStreak);
-        const nextRankInfo = calculateDaysUntilNextRank(currentStreak);
+        const currentRank = calculateRankFromStreak(currentStreak);
+        const nextRankInfo = getNextRankInfo(currentStreak);
 
         return NextResponse.json({
             ...user,
@@ -171,7 +169,7 @@ export async function GET() {
 }
 
 // POST /api/progress/grace - Use a grace token
-export async function POST() {
+export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
 
@@ -190,11 +188,109 @@ export async function POST() {
             return NextResponse.json({ error: "No grace tokens remaining" }, { status: 400 });
         }
 
-        // Use grace token
+        let targetDate = new Date();
+        targetDate.setUTCHours(0, 0, 0, 0);
+        targetDate.setDate(targetDate.getDate() - 1);
+
+        try {
+            const body = await request.json();
+            if (body?.date) {
+                const parsed = new Date(body.date);
+                parsed.setUTCHours(0, 0, 0, 0);
+                targetDate = parsed;
+            }
+        } catch {
+            // No body provided; default to yesterday.
+        }
+
+        const existingEntry = await prisma.entry.findFirst({
+            where: {
+                userId,
+                entryDate: targetDate,
+                wordCount: { gte: MIN_WORDS },
+            },
+        });
+
+        if (existingEntry) {
+            return NextResponse.json({ error: "Day already completed" }, { status: 400 });
+        }
+
+        const existingGrace = await prisma.graceDay.findFirst({
+            where: { userId, date: targetDate },
+        });
+
+        if (existingGrace) {
+            return NextResponse.json({ error: "Grace already used for this day" }, { status: 400 });
+        }
+
+        await prisma.graceDay.create({
+            data: {
+                userId,
+                date: targetDate,
+            },
+        });
+
+        const entries = await prisma.entry.findMany({
+            where: { userId, wordCount: { gte: MIN_WORDS } },
+            select: { entryDate: true },
+            orderBy: { entryDate: "desc" },
+        });
+
+        const entryDates = new Set(entries.map((e) => e.entryDate.toISOString().split("T")[0]));
+        const graceDays = await prisma.graceDay.findMany({
+            where: { userId },
+            select: { date: true },
+        });
+        const graceDates = new Set(graceDays.map((g) => g.date.toISOString().split("T")[0]));
+        const streakDates = new Set<string>([...entryDates, ...graceDates]);
+
+        let currentStreak = 0;
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        const checkDate = new Date(today);
+
+        while (true) {
+            const dateStr = checkDate.toISOString().split("T")[0];
+            if (!streakDates.has(dateStr)) break;
+            currentStreak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+        }
+
+        const sortedDates = Array.from(streakDates).sort();
+        let longestStreak = 0;
+        let tempStreak = 0;
+        let prevDate: Date | null = null;
+
+        for (const dateStr of sortedDates) {
+            const currDate = new Date(dateStr);
+            if (prevDate) {
+                const diffMs = currDate.getTime() - prevDate.getTime();
+                const diffDays = diffMs / (1000 * 60 * 60 * 24);
+                if (diffDays === 1) {
+                    tempStreak++;
+                } else {
+                    longestStreak = Math.max(longestStreak, tempStreak);
+                    tempStreak = 1;
+                }
+            } else {
+                tempStreak = 1;
+            }
+            prevDate = currDate;
+        }
+        longestStreak = Math.max(longestStreak, tempStreak);
+
+        const totalCompletedDays = entryDates.size;
+        const latestEntryDate = entries[0]?.entryDate ?? user.lastEntryDate ?? null;
+
         await prisma.user.update({
             where: { id: userId },
             data: {
                 graceTokens: user.graceTokens - 1,
+                streakCount: currentStreak,
+                longestStreak: Math.max(user.longestStreak, longestStreak),
+                currentRank: calculateRankFromStreak(currentStreak),
+                currentDay: totalCompletedDays,
+                lastEntryDate: latestEntryDate,
             },
         });
 

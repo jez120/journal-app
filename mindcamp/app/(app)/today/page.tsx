@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { YesterdayIcon, TodayIcon, ReflectIcon } from "@/components/JournalIcons";
 import { InsightsContainer } from "@/components/InsightCard";
+import { MIN_WORDS } from "@/lib/mechanics";
 import { addEntry, getEntriesByDate, getTodayDateString, LocalEntry } from "@/lib/localDb";
 
 interface Insight {
@@ -99,7 +100,7 @@ export default function TodayPage() {
     }, [session]);
 
     const wordCount = entry.trim().split(/\s+/).filter(Boolean).length;
-    const minWords = 10;
+    const minWords = MIN_WORDS;
     const isShort = wordCount > 0 && wordCount < minWords;
     const hasContent = entry.trim().length > 0;
 
@@ -126,7 +127,11 @@ export default function TodayPage() {
             const res = await fetch("/api/entries/sync", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ date: todayStr }),
+                body: JSON.stringify({
+                    date: todayStr,
+                    wordCount,
+                    meetsMinimum: wordCount >= minWords,
+                }),
             });
 
             if (!res.ok) {
