@@ -31,12 +31,31 @@ export async function GET() {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        // Calculate actual day number from program start (if set)
+        // Calculate actual day number from program start
         let actualDay = user.currentDay;
-        if (user.programStartDate) {
+        let programStart = user.programStartDate;
+
+        // Fallback: if programStartDate is null, use first entry date
+        if (!programStart) {
+            const firstEntry = await prisma.entry.findFirst({
+                where: { userId },
+                orderBy: { entryDate: 'asc' },
+                select: { entryDate: true },
+            });
+            if (firstEntry) {
+                programStart = firstEntry.entryDate;
+                // Auto-update user record for future requests
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { programStartDate: programStart },
+                });
+            }
+        }
+
+        if (programStart) {
             const now = new Date();
             now.setUTCHours(0, 0, 0, 0);
-            const start = new Date(user.programStartDate);
+            const start = new Date(programStart);
             start.setUTCHours(0, 0, 0, 0);
             const diffTime = now.getTime() - start.getTime();
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
