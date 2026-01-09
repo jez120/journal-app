@@ -10,15 +10,18 @@ interface ProgressData {
     longestStreak: number;
     graceTokens: number;
     totalEntries: number;
+    totalCompletedDays: number;
+    nextRankInfo: { nextRank: string; daysNeeded: number } | null;
 }
 
+// Ranks are based on CURRENT STREAK (consecutive days)
 const allRanks = [
-    { name: "Guest", key: "guest", days: "Day 0-3", unlocks: "Basic writing", minDay: 0 },
-    { name: "Member", key: "member", days: "Day 4-14", unlocks: "Week view", minDay: 4 },
-    { name: "Regular", key: "regular", days: "Day 15-30", unlocks: "Keyword tracking", minDay: 15 },
-    { name: "Veteran", key: "veteran", days: "Day 31-56", unlocks: "Month comparisons", minDay: 31 },
-    { name: "Final Week", key: "final_week", days: "Day 57-63", unlocks: "Harder prompts", minDay: 57 },
-    { name: "Master", key: "master", days: "Day 64+", unlocks: "All analytics", minDay: 64 },
+    { name: "Guest", key: "guest", days: "Streak 0-3", unlocks: "Basic writing", minDay: 0 },
+    { name: "Member", key: "member", days: "Streak 4-14", unlocks: "Week view", minDay: 4 },
+    { name: "Regular", key: "regular", days: "Streak 15-30", unlocks: "Keyword tracking", minDay: 15 },
+    { name: "Veteran", key: "veteran", days: "Streak 31-56", unlocks: "Month comparisons", minDay: 31 },
+    { name: "Final Week", key: "finalweek", days: "Streak 57-63", unlocks: "Harder prompts", minDay: 57 },
+    { name: "Master", key: "master", days: "Streak 64+", unlocks: "All analytics", minDay: 64 },
 ];
 
 export default function ProgressPage() {
@@ -42,22 +45,21 @@ export default function ProgressPage() {
         fetchProgress();
     }, []);
 
-    const totalDays = 63;
-    const currentDay = progress?.currentDay || 0;
-    const progressPercent = Math.min((currentDay / totalDays) * 100, 100);
+    const totalDaysToMaster = 64;
+    const currentStreak = progress?.streakCount || 0;
+    const progressPercent = Math.min((currentStreak / totalDaysToMaster) * 100, 100);
 
     // Determine which rank is active
     const currentRankKey = progress?.currentRank || "guest";
     const currentRankIndex = allRanks.findIndex(r => r.key === currentRankKey);
 
-    // Calculate days until next rank
-    const nextRank = allRanks[currentRankIndex + 1];
-    const daysUntilNext = nextRank ? nextRank.minDay - currentDay : 0;
+    // Use nextRankInfo from API for accurate "days until" display
+    const nextRankInfo = progress?.nextRankInfo;
 
     const stats = [
         { label: "Current Streak", value: String(progress?.streakCount || 0), icon: "🔥" },
         { label: "Longest Streak", value: String(progress?.longestStreak || 0), icon: "🏆" },
-        { label: "Total Entries", value: String(progress?.totalEntries || 0), icon: "📝" },
+        { label: "Total Days", value: String(progress?.totalCompletedDays || 0), icon: "📅" },
         { label: "Grace Tokens", value: String(progress?.graceTokens || 0), icon: "🎟️" },
     ];
 
@@ -83,7 +85,7 @@ export default function ProgressPage() {
             {/* Header */}
             <div>
                 <h1 className="text-3xl font-bold text-white mb-1">Progress</h1>
-                <p className="text-white/60">Day {currentDay} of your journey</p>
+                <p className="text-white/60">🔥 {currentStreak} day streak</p>
             </div>
 
             {/* Current rank card */}
@@ -96,8 +98,8 @@ export default function ProgressPage() {
                         </span>
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-white/60 uppercase mb-1">Day</p>
-                        <p className="text-2xl font-bold text-white">{currentDay}</p>
+                        <p className="text-xs text-white/60 uppercase mb-1">Streak</p>
+                        <p className="text-2xl font-bold text-white">{currentStreak}</p>
                     </div>
                 </div>
 
@@ -105,14 +107,14 @@ export default function ProgressPage() {
                 <div className="mb-2">
                     <div className="flex justify-between text-xs text-white/60 mb-1">
                         <span>Progress to Master</span>
-                        <span>{currentDay}/{totalDays}</span>
+                        <span>{currentStreak}/64</span>
                     </div>
                     <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
                         <div className="h-full bg-[#E05C4D] rounded-full transition-all" style={{ width: `${progressPercent}%` }} />
                     </div>
                 </div>
-                {nextRank && daysUntilNext > 0 && (
-                    <p className="text-xs text-white/60">🎯 {daysUntilNext} days until {nextRank.name}</p>
+                {nextRankInfo && nextRankInfo.daysNeeded > 0 && (
+                    <p className="text-xs text-white/60">🎯 {nextRankInfo.daysNeeded} more consecutive days until {nextRankInfo.nextRank}</p>
                 )}
                 {currentRankKey === "master" && (
                     <p className="text-xs text-green-400">🏆 Congratulations! You've achieved Master rank!</p>

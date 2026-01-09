@@ -86,6 +86,9 @@ export async function GET() {
             entryDates.add(dateStr);
         });
 
+        // Total completed days = unique days with entries (never decreases)
+        const totalCompletedDays = entryDates.size;
+
         // Calculate consecutive streak from today backwards (on-the-fly)
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
@@ -126,13 +129,40 @@ export async function GET() {
         }
         longestStreak = Math.max(longestStreak, tempStreak);
 
+        // Calculate rank based on CURRENT STREAK (not calendar days)
+        // Guest = 0-3, Member = 4-14, Regular = 15-30, Veteran = 31-56, Final Week = 57-63, Master = 64+
+        const calculateRank = (streak: number): string => {
+            if (streak >= 64) return "master";
+            if (streak >= 57) return "finalweek";
+            if (streak >= 31) return "veteran";
+            if (streak >= 15) return "regular";
+            if (streak >= 4) return "member";
+            return "guest";
+        };
+
+        // Days until next rank
+        const calculateDaysUntilNextRank = (streak: number): { nextRank: string; daysNeeded: number } | null => {
+            if (streak >= 64) return null; // Already Master
+            if (streak >= 57) return { nextRank: "Master", daysNeeded: 64 - streak };
+            if (streak >= 31) return { nextRank: "Final Week", daysNeeded: 57 - streak };
+            if (streak >= 15) return { nextRank: "Veteran", daysNeeded: 31 - streak };
+            if (streak >= 4) return { nextRank: "Regular", daysNeeded: 15 - streak };
+            return { nextRank: "Member", daysNeeded: 4 - streak };
+        };
+
+        const currentRank = calculateRank(currentStreak);
+        const nextRankInfo = calculateDaysUntilNextRank(currentStreak);
+
         return NextResponse.json({
             ...user,
-            currentDay: actualDay, // Override with calculated day
-            streakCount: currentStreak, // Override with calculated streak
-            longestStreak: longestStreak, // Override with calculated longest streak
+            currentDay: totalCompletedDays, // Show total completed days as "Day X"
+            streakCount: currentStreak, // Current consecutive streak (drives rank)
+            longestStreak: longestStreak, // Best streak ever
+            currentRank: currentRank, // Rank based on current streak
+            totalCompletedDays, // Lifetime completions (never decreases)
             totalEntries,
             activityMap,
+            nextRankInfo, // { nextRank, daysNeeded } or null if Master
         });
     } catch (error) {
         console.error("Error fetching progress:", error);
