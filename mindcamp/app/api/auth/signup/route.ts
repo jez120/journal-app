@@ -1,27 +1,26 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import prisma from "@/lib/db";
+import { userAuthSchema } from "@/lib/validations/auth";
 
 // POST /api/auth/signup - Register new user
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { email, password, name } = body;
-
         // Validation
-        if (!email || !password) {
+        const result = userAuthSchema.safeParse(body);
+
+        if (!result.success) {
+            console.error("Zod validation result:", JSON.stringify(result, null, 2));
+            const fieldErrors = result.error.flatten().fieldErrors;
+            const errorMessage = fieldErrors.email?.[0] || fieldErrors.password?.[0] || fieldErrors.name?.[0] || "Validation failed";
             return NextResponse.json(
-                { error: "Email and password are required" },
+                { error: errorMessage },
                 { status: 400 }
             );
         }
 
-        if (password.length < 8) {
-            return NextResponse.json(
-                { error: "Password must be at least 8 characters" },
-                { status: 400 }
-            );
-        }
+        const { email, password, name } = result.data;
 
         // Check if user exists
         const existingUser = await prisma.user.findUnique({

@@ -10,6 +10,7 @@ declare module "next-auth" {
             id: string;
             email: string;
             name?: string | null;
+            isAdmin?: boolean;
         };
     }
 }
@@ -60,10 +61,16 @@ export const authOptions: NextAuthOptions = {
         newUser: "/onboarding",
     },
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
                 token.id = user.id;
                 token.email = user.email;
+
+                // Check if user is admin
+                const adminEmails = process.env.ADMIN_EMAILS?.split(",").map(e => e.trim().toLowerCase()) || [];
+                if (user.email && adminEmails.includes(user.email.toLowerCase())) {
+                    token.isAdmin = true;
+                }
             }
             return token;
         },
@@ -71,6 +78,7 @@ export const authOptions: NextAuthOptions = {
             if (token && session.user) {
                 session.user.id = token.id as string;
                 session.user.email = token.email as string;
+                session.user.isAdmin = !!token.isAdmin;
             }
             return session;
         },

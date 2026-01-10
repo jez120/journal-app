@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { userAuthSchema } from "@/lib/validations/auth";
 
 export default function SignupPage() {
     const [email, setEmail] = useState("");
@@ -16,8 +17,10 @@ export default function SignupPage() {
         setIsLoading(true);
         setError("");
 
-        if (password.length < 8) {
-            setError("Password must be at least 8 characters");
+        const result = userAuthSchema.safeParse({ email, password });
+
+        if (!result.success) {
+            setError(result.error.errors[0].message);
             setIsLoading(false);
             return;
         }
@@ -73,9 +76,9 @@ export default function SignupPage() {
 
                 {/* Signup Card */}
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-2xl shadow-xl">
-                    <h1 className="text-xl font-bold text-center mb-1 text-white">Start your journey</h1>
+                    <h1 className="text-xl font-bold text-center mb-1 text-white">Start your 3-day assessment</h1>
                     <p className="text-sm text-white/85 text-center mb-6">
-                        Try free for 3 days, then subscribe
+                        See if journaling works for you
                     </p>
 
                     {error && (

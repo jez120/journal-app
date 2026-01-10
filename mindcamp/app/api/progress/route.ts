@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 import { MIN_WORDS, calculateRankFromStreak, getNextRankInfo } from "@/lib/mechanics";
+import { getNow } from "@/lib/time";
 
 // GET /api/progress - Get user progress data
 export async function GET() {
@@ -25,11 +26,46 @@ export async function GET() {
                 graceTokens: true,
                 programStartDate: true,
                 lastEntryDate: true,
+                lastGraceReset: true,
             },
         });
 
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        // Check for monthly grace token reset (on the 1st of every month)
+        const isAdmin = session.user.isAdmin === true;
+        const now = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
+        const lastReset = user.lastGraceReset;
+        let shouldReset = false;
+
+        if (!lastReset) {
+            // First time tracking: initialize specific field
+            shouldReset = true;
+        } else {
+            const currentMonth = now.getUTCMonth();
+            const currentYear = now.getUTCFullYear();
+            const lastMonth = lastReset.getUTCMonth();
+            const lastYear = lastReset.getUTCFullYear();
+
+            // If we are in a new month compared to last reset
+            if (currentYear > lastYear || (currentYear === lastYear && currentMonth > lastMonth)) {
+                shouldReset = true;
+            }
+        }
+
+        if (shouldReset) {
+            await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    graceTokens: 2,
+                    lastGraceReset: now,
+                },
+            });
+            // Update local user object so response is correct
+            user.graceTokens = 2;
+            user.lastGraceReset = now;
         }
 
         // Calculate actual day number from first entry date (most accurate)
@@ -43,7 +79,7 @@ export async function GET() {
         });
 
         if (firstEntry) {
-            const now = new Date();
+            const now = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
             now.setUTCHours(0, 0, 0, 0);
             const start = new Date(firstEntry.entryDate);
             start.setUTCHours(0, 0, 0, 0);
@@ -86,9 +122,9 @@ export async function GET() {
         const streakDateStrings = new Set<string>([...allEntryDateStrings, ...graceDateStrings]);
 
         // Get activity data for heatmap (last 365 days)
-        const oneYearAgo = new Date();
+        const oneYearAgo = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         oneYearAgo.setDate(oneYearAgo.getDate() - 365);
-        const todayForHeatmap = new Date();
+        const todayForHeatmap = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         todayForHeatmap.setUTCHours(0, 0, 0, 0);
 
         const entries = await prisma.entry.findMany({
@@ -120,10 +156,18 @@ export async function GET() {
         });
 
         // Calculate consecutive streak from today backwards (on-the-fly)
-        const today = new Date();
+        // NEW: Soft streak - if today is missing but yesterday exists, streak is preserved
+        const today = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         today.setUTCHours(0, 0, 0, 0);
+        const todayStr = today.toISOString().split("T")[0];
+
         let currentStreak = 0;
         let checkDate = new Date(today);
+
+        // Soft streak: If today is missing, start counting from yesterday
+        if (!streakDateStrings.has(todayStr)) {
+            checkDate.setDate(checkDate.getDate() - 1);
+        }
 
         while (true) {
             const dateStr = checkDate.toISOString().split("T")[0];
@@ -164,7 +208,7 @@ export async function GET() {
 
         return NextResponse.json({
             ...user,
-            currentDay: totalCompletedDays, // Show total completed days as "Day X"
+            currentDay: actualDay, // Use timeline-based day (Days since start)
             streakCount: currentStreak, // Current consecutive streak (drives rank)
             longestStreak: longestStreak, // Best streak ever
             currentRank: currentRank, // Rank based on current streak
@@ -199,7 +243,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "No grace tokens remaining" }, { status: 400 });
         }
 
-        let targetDate = new Date();
+        const isAdmin = session.user.isAdmin === true;
+        let targetDate = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         targetDate.setUTCHours(0, 0, 0, 0);
         targetDate.setDate(targetDate.getDate() - 1);
 
@@ -256,7 +301,7 @@ export async function POST(request: Request) {
         const streakDates = new Set<string>([...entryDates, ...graceDates]);
 
         let currentStreak = 0;
-        const today = new Date();
+        const today = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         today.setUTCHours(0, 0, 0, 0);
         const checkDate = new Date(today);
 

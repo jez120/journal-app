@@ -198,9 +198,10 @@ export async function importEntries(jsonData: string): Promise<number> {
 }
 
 // Get today's date string (YYYY-MM-DD)
+import { getClientTodayDateString } from "./time-client";
+
 export function getTodayDateString(): string {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
+    return getClientTodayDateString();
 }
 
 // Count total entries

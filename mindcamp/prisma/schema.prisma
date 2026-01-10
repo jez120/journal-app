@@ -29,6 +29,7 @@ model User {
   streakCount      Int       @default(0)
   longestStreak    Int       @default(0)
   graceTokens      Int       @default(2)
+  lastGraceReset   DateTime?
   lastEntryDate    DateTime?
 
   onboardingCompleted Boolean @default(false)

@@ -7,6 +7,7 @@ import { YesterdayIcon, TodayIcon, ReflectIcon } from "@/components/JournalIcons
 import { InsightsContainer } from "@/components/InsightCard";
 import { MIN_WORDS } from "@/lib/mechanics";
 import { addEntry, getEntriesByDate, getTodayDateString, LocalEntry } from "@/lib/localDb";
+import { getClientNow } from "@/lib/time-client";
 
 interface Insight {
     type: "keyword" | "milestone" | "pattern" | "comparison" | "encouragement" | "sentiment" | "dayofweek";
@@ -46,7 +47,8 @@ export default function TodayPage() {
 
     // Use deterministic prompt based on date to prevent hydration mismatch
     const [currentPrompt] = useState(() => {
-        const dayOfYear = Math.floor((new Date().getTime() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
+        const now = getClientNow();
+        const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
         return prompts[dayOfYear % prompts.length];
     });
 
@@ -68,7 +70,7 @@ export default function TodayPage() {
                 })));
 
                 // Fetch yesterday's entries from local IndexedDB
-                const yesterday = new Date();
+                const yesterday = getClientNow();
                 yesterday.setDate(yesterday.getDate() - 1);
                 const yesterdayStr = yesterday.toISOString().split("T")[0];
                 const yesterdayEntries = await getEntriesByDate(yesterdayStr);
@@ -88,6 +90,18 @@ export default function TodayPage() {
                 if (progressRes.ok) {
                     const data = await progressRes.json();
                     setUserProgress(data);
+
+                    // Check paywall: Day 4+ users without subscription need to pay
+                    if (data.currentDay >= 4 && data.subscriptionStatus !== 'active') {
+                        // Check if trial is still active
+                        const trialEndsAt = data.trialEndsAt ? new Date(data.trialEndsAt) : null;
+                        const now = getClientNow();
+
+                        if (!trialEndsAt || trialEndsAt <= now) {
+                            router.push('/paywall');
+                            return;
+                        }
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching data:", err);
@@ -97,7 +111,7 @@ export default function TodayPage() {
         if (session) {
             fetchData();
         }
-    }, [session]);
+    }, [session, router]);
 
     const wordCount = entry.trim().split(/\s+/).filter(Boolean).length;
     const minWords = MIN_WORDS;
@@ -176,7 +190,7 @@ export default function TodayPage() {
         }
     };
 
-    const today = new Date();
+    const today = getClientNow();
     const formattedDate = today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
     const currentDay = userProgress?.currentDay || 1;
     const streakCount = userProgress?.streakCount || 0;

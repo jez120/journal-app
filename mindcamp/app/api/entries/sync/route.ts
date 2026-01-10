@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 import { MIN_WORDS, calculateRankFromStreak } from "@/lib/mechanics";
+import { getNow } from "@/lib/time";
 
 // POST /api/entries/sync - Sync entry date to server for streak tracking
 // Content is NOT sent - stays local on device
@@ -91,14 +92,21 @@ async function updateUserStreak(userId: string) {
     const streakDates = new Set<string>([...entryDates, ...graceDates]);
 
     // Calculate consecutive streak from today backwards
-    const today = new Date();
+    // NEW: If today is missing but yesterday exists, streak is preserved (grace period until end of day)
+    const isAdmin = user.email && process.env.ADMIN_EMAILS?.split(",").map(e => e.trim().toLowerCase()).includes(user.email.toLowerCase());
+    const today = getNow(undefined, process.env.NODE_ENV === "development" || !!isAdmin);
     today.setUTCHours(0, 0, 0, 0);
     const todayStr = today.toISOString().split('T')[0];
 
     let currentStreak = 0;
     let checkDate = new Date(today);
 
-    // Start from today and count backwards while entries exist
+    // Soft streak: If today is missing, start counting from yesterday
+    if (!streakDates.has(todayStr)) {
+        checkDate.setDate(checkDate.getDate() - 1);
+    }
+
+    // Count backwards while entries exist
     while (true) {
         const dateStr = checkDate.toISOString().split('T')[0];
         if (streakDates.has(dateStr)) {
