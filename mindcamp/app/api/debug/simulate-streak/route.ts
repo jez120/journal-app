@@ -7,14 +7,16 @@ import { calculateRankFromStreak } from "@/lib/mechanics";
 // POST /api/debug/simulate-streak - Create entries to simulate a specific streak
 // DEV ONLY - For testing rank mechanics
 export async function POST(request: Request) {
-    // Allow in development or when DEBUG_MODE is set
-    if (process.env.NODE_ENV === "production" && !process.env.DEBUG_MODE) {
+    // Allow in development, with DEBUG_MODE, or for specific test accounts
+    const session = await getServerSession(authOptions);
+    const testEmails = ["arek.peter@gmail.com", "qa.test.core@arpe.uk"];
+    const isTestAccount = session?.user?.email && testEmails.includes(session.user.email);
+
+    if (process.env.NODE_ENV === "production" && !process.env.DEBUG_MODE && !isTestAccount) {
         return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
     try {
-        const session = await getServerSession(authOptions);
-
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }

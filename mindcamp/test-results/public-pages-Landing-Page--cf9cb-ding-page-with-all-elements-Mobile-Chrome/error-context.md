@@ -1,0 +1,103 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img "Clarity Journal" [ref=e7]
+          - generic [ref=e8]: Clarity Journal
+        - generic [ref=e9]:
+          - link "Log in" [ref=e10] [cursor=pointer]:
+            - /url: /login
+          - link "Start Free" [ref=e11] [cursor=pointer]:
+            - /url: /signup
+    - main [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: ✨
+            - generic [ref=e17]: Build lasting habits
+          - heading "Build the habit of knowing yourself." [level=1] [ref=e18]
+          - paragraph [ref=e19]: A simple daily journal that helps you reflect, track patterns, and build consistency. 2 minutes a day, real insights over time.
+          - generic [ref=e20]:
+            - link "Start Free Trial" [ref=e21] [cursor=pointer]:
+              - /url: /signup
+            - link "See how it works" [ref=e22] [cursor=pointer]:
+              - /url: "#how-it-works"
+          - generic [ref=e23]:
+            - generic [ref=e24]:
+              - img [ref=e25]
+              - generic [ref=e27]: 3 days free
+            - generic [ref=e28]:
+              - img [ref=e29]
+              - generic [ref=e31]: Cancel anytime
+            - generic [ref=e32]:
+              - img [ref=e33]
+              - generic [ref=e35]: 2 minutes per day
+        - generic [ref=e36]:
+          - heading "How it works" [level=2] [ref=e37]
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - img [ref=e41]
+              - heading "Yesterday's Entry" [level=3] [ref=e52]
+              - paragraph [ref=e53]: Start each session by reading what you wrote yesterday. This builds continuity and self-awareness.
+            - generic [ref=e54]:
+              - img [ref=e56]
+              - heading "Write today" [level=3] [ref=e64]
+              - paragraph [ref=e65]: Answer a simple prompt with 2-3 sentences. Takes under 2 minutes. Consistency over quantity.
+            - generic [ref=e66]:
+              - img [ref=e68]
+              - heading "See patterns" [level=3] [ref=e78]
+              - paragraph [ref=e79]: Over time, discover insights from your own words. What themes keep appearing? What's changing?
+        - generic [ref=e80]:
+          - heading "Your 63-Day Journey" [level=2] [ref=e81]
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - generic [ref=e84]: Guest
+              - paragraph [ref=e85]: Day 0-3
+            - generic [ref=e86]:
+              - generic [ref=e87]: Member
+              - paragraph [ref=e88]: Day 4-14
+            - generic [ref=e89]:
+              - generic [ref=e90]: Regular
+              - paragraph [ref=e91]: Day 15-30
+            - generic [ref=e92]:
+              - generic [ref=e93]: Veteran
+              - paragraph [ref=e94]: Day 31-56
+            - generic [ref=e95]:
+              - generic [ref=e96]: Final Week
+              - paragraph [ref=e97]: Day 57-63
+            - generic [ref=e98]:
+              - generic [ref=e99]: Master
+              - paragraph [ref=e100]: Day 64+
+        - generic [ref=e101]:
+          - paragraph [ref=e102]: Join thousands building lasting journaling habits
+          - generic [ref=e103]:
+            - generic [ref=e104]:
+              - generic [ref=e105]: 10K+
+              - generic [ref=e106]: Active users
+            - generic [ref=e107]:
+              - generic [ref=e108]: 2.5M
+              - generic [ref=e109]: Entries written
+            - generic [ref=e110]:
+              - generic [ref=e111]: 68%
+              - generic [ref=e112]: Complete journey
+    - contentinfo [ref=e113]:
+      - generic [ref=e115]:
+        - generic [ref=e116]:
+          - img "Clarity Journal" [ref=e117]
+          - generic [ref=e118]: Clarity Journal
+        - generic [ref=e119]:
+          - link "Privacy" [ref=e120] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms" [ref=e121] [cursor=pointer]:
+            - /url: /terms
+          - link "Contact" [ref=e122] [cursor=pointer]:
+            - /url: /contact
+        - paragraph [ref=e123]: © 2026 Clarity Journal
+  - button "Open Next.js Dev Tools" [ref=e129] [cursor=pointer]:
+    - img [ref=e130]
+  - alert [ref=e133]
+```
