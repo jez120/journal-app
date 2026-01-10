@@ -27,7 +27,7 @@
 2. Views "How it works" section (3 cards)
 3. Views "63-Day Journey" progression preview
 4. Clicks "Start Free Trial"
-5. Enters email + password (min 8 chars)
+5. Enters email + password (min 8 chars, validated via Zod schema)
 6. Account created → redirected to onboarding
 
 ### Day 0: Onboarding (2 screens)
@@ -50,9 +50,10 @@
 - **Key behavior**: Day counter starts at Day 1 on signup date
 
 ### Day 4: Paywall Trigger
-- User tries to write → Paywall modal appears
+- User tries to access main app → Redirected to /paywall
+- Message: "Your 3-day assessment is complete. Subscribe to continue."
 - Options:
-  - Subscribe ($4.99/mo or $39.99/yr)
+  - Subscribe ($9.99/mo or $69.99/yr)
   - Read-only mode (can view old entries but cannot write)
 - After payment → Rank becomes "Member"
 
@@ -60,7 +61,7 @@
 - **Rank**: Member
 - **Features unlocked**: Week view (compare this week vs last week)
 - **Streak**: Must write daily to maintain streak
-- **Grace tokens**: 2 tokens available - can skip 1 day without breaking streak
+- **Grace tokens**: 2 tokens available - can skip 1 day without breaking streak. Tokens reset to 2 on the 1st of every month.
 
 ### Day 15-30: Regular Phase
 - **Rank**: Regular
@@ -167,6 +168,13 @@ Table: Entry (server only stores DATE, not content)
 - **Entry today + NO entry yesterday + grace token available**: streak maintained, token used
 - **Entry today + NO entry yesterday + NO grace token**: streak = 1 (reset)
 - **Multiple entries same day**: streak NOT incremented again
+
+### Soft Streak (Grace Period)
+> **NEW**: If today is missing but yesterday has an entry, the streak is **preserved** (not reset to 0). This gives users until end of day to maintain their streak.
+
+- **Streak display**: Shows current streak even if today's entry not yet written
+- **Reset trigger**: Only resets if BOTH today AND yesterday are missing
+- **Example**: User wrote yesterday (streak 5), hasn't written today → Shows "Streak: 5" until midnight
 
 ### Day Counter Rules
 - **Day 1**: Set on signup date (programStartDate)

@@ -36,7 +36,7 @@ export async function GET() {
 
         // Check for monthly grace token reset (on the 1st of every month)
         const isAdmin = session.user.isAdmin === true;
-        const now = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
+        const now = await getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         const lastReset = user.lastGraceReset;
         let shouldReset = false;
 
@@ -79,7 +79,7 @@ export async function GET() {
         });
 
         if (firstEntry) {
-            const now = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
+            const now = await getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
             now.setUTCHours(0, 0, 0, 0);
             const start = new Date(firstEntry.entryDate);
             start.setUTCHours(0, 0, 0, 0);
@@ -122,9 +122,9 @@ export async function GET() {
         const streakDateStrings = new Set<string>([...allEntryDateStrings, ...graceDateStrings]);
 
         // Get activity data for heatmap (last 365 days)
-        const oneYearAgo = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
+        const oneYearAgo = await getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         oneYearAgo.setDate(oneYearAgo.getDate() - 365);
-        const todayForHeatmap = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
+        const todayForHeatmap = await getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         todayForHeatmap.setUTCHours(0, 0, 0, 0);
 
         const entries = await prisma.entry.findMany({
@@ -157,7 +157,7 @@ export async function GET() {
 
         // Calculate consecutive streak from today backwards (on-the-fly)
         // NEW: Soft streak - if today is missing but yesterday exists, streak is preserved
-        const today = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
+        const today = await getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         today.setUTCHours(0, 0, 0, 0);
         const todayStr = today.toISOString().split("T")[0];
 
@@ -244,7 +244,7 @@ export async function POST(request: Request) {
         }
 
         const isAdmin = session.user.isAdmin === true;
-        let targetDate = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
+        let targetDate = await getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         targetDate.setUTCHours(0, 0, 0, 0);
         targetDate.setDate(targetDate.getDate() - 1);
 
@@ -301,7 +301,7 @@ export async function POST(request: Request) {
         const streakDates = new Set<string>([...entryDates, ...graceDates]);
 
         let currentStreak = 0;
-        const today = getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
+        const today = await getNow(undefined, process.env.NODE_ENV === "development" || isAdmin);
         today.setUTCHours(0, 0, 0, 0);
         const checkDate = new Date(today);
 

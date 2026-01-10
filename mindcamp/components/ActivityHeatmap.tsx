@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAllEntries } from "@/lib/localDb";
+import { getClientNow } from "@/lib/time-client";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -13,7 +14,7 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
     const [hoveredDay, setHoveredDay] = useState<{ date: string; level: number; x: number; y: number } | null>(null);
     const [viewMode, setViewMode] = useState<ViewMode>("year");
 
-    const today = new Date();
+    const today = getClientNow();
 
     // Fetch entry dates from local IndexedDB and grace days from server
     useEffect(() => {
@@ -82,28 +83,23 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
         if (viewMode === "month") {
             return MONTHS[today.getMonth()] + " " + today.getFullYear();
         } else {
-            // Rolling 365 days - show year range if crossing years
-            const startDate = new Date(today);
-            startDate.setDate(today.getDate() - 364);
-            if (startDate.getFullYear() !== today.getFullYear()) {
-                return `${startDate.getFullYear()} - ${today.getFullYear()}`;
-            }
             return today.getFullYear().toString();
         }
     };
 
-    // ========== YEAR VIEW (Rolling 365 days, GitHub-style) ==========
+    // ========== YEAR VIEW (Calendar year, GitHub-style) ==========
     const renderYearView = () => {
+        const year = today.getFullYear();
         const weeks: Date[][] = [];
 
-        // Start from 52 weeks ago (364 days), aligned to start of week
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - 364);
-        // Adjust to start of week (Sunday)
-        startDate.setDate(startDate.getDate() - startDate.getDay());
+        const yearStart = new Date(year, 0, 1);
+        const yearEnd = new Date(year, 11, 31);
 
-        // End at today
-        const endDate = new Date(today);
+        // Start at the Sunday before Jan 1 and end at the Saturday after Dec 31
+        const startDate = new Date(yearStart);
+        startDate.setDate(startDate.getDate() - startDate.getDay());
+        const endDate = new Date(yearEnd);
+        endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
 
         let currentDate = new Date(startDate);
         while (currentDate <= endDate) {
@@ -115,17 +111,16 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
             weeks.push(week);
         }
 
-        // Build month labels (track when month changes)
+        // Build month labels (track when month changes within the year)
         const monthLabels: { label: string; weekIndex: number }[] = [];
         let lastMonth = -1;
         weeks.forEach((week, weekIndex) => {
-            const firstDayOfWeek = week[0];
-            const month = firstDayOfWeek.getMonth();
-            const year = firstDayOfWeek.getFullYear();
-            // Show label at start of each month
-            if (month !== lastMonth && firstDayOfWeek.getDate() <= 7) {
+            const firstInYear = week.find((day) => day.getFullYear() === year);
+            if (!firstInYear) return;
+            const month = firstInYear.getMonth();
+            if (month !== lastMonth) {
                 const monthName = MONTHS[month];
-                const label = monthLabels.length === 0 || month === 0 ? `${monthName} ${year}` : monthName;
+                const label = month === 0 ? `${monthName} ${year}` : monthName;
                 monthLabels.push({ label, weekIndex });
                 lastMonth = month;
             }
@@ -155,16 +150,17 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
                             return (
                                 <div key={weekIndex} className={`flex flex-col gap-[2px] ${isNewMonth ? "ml-[6px]" : ""}`}>
                                     {week.map((date, dayIndex) => {
+                                        const inYear = date.getFullYear() === year;
                                         const dateStr = date.toISOString().split("T")[0];
-                                        const level = activityData.get(dateStr) ?? 0;
+                                        const level = inYear ? activityData.get(dateStr) ?? 0 : 0;
                                         const isFuture = date > today;
 
                                         return (
                                             <div
                                                 key={dayIndex}
-                                                className={`w-[10px] h-[10px] rounded-[2px] cursor-pointer ${isFuture ? "bg-white/5" : getLevelColor(level)}`}
+                                                className={`w-[10px] h-[10px] rounded-[2px] ${inYear ? "cursor-pointer" : "cursor-default"} ${inYear ? (isFuture ? "bg-white/5" : getLevelColor(level)) : "bg-transparent"}`}
                                                 onMouseEnter={(e) => {
-                                                    if (!isFuture) {
+                                                    if (inYear && !isFuture) {
                                                         const rect = e.currentTarget.getBoundingClientRect();
                                                         const card = e.currentTarget.closest('.relative.group');
                                                         if (card) {

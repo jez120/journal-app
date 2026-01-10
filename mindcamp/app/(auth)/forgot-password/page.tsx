@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { BackIcon, CheckIcon } from "@/components/JournalIcons";
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
@@ -79,9 +80,7 @@ export default function ForgotPasswordPage() {
                 ) : (
                     <div className="text-center">
                         <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
+                            <CheckIcon className="w-8 h-8" />
                         </div>
                         <h2 className="text-xl font-semibold text-white/90 mb-2">
                             Check Your Email
@@ -95,9 +94,10 @@ export default function ForgotPasswordPage() {
                 <div className="mt-6 text-center">
                     <Link
                         href="/login"
-                        className="text-white/60 hover:text-white/80 text-sm transition-colors"
+                        className="text-white/60 hover:text-white/80 text-sm transition-colors inline-flex items-center gap-2"
                     >
-                        ← Back to Login
+                        <BackIcon className="w-4 h-4" />
+                        <span>Back to Login</span>
                     </Link>
                 </div>
             </div>

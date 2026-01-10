@@ -194,6 +194,178 @@ export function WarningIcon({ className = "w-8 h-8" }: { className?: string }) {
 }
 
 // ============================================
+// UTILITY ICONS
+// ============================================
+
+export function BackIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Isometric left arrow */}
+            <path d="M10 12 L16 8 L16 16 Z" fill="#0E7490" /> {/* Arrow head base */}
+            <path d="M10 12 L16 8 L8 12 Z" fill="#22D3EE" /> {/* Arrow top */}
+            <path d="M10 12 L16 16 L8 12 Z" fill="#0891B2" /> {/* Arrow bottom shadow */}
+            {/* Shaft */}
+            <path d="M16 11 L20 11 L20 13 L16 13 Z" fill="#06B6D4" />
+        </svg>
+    );
+}
+
+export function ForwardIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Isometric right arrow */}
+            <path d="M14 12 L8 8 L8 16 Z" fill="#0E7490" />
+            <path d="M14 12 L8 8 L16 12 Z" fill="#22D3EE" />
+            <path d="M14 12 L8 16 L16 12 Z" fill="#0891B2" />
+            <path d="M4 11 L8 11 L8 13 L4 13 Z" fill="#06B6D4" />
+        </svg>
+    );
+}
+
+export function CheckIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Isometric Checkmark */}
+            {/* Short leg */}
+            <path d="M9 16 L5 12 L7 10 L11 14 Z" fill="#22C55E" />
+            <path d="M9 18 L5 14 L5 12 L9 16 Z" fill="#166534" /> {/* Shadow */}
+            {/* Long leg */}
+            <path d="M9 16 L19 6 L21 8 L11 18 Z" fill="#4ADE80" />
+            <path d="M9 18 L19 8 L19 6 L9 16 Z" fill="#15803D" /> {/* Shadow */}
+            {/* Sparkle */}
+            <circle cx="19" cy="5" r="1" fill="#BBF7D0" />
+        </svg>
+    );
+}
+
+export function TrophyIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Trophy cup */}
+            <path d="M7 5 L17 5 L16 11 L8 11 Z" fill="#FBBF24" />
+            <path d="M8 11 L16 11 L14 15 L10 15 Z" fill="#F59E0B" />
+            {/* Handles */}
+            <path d="M4 6 L7 6 L7 9 L5 9 Z" fill="#F59E0B" />
+            <path d="M17 6 L20 6 L19 9 L17 9 Z" fill="#F59E0B" />
+            {/* Base */}
+            <path d="M9 15 L15 15 L15 18 L9 18 Z" fill="#D97706" />
+            <path d="M8 18 L16 18 L16 20 L8 20 Z" fill="#B45309" />
+        </svg>
+    );
+}
+
+export function CalendarIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Calendar body */}
+            <path d="M4 6 L20 6 L20 20 L4 20 Z" fill="#22D3EE" />
+            <path d="M4 6 L20 6 L20 10 L4 10 Z" fill="#0E7490" />
+            {/* Date blocks */}
+            <path d="M7 12 L10 12 L10 15 L7 15 Z" fill="#A5F3FC" />
+            <path d="M12 12 L15 12 L15 15 L12 15 Z" fill="#67E8F9" />
+            <path d="M7 16 L10 16 L10 19 L7 19 Z" fill="#67E8F9" />
+            <path d="M12 16 L15 16 L15 19 L12 19 Z" fill="#A5F3FC" />
+        </svg>
+    );
+}
+
+export function TicketIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Ticket body */}
+            <path d="M4 8 L20 8 L20 12 L18 12 L18 16 L20 16 L20 20 L4 20 L4 16 L6 16 L6 12 L4 12 Z" fill="#F97316" />
+            {/* Inner cut */}
+            <path d="M6 10 L18 10 L18 14 L6 14 Z" fill="#FDBA74" />
+            {/* Divider */}
+            <path d="M12 9 L12 19" stroke="#EA580C" strokeWidth="1.2" strokeDasharray="1.5 1.5" />
+        </svg>
+    );
+}
+
+export function TargetIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Target rings */}
+            <circle cx="12" cy="12" r="9" fill="#FCA5A5" />
+            <circle cx="12" cy="12" r="6" fill="#EF4444" />
+            <circle cx="12" cy="12" r="3" fill="#FCD34D" />
+            {/* Center dot */}
+            <circle cx="12" cy="12" r="1.5" fill="#991B1B" />
+        </svg>
+    );
+}
+
+export function LightbulbIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Bulb */}
+            <circle cx="12" cy="9" r="6" fill="#FCD34D" />
+            <path d="M8 12 L16 12 L15 16 L9 16 Z" fill="#F59E0B" />
+            {/* Base */}
+            <path d="M9 16 L15 16 L15 19 L9 19 Z" fill="#D97706" />
+            {/* Highlight */}
+            <path d="M10 6 L12 5 L13 6" stroke="#FEF3C7" strokeWidth="1" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+export function SparkleIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Sparkle star */}
+            <path d="M12 3 L13.5 8.5 L19 10 L13.5 11.5 L12 17 L10.5 11.5 L5 10 L10.5 8.5 Z" fill="#A5F3FC" />
+            <circle cx="18" cy="6" r="1.5" fill="#67E8F9" />
+        </svg>
+    );
+}
+
+export function BoltIcon({ className = "w-5 h-5" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            <path d="M13 2 L5 13 L11 13 L9 22 L19 10 L13 10 Z" fill="#FBBF24" />
+            <path d="M13 2 L9 12 L11 12 L9 22 L14 12 L12 12 Z" fill="#F59E0B" />
+        </svg>
+    );
+}
+
+export function CloseIcon({ className = "w-5 h-5" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            <path d="M6 6 L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path d="M6 18 L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+export function ChevronDownIcon({ className = "w-5 h-5" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            <path d="M6 9 L12 15 L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
+
+export function FireIcon({ className = "w-6 h-6" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+            {/* Isometric Flame */}
+            {/* Outer Flame (Orange) */}
+            <path d="M12 21 C16 21 19 18 19 13 C19 9 16 6 12 2 C8 6 5 9 5 13 C5 18 8 21 12 21 Z" fill="#F97316" />
+            <path d="M12 21 C8 21 5 18 5 13 C5 11 6 9 7 8 L12 21 Z" fill="#EA580C" /> {/* Shadow side */}
+
+            {/* Inner Flame (Yellow) */}
+            <path d="M12 18 C14 18 15.5 16 15.5 13.5 C15.5 11 14 9 12 7 C10 9 8.5 11 8.5 13.5 C8.5 16 10 18 12 18 Z" fill="#FCD34D" />
+
+            {/* Core Flame (White/Light Yellow) */}
+            <path d="M12 16 C13 16 13.5 15 13.5 14 C13.5 13 13 12 12 11 C11 12 10.5 13 10.5 14 C10.5 15 11 16 12 16 Z" fill="#FEF3C7" />
+
+            {/* Spark */}
+            <circle cx="14" cy="5" r="1.5" fill="#FDBA74" opacity="0.8" />
+        </svg>
+    );
+}
+
+// ============================================
 // APP LOGO
 // ============================================
 

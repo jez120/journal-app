@@ -2,25 +2,34 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { calculateRankFromStreak } from "@/lib/mechanics";
+import { enforceDebugGuard, logDebugAction } from "@/lib/debug-tools";
 
 // POST /api/debug/generate-entries - Create fake entries for testing
 // DEV ONLY
 export async function POST(request: Request) {
-    if (process.env.NODE_ENV === "production" && !process.env.DEBUG_MODE) {
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
     try {
         const session = await getServerSession(authOptions);
-
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        let body: { count?: number; confirm?: unknown } = {};
+        try {
+            body = await request.json();
+        } catch {
+            body = {};
         }
 
-        const body = await request.json();
+        const guard = enforceDebugGuard({
+            action: "generate-entries",
+            request,
+            session,
+            confirm: body.confirm,
+            requiresConfirm: true,
+            heavy: true,
+        });
+        if (!guard.ok) return guard.response;
+
         const { count = 65 } = body;
 
         const { default: prisma } = await import("@/lib/db");
+        const userId = guard.actor.id;
 
         const entries = [];
         const today = new Date();
@@ -30,7 +39,7 @@ export async function POST(request: Request) {
             entryDate.setDate(today.getDate() - (count - 1 - i));
 
             entries.push({
-                userId: session.user.id,
+                userId,
                 entryDate: entryDate,
                 content: `Day ${i + 1} journal entry. Testing the full journey simulation. This is test content with enough words to pass validation.`,
                 reflection: i % 3 === 0 ? `Reflection for day ${i + 1}` : null,
@@ -40,7 +49,7 @@ export async function POST(request: Request) {
 
         // Delete existing entries first
         await prisma.entry.deleteMany({
-            where: { userId: session.user.id },
+            where: { userId },
         });
 
         // Create all entries
@@ -53,7 +62,7 @@ export async function POST(request: Request) {
         newStartDate.setDate(newStartDate.getDate() - count);
 
         await prisma.user.update({
-            where: { id: session.user.id },
+            where: { id: userId },
             data: {
                 currentDay: count,
                 programStartDate: newStartDate,
@@ -62,6 +71,16 @@ export async function POST(request: Request) {
                 longestStreak: count,
                 lastEntryDate: today,
             },
+        });
+
+        await logDebugAction({
+            action: "generate-entries",
+            actorUserId: guard.actor.id,
+            actorEmail: guard.actor.email,
+            targetUserId: userId,
+            targetEmail: guard.actor.email,
+            metadata: { count },
+            request,
         });
 
         return NextResponse.json({

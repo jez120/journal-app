@@ -1,6 +1,6 @@
 # MindCamp - Implementation Roadmap
 
-> **Last Updated**: January 9, 2026
+> **Last Updated**: January 10, 2026
 
 ---
 
@@ -9,16 +9,18 @@
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  CURRENT PHASE: Phase 5 - Final Testing                 │
-│  NEXT STEP: Launch!                                     │
+│  NEXT STEP: Fix Critical Bugs (Core, Pay, Privacy)      │
 │                                                         │
-│  █████████████████████████████████████████████████ 100% │
+│  █████████████████████████████████████████░░░░░░░░ 85%  │
 │                                                         │
-│  ✅ Frontend (18/18) - iOS semantic colors, tab bar     │
-│  ✅ Backend (22/22) - Auth, DB, entries, password reset │
-│  ✅ Payments (11/11) - Stripe setup, paywall, beta mode │
-│  ✅ Insights (10/10) - Full insights with sentiment     │
-│  ✅ Polish (18/18) - Export, settings, domain, email    │
-│  ✅ Privacy (3/3) - Local storage, export/import        │
+│  ⚠️ Frontend (18/18) - iOS semantic colors, tab bar     │
+│  ⚠️ Backend (22/22) - Auth, DB, entries, password reset │
+│  ⚠️ Payments (11/11) - Stripe setup, paywall, beta mode │
+│  ⚠️ Insights (10/10) - Full insights with sentiment     │
+│  ⚠️ Polish (18/18) - Export, settings, domain, email    │
+│  ⚠️ Privacy (3/3) - Local storage, export/import        │
+│  ⚠️ Digital Gym (4/4) - Zod, soft streak, paywall gate  │
+│  ⚠️ Testing (64/91) - Automated suite verification      │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -44,6 +46,7 @@
   - Final Week = 57-63
   - Master = 64+
 - **Missed day:** Streak resets unless a grace token is used.
+- **Soft streak:** If today is missing but yesterday has entry, streak is preserved until end of day.
 - **UI must show two numbers:** Current Streak (drives rank) and Total Completed Days (lifetime, never decreases).
 - **64-day framing:** Habit automaticity varies; one large study found a median ~66 days (range ~18-254). "64-day challenge" is credible framing, not a guarantee.
 - **Light gamification:** Use ranks, milestones, streak feedback, and optional prompts (SDT). Avoid heavy points/leaderboards (overjustification risk). Keep action easy + triggered (Fogg).
@@ -190,89 +193,89 @@
 #### A. User Journey Tests (Full Progression)
 
 **Day 1-3: Guest Phase (Free Trial)**
-- [ ] Sign up → redirects to onboarding
-- [ ] Onboarding completes → Today page shows Day 1
-- [ ] Write first entry → streak shows 1, Day 1
-- [ ] Next day shows Day 2, yesterday's entry visible
-- [ ] Day 3 shows trial expiring warning
-- [ ] Day 4 triggers paywall (cannot write without subscription)
+- [✅] Sign up → redirects to onboarding
+- [✅] Onboarding completes → Today page shows Day 1
+- [✅] Write first entry → streak shows 1, Day 1
+- [✅] Next day shows Day 2, yesterday's entry visible
+- [✅] Day 3 shows trial expiring warning
+- [✅] Day 4 triggers paywall (cannot write without subscription)
 
 **Day 4-14: Member Phase**
-- [ ] Subscribe → paywall dismissed, can write
-- [ ] Day counter continues correctly (4, 5, 6...)
-- [ ] Streak maintained with consecutive entries
-- [ ] Miss a day → streak resets to 0
-- [ ] Grace token available → use token → streak preserved
-- [ ] Week view unlocked (after Day 7)
+- [✅] Subscribe → paywall dismissed, can write
+- [✅] Day counter continues correctly (4, 5, 6...)
+- [✅] Streak maintained with consecutive entries
+- [✅] Miss a day → streak resets to 0
+- [✅] Grace token available → use token → streak preserved
+- [✅] Week view unlocked (after Day 7)
 
 **Day 15-30: Regular Phase**
-- [ ] Rank changes to "Regular" on Day 15
-- [ ] Keyword tracking visible in insights
-- [ ] Writing patterns shown
+- [✅] Rank changes to "Regular" on Day 15
+- [✅] Keyword tracking visible in insights
+- [✅] Writing patterns shown
 
 **Day 31-56: Veteran Phase**
-- [ ] Rank changes to "Veteran" on Day 31
+- [✅] Rank changes to "Veteran" on Day 31
 - [ ] Month comparison insights available
-- [ ] Historical data visible in heatmap
+- [✅] Historical data visible in heatmap
 
 **Day 57-63: Final Week Challenge**
-- [ ] Rank changes to "Final Week" on Day 57
+- [✅] Rank changes to "Final Week" on Day 57
 - [ ] Harder prompts appear (if implemented)
 - [ ] Challenge pass requirements active
 
 **Day 64+: Master Phase**
-- [ ] Rank changes to "Master" on Day 64
+- [❌] Rank changes to "Master" on Day 64
 - [ ] Full access to all features unlocked
 - [ ] Lifetime access granted
 
 #### B. Core Mechanics Tests
 
 **Entry System**
-- [ ] Create single non-empty entry → saves and counts as completed day
-- [ ] Create multiple entries same day → all saved, still counts as one completed day
-- [ ] Entry syncs date/metadata to server (no content)
-- [ ] Entry content stays local (never sent to server)
-- [ ] View today's entries → all shown with timestamps
-- [ ] View yesterday's entry → displayed correctly
+- [❌] Create single non-empty entry → saves and counts as completed day
+- [✅] Create multiple entries same day → all saved, still counts as one completed day
+- [❌] Entry syncs date/metadata to server (no content)
+- [✅] Entry content stays local (never sent to server)
+- [❌] View today's entries → all shown with timestamps
+- [❌] View yesterday's entry → displayed correctly
 
 **Streak System**
-- [ ] First completed day → streak = 1
-- [ ] Consecutive completed day → streak increments
-- [ ] Miss a day → streak resets (unless grace used)
-- [ ] Use grace token → streak preserved
-- [ ] No grace tokens left → streak resets
-- [ ] Longest streak tracked separately
+- [✅] First completed day → streak = 1
+- [✅] Consecutive completed day → streak increments
+- [✅] Miss a day → streak resets (unless grace used)
+- [✅] Use grace token → streak preserved
+- [✅] No grace tokens left → streak resets
+- [✅] Longest streak tracked separately
 
 **Total Completed Days**
-- [ ] Increments only on completed day (Save)
-- [ ] Never decreases
-- [ ] Independent of current streak
-- [ ] Existing user with null totals → auto-fixed
+- [✅] Increments only on completed day (Save)
+- [✅] Never decreases
+- [✅] Independent of current streak
+- [✅] Existing user with null totals → auto-fixed
 
 **Rank Progression**
-- [ ] Streak 0-3: Guest
-- [ ] Streak 4-14: Member
-- [ ] Streak 15-30: Regular
-- [ ] Streak 31-56: Veteran
-- [ ] Streak 57-63: Final Week
-- [ ] Streak 64+: Master
+- [✅] Streak 0-3: Guest
+- [✅] Streak 4-14: Member
+- [✅] Streak 15-30: Regular
+- [✅] Streak 31-56: Veteran
+- [✅] Streak 57-63: Final Week
+- [❌] Streak 64+: Master
 
 #### C. Payment Tests
 
-- [ ] Start trial → 3 days free
+- [✅] Start trial → 3 days free
 - [ ] Cancel before Day 4 → no charge
-- [ ] Subscribe on Day 4 → access restored
+- [✅] Subscribe on Day 4 → access restored
 - [ ] Recurring payment → subscription active
-- [ ] Cancel subscription → read-only mode after period
+- [❌] Cancel subscription → read-only mode after period
 - [ ] Resubscribe → full access restored
 
 #### D. Local Storage Tests
 
-- [ ] New entry saved to IndexedDB
-- [ ] App reload → entries persist
-- [ ] Export → JSON file downloads
+- [✅] New entry saved to IndexedDB
+- [✅] App reload → entries persist
+- [❌] Export → JSON file downloads
 - [ ] Import backup → entries restored
-- [ ] Clear browser data → entries lost (expected)
+- [✅] Clear browser data → entries lost (expected)
 - [ ] Install as PWA → storage more persistent
 
 #### E. Edge Cases
@@ -297,7 +300,7 @@
 #### G. Insight Tests
 
 - [ ] After entry → insights generated
-- [ ] Keyword frequency accurate
+- [❌] Keyword frequency accurate
 - [ ] Streak milestones detected
 - [ ] Week comparisons shown (after 2 weeks)
 - [ ] Sentiment analysis displayed

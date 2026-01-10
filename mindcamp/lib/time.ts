@@ -1,5 +1,9 @@
 import { headers } from "next/headers";
-import 'server-only';
+import "server-only";
+
+type HeaderSource = {
+    get(name: string): string | null;
+};
 
 /**
  * Gets the current date/time, respecting any virtual time overrides from cookies/headers.
@@ -9,16 +13,20 @@ import 'server-only';
  * @param allowVirtual Whether to allow virtual time (pass true if user is admin or in dev mode)
  * @returns Date object representing "now"
  */
-export function getNow(reqHeaders?: Headers, allowVirtual: boolean = process.env.NODE_ENV === "development"): Date {
+export async function getNow(
+    reqHeaders?: Headers,
+    allowVirtual: boolean = process.env.NODE_ENV === "development"
+): Promise<Date> {
     // If not allowed, always return real time
     if (!allowVirtual) return new Date();
 
     let virtualDateStr: string | null = null;
+    let headerSource: HeaderSource | null = null;
 
     try {
         // Try to get from Next.js headers()
-        const h = headers();
-        virtualDateStr = h.get("x-virtual-date");
+        headerSource = await headers();
+        virtualDateStr = headerSource.get("x-virtual-date");
     } catch (e) {
         // Ignore error if outside request context
     }
@@ -31,9 +39,8 @@ export function getNow(reqHeaders?: Headers, allowVirtual: boolean = process.env
     // Also check cookies if available via headers
     if (!virtualDateStr) {
         try {
-            const h = headers();
-            const cookie = h.get('cookie') || '';
-            const match = cookie.match(new RegExp('(^| )x-virtual-date=([^;]+)'));
+            const cookie = headerSource?.get("cookie") || "";
+            const match = cookie.match(new RegExp("(^| )x-virtual-date=([^;]+)"));
             if (match) virtualDateStr = match[2];
         } catch (e) { }
     }
@@ -48,8 +55,11 @@ export function getNow(reqHeaders?: Headers, allowVirtual: boolean = process.env
 /**
  * Gets "today" as a Date object with time set to 00:00:00 UTC
  */
-export function getToday(reqHeaders?: Headers, allowVirtual: boolean = process.env.NODE_ENV === "development"): Date {
-    const now = getNow(reqHeaders, allowVirtual);
+export async function getToday(
+    reqHeaders?: Headers,
+    allowVirtual: boolean = process.env.NODE_ENV === "development"
+): Promise<Date> {
+    const now = await getNow(reqHeaders, allowVirtual);
     now.setUTCHours(0, 0, 0, 0);
     return now;
 }

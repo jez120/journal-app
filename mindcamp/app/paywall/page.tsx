@@ -3,6 +3,15 @@
 import Link from "next/link";
 import { useState } from "react";
 import { SessionProvider, useSession } from "next-auth/react";
+import {
+    AppLogo,
+    WriteIcon,
+    UnderstandIcon,
+    FireIcon,
+    TrackIcon,
+    ReflectIcon,
+    YesterdayIcon
+} from "@/components/JournalIcons";
 
 function PaywallContent() {
     const { data: session } = useSession();
@@ -40,12 +49,12 @@ function PaywallContent() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--system-background)]">
+        <div className="min-h-screen flex items-start justify-center p-4 pt-10 pb-12 bg-[var(--system-background)]">
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 mb-4">
-                        <span className="text-4xl">📔</span>
+                        <span className="text-4xl"><AppLogo className="w-16 h-16" /></span>
                     </div>
                     <h1 className="text-2xl font-bold mb-2">Your trial has ended</h1>
                     <p className="text-[var(--secondary-label)]">
@@ -83,7 +92,7 @@ function PaywallContent() {
                     </div>
 
                     {/* Yearly - Recommended */}
-                    <div className="card p-5 border-2 border-[var(--accent-color)] relative">
+                    <div className="card p-5 border-2 border-[var(--accent-color)] relative overflow-visible pt-7">
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                             <span className="bg-[var(--accent-color)] text-white text-xs font-semibold px-3 py-1 rounded-full">
                                 SAVE 40%
@@ -112,12 +121,12 @@ function PaywallContent() {
                 {/* Features */}
                 <div className="mt-8 space-y-3">
                     <h4 className="font-medium text-center mb-4">What you&apos;ll get:</h4>
-                    <FeatureItem icon="✏️" text="Unlimited daily journaling" />
-                    <FeatureItem icon="📊" text="Personal insights & patterns" />
-                    <FeatureItem icon="🔥" text="Streak tracking & motivation" />
-                    <FeatureItem icon="📈" text="Progress visualization" />
-                    <FeatureItem icon="🎯" text="Personalized prompts" />
-                    <FeatureItem icon="📤" text="Export your data anytime" />
+                    <FeatureItem icon={<WriteIcon className="w-6 h-6" />} text="Unlimited daily journaling" />
+                    <FeatureItem icon={<UnderstandIcon className="w-6 h-6" />} text="Personal insights & patterns" />
+                    <FeatureItem icon={<FireIcon className="w-6 h-6" />} text="Streak tracking & motivation" />
+                    <FeatureItem icon={<TrackIcon className="w-6 h-6" />} text="Progress visualization" />
+                    <FeatureItem icon={<ReflectIcon className="w-6 h-6" />} text="Personalized prompts" />
+                    <FeatureItem icon={<YesterdayIcon className="w-6 h-6" />} text="Export your data anytime" />
                 </div>
 
                 {/* Footer */}
@@ -135,10 +144,10 @@ function PaywallContent() {
     );
 }
 
-function FeatureItem({ icon, text }: { icon: string; text: string }) {
+function FeatureItem({ icon, text }: { icon: React.ReactNode; text: string }) {
     return (
         <div className="flex items-center gap-3">
-            <span className="text-lg">{icon}</span>
+            <span className="text-lg flex-shrink-0">{icon}</span>
             <span className="text-sm">{text}</span>
         </div>
     );

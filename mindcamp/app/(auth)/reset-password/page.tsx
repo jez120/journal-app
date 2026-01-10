@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { BackIcon, CheckIcon, CloseIcon, ForwardIcon } from "@/components/JournalIcons";
 
 function ResetPasswordForm() {
     const searchParams = useSearchParams();
@@ -58,10 +59,8 @@ function ResetPasswordForm() {
     if (!token) {
         return (
             <div className="text-center">
-                <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-red-400">
+                    <CloseIcon className="w-8 h-8" />
                 </div>
                 <h2 className="text-xl font-semibold text-white/90 mb-2">Invalid Link</h2>
                 <p className="text-white/60 text-sm mb-6">
@@ -69,9 +68,10 @@ function ResetPasswordForm() {
                 </p>
                 <Link
                     href="/forgot-password"
-                    className="text-blue-400 hover:text-blue-300 text-sm"
+                    className="text-blue-400 hover:text-blue-300 text-sm inline-flex items-center gap-2"
                 >
-                    Request a new reset link →
+                    <span>Request a new reset link</span>
+                    <ForwardIcon className="w-4 h-4" />
                 </Link>
             </div>
         );
@@ -81,9 +81,7 @@ function ResetPasswordForm() {
         return (
             <div className="text-center">
                 <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <CheckIcon className="w-8 h-8" />
                 </div>
                 <h2 className="text-xl font-semibold text-white/90 mb-2">Password Reset!</h2>
                 <p className="text-white/60 text-sm mb-6">
@@ -164,9 +162,10 @@ export default function ResetPasswordPage() {
                 <div className="mt-6 text-center">
                     <Link
                         href="/login"
-                        className="text-white/60 hover:text-white/80 text-sm transition-colors"
+                        className="text-white/60 hover:text-white/80 text-sm transition-colors inline-flex items-center gap-2"
                     >
-                        ← Back to Login
+                        <BackIcon className="w-4 h-4" />
+                        <span>Back to Login</span>
                     </Link>
                 </div>
             </div>

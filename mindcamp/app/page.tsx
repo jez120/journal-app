@@ -3,7 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { YesterdayIcon, TodayIcon, TrackIcon } from "@/components/JournalIcons";
+import {
+  YesterdayIcon,
+  TodayIcon,
+  TrackIcon,
+  ReflectIcon,
+  CheckIcon,
+  AppLogo
+} from "@/components/JournalIcons";
 export default function LandingPage() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -18,7 +25,7 @@ export default function LandingPage() {
         <div className="container-app">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <Image src="/icon.png" alt="Clarity Journal" width={32} height={32} className="rounded-lg" unoptimized />
+              <AppLogo className="w-8 h-8" />
               <span className="font-semibold text-xl text-white">Clarity Journal</span>
             </div>
             <div className="flex items-center gap-4">
@@ -45,7 +52,7 @@ export default function LandingPage() {
           >
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium mb-6">
-              <span>✨</span>
+              <span className="mb-0.5"><ReflectIcon className="w-5 h-5" /></span>
               <span>Build lasting habits</span>
             </div>
 
@@ -74,21 +81,15 @@ export default function LandingPage() {
             {/* Trust indicators */}
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/70">
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#34C759]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
+                <CheckIcon className="w-5 h-5" />
                 <span>3 days free</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#34C759]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
+                <CheckIcon className="w-5 h-5" />
                 <span>Cancel anytime</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-[#34C759]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
+                <CheckIcon className="w-5 h-5" />
                 <span>2 minutes per day</span>
               </div>
             </div>
@@ -188,7 +189,7 @@ export default function LandingPage() {
         <div className="container-app">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Image src="/icon.png" alt="Clarity Journal" width={24} height={24} className="rounded-md" unoptimized />
+              <AppLogo className="w-6 h-6" />
               <span className="font-semibold text-white">Clarity Journal</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-white/60">

@@ -61,17 +61,16 @@ export const authOptions: NextAuthOptions = {
         newUser: "/onboarding",
     },
     callbacks: {
-        async jwt({ token, user, trigger, session }) {
+        async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
                 token.email = user.email;
-
-                // Check if user is admin
-                const adminEmails = process.env.ADMIN_EMAILS?.split(",").map(e => e.trim().toLowerCase()) || [];
-                if (user.email && adminEmails.includes(user.email.toLowerCase())) {
-                    token.isAdmin = true;
-                }
             }
+
+            const adminEmails = process.env.ADMIN_EMAILS?.split(",").map((e) => e.trim().toLowerCase()) || [];
+            const email = (user?.email || token.email || "").toString().toLowerCase();
+            token.isAdmin = !!email && adminEmails.includes(email);
+
             return token;
         },
         async session({ session, token }) {

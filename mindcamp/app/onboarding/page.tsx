@@ -11,7 +11,9 @@ import {
     WriteIcon,
     ReadIcon,
     InsightsIcon,
-    WarningIcon
+    WarningIcon,
+    BackIcon,
+    ForwardIcon
 } from "@/components/JournalIcons";
 
 type Step = "goal" | "rules";
@@ -73,8 +75,9 @@ export default function OnboardingPage() {
                     <div className="animate-fade-in">
                         {/* Skip link */}
                         <div className="text-right mb-4">
-                            <Link href="/today" className="text-sm text-[var(--secondary-label)] hover:text-[var(--label)]">
-                                Skip →
+                            <Link href="/today" className="text-sm text-[var(--secondary-label)] hover:text-[var(--label)] inline-flex items-center gap-2">
+                                <span>Skip</span>
+                                <ForwardIcon className="w-4 h-4" />
                             </Link>
                         </div>
 
@@ -128,8 +131,9 @@ export default function OnboardingPage() {
                             </div>
                         </div>
 
-                        <button onClick={() => setStep("goal")} className="w-full text-center mt-4 text-sm text-[var(--secondary-label)] hover:text-[var(--label)]">
-                            ← Back
+                        <button onClick={() => setStep("goal")} className="w-full text-center mt-4 text-sm text-[var(--secondary-label)] hover:text-[var(--label)] inline-flex items-center justify-center gap-2">
+                            <BackIcon className="w-4 h-4" />
+                            <span>Back</span>
                         </button>
                     </div>
                 )}

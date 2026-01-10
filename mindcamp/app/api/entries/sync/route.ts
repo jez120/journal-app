@@ -94,7 +94,7 @@ async function updateUserStreak(userId: string) {
     // Calculate consecutive streak from today backwards
     // NEW: If today is missing but yesterday exists, streak is preserved (grace period until end of day)
     const isAdmin = user.email && process.env.ADMIN_EMAILS?.split(",").map(e => e.trim().toLowerCase()).includes(user.email.toLowerCase());
-    const today = getNow(undefined, process.env.NODE_ENV === "development" || !!isAdmin);
+    const today = await getNow(undefined, process.env.NODE_ENV === "development" || !!isAdmin);
     today.setUTCHours(0, 0, 0, 0);
     const todayStr = today.toISOString().split('T')[0];
 

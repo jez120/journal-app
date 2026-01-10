@@ -3,26 +3,32 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 import { calculateRankFromStreak } from "@/lib/mechanics";
+import { enforceDebugGuard, logDebugAction } from "@/lib/debug-tools";
 
 // POST /api/debug/simulate-streak - Create entries to simulate a specific streak
 // DEV ONLY - For testing rank mechanics
 export async function POST(request: Request) {
-    // Allow in development, with DEBUG_MODE, or for specific test accounts
     const session = await getServerSession(authOptions);
-    const testEmails = ["arek.peter@gmail.com", "qa.test.core@arpe.uk"];
-    const isTestAccount = session?.user?.email && testEmails.includes(session.user.email);
-
-    if (process.env.NODE_ENV === "production" && !process.env.DEBUG_MODE && !isTestAccount) {
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
 
     try {
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        let body: { streak?: number; skipOffsets?: number[]; confirm?: unknown } = {};
+        try {
+            body = await request.json();
+        } catch {
+            body = {};
         }
 
-        const userId = session.user.id;
-        const body = await request.json();
+        const guard = enforceDebugGuard({
+            action: "simulate-streak",
+            request,
+            session,
+            confirm: body.confirm,
+            requiresConfirm: true,
+            heavy: true,
+        });
+        if (!guard.ok) return guard.response;
+
+        const userId = session!.user!.id;
         const { streak, skipOffsets = [] } = body;
 
         if (typeof streak !== "number" || streak < 0) {
@@ -99,6 +105,16 @@ export async function POST(request: Request) {
                 longestStreak: Math.max(currentStreak, 0),
                 lastEntryDate: entries[0]?.entryDate ?? null,
             },
+        });
+
+        await logDebugAction({
+            action: "simulate-streak",
+            actorUserId: guard.actor.id,
+            actorEmail: guard.actor.email,
+            targetUserId: userId,
+            targetEmail: session?.user?.email ?? null,
+            metadata: { streak: currentStreak, skipOffsets },
+            request,
         });
 
         return NextResponse.json({

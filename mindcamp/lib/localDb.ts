@@ -156,6 +156,20 @@ export async function deleteEntry(id: string): Promise<boolean> {
     });
 }
 
+// Clear all entries
+export async function clearAllEntries(): Promise<void> {
+    const db = await openDB();
+
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(ENTRIES_STORE, "readwrite");
+        const store = tx.objectStore(ENTRIES_STORE);
+        const request = store.clear();
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
 // Get all unique dates that have entries
 export async function getEntryDates(): Promise<string[]> {
     const entries = await getAllEntries();

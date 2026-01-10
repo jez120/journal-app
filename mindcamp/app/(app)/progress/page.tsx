@@ -2,6 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { ActivityHeatmap } from "@/components/ActivityHeatmap";
+import {
+    CalendarIcon,
+    CheckIcon,
+    FireIcon,
+    TargetIcon,
+    TicketIcon,
+    TrophyIcon,
+} from "@/components/JournalIcons";
 
 interface ProgressData {
     currentRank: string;
@@ -57,10 +65,10 @@ export default function ProgressPage() {
     const nextRankInfo = progress?.nextRankInfo;
 
     const stats = [
-        { label: "Current Streak", value: String(progress?.streakCount || 0), icon: "🔥" },
-        { label: "Longest Streak", value: String(progress?.longestStreak || 0), icon: "🏆" },
-        { label: "Total Days", value: String(progress?.totalCompletedDays || 0), icon: "📅" },
-        { label: "Grace Tokens", value: String(progress?.graceTokens || 0), icon: "🎟️" },
+        { label: "Current Streak", value: String(progress?.streakCount || 0), Icon: FireIcon },
+        { label: "Longest Streak", value: String(progress?.longestStreak || 0), Icon: TrophyIcon },
+        { label: "Total Days", value: String(progress?.totalCompletedDays || 0), Icon: CalendarIcon },
+        { label: "Grace Tokens", value: String(progress?.graceTokens || 0), Icon: TicketIcon },
     ];
 
     const rankBadgeColors: Record<string, string> = {
@@ -85,7 +93,10 @@ export default function ProgressPage() {
             {/* Header */}
             <div>
                 <h1 className="text-3xl font-bold text-white mb-1">Progress</h1>
-                <p className="text-white/60">🔥 {currentStreak} day streak</p>
+                <p className="text-white/60 flex items-center gap-2">
+                    <FireIcon className="w-4 h-4" />
+                    <span>{currentStreak} day streak</span>
+                </p>
             </div>
 
             {/* Current rank card */}
@@ -114,10 +125,16 @@ export default function ProgressPage() {
                     </div>
                 </div>
                 {nextRankInfo && nextRankInfo.daysNeeded > 0 && (
-                    <p className="text-xs text-white/60">🎯 {nextRankInfo.daysNeeded} more consecutive days until {nextRankInfo.nextRank}</p>
+                    <p className="text-xs text-white/60 flex items-center gap-2">
+                        <TargetIcon className="w-4 h-4" />
+                        <span>{nextRankInfo.daysNeeded} more consecutive days until {nextRankInfo.nextRank}</span>
+                    </p>
                 )}
                 {currentRankKey === "master" && (
-                    <p className="text-xs text-green-400">🏆 Congratulations! You've achieved Master rank!</p>
+                    <p className="text-xs text-green-400 flex items-center gap-2">
+                        <TrophyIcon className="w-4 h-4" />
+                        <span>Congratulations! You've achieved Master rank!</span>
+                    </p>
                 )}
             </div>
 
@@ -129,7 +146,7 @@ export default function ProgressPage() {
                 {stats.map((stat) => (
                     <div key={stat.label} className="bg-white/5 backdrop-blur-sm border border-white/10 p-3 rounded-xl">
                         <div className="flex items-center gap-1.5 mb-0.5">
-                            <span>{stat.icon}</span>
+                            <stat.Icon className="w-4 h-4" />
                             <span className="text-xs text-white/60">{stat.label}</span>
                         </div>
                         <p className="text-xl font-bold text-white">{stat.value}</p>
@@ -156,7 +173,7 @@ export default function ProgressPage() {
                                                 : isMaster ? "bg-gradient-to-r from-yellow-400 to-orange-400 text-black"
                                                     : "bg-white/10 text-white/80"
                                         }`}>
-                                        {isCompleted ? "✓" : isActive ? "●" : index + 1}
+                                        {isCompleted ? <CheckIcon className="w-3.5 h-3.5" /> : isActive ? "●" : index + 1}
                                     </div>
                                     {index < allRanks.length - 1 && <div className={`w-0.5 h-8 ${isCompleted ? "bg-[#34C759]" : "bg-white/10"}`} />}
                                 </div>

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { AppLogo } from "@/components/JournalIcons";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -44,7 +44,7 @@ export default function LoginPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <Image src="/icon.png" alt="Clarity Journal" width={40} height={40} className="rounded-lg" unoptimized />
+                        <AppLogo className="w-10 h-10" />
                         <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </Link>
                 </div>

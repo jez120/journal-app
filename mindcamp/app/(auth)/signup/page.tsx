@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { userAuthSchema } from "@/lib/validations/auth";
+import { AppLogo, CheckIcon } from "@/components/JournalIcons";
 
 export default function SignupPage() {
     const [email, setEmail] = useState("");
@@ -20,7 +20,8 @@ export default function SignupPage() {
         const result = userAuthSchema.safeParse({ email, password });
 
         if (!result.success) {
-            setError(result.error.errors[0].message);
+            const firstIssue = result.error.issues[0];
+            setError(firstIssue?.message || "Invalid signup details");
             setIsLoading(false);
             return;
         }
@@ -69,7 +70,7 @@ export default function SignupPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <Image src="/icon.png" alt="Clarity Journal" width={40} height={40} className="rounded-lg" unoptimized />
+                        <AppLogo className="w-10 h-10" />
                         <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </Link>
                 </div>
@@ -129,15 +130,11 @@ export default function SignupPage() {
                     {/* Trust indicators */}
                     <div className="flex flex-col gap-2 mt-5 pt-5 border-t border-white/15">
                         <div className="flex items-center gap-2 text-sm text-white/85">
-                            <svg className="w-4 h-4 text-[#34C759]" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
+                            <CheckIcon className="w-4 h-4" />
                             <span>3 days free, full access</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-white/60">
-                            <svg className="w-4 h-4 text-[#34C759]" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
+                            <CheckIcon className="w-4 h-4" />
                             <span>Cancel anytime</span>
                         </div>
                     </div>

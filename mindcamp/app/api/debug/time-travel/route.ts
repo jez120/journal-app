@@ -2,30 +2,62 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { calculateRankFromStreak } from "@/lib/mechanics";
+import { enforceDebugGuard, logDebugAction } from "@/lib/debug-tools";
 
 // POST /api/debug/time-travel - Advance or set user's day
 // DEV ONLY - Blocked in production via middleware
 export async function POST(request: Request) {
-    // Block in production
-    if (process.env.NODE_ENV === "production" && !process.env.DEBUG_MODE) {
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
     try {
         const session = await getServerSession(authOptions);
-
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        let body: {
+            action?: string;
+            days?: number;
+            targetDay?: number;
+            targetStreak?: number;
+            targetTotalDays?: number;
+            email?: string;
+            confirm?: unknown;
+            graceTokens?: number;
+            lastGraceResetDate?: string;
+            lastEntryDate?: string;
+        } = {};
+        try {
+            body = await request.json();
+        } catch {
+            body = {};
         }
 
-        const body = await request.json();
-        const { action, days, targetDay, targetStreak, targetTotalDays } = body;
+        const guard = enforceDebugGuard({
+            action: "time-travel",
+            request,
+            session,
+            confirm: body.confirm,
+            requiresConfirm: true,
+        });
+        if (!guard.ok) return guard.response;
+
+        const { action, days, targetDay, targetStreak, targetTotalDays, email } = body;
 
         const { default: prisma } = await import("@/lib/db");
+        const targetEmail = typeof email === "string" ? email.trim().toLowerCase() : null;
+
+        let targetUserId = guard.actor.id;
+        if (targetEmail) {
+            const targetUser = await prisma.user.findUnique({
+                where: { email: targetEmail },
+                select: { id: true },
+            });
+
+            if (!targetUser) {
+                return NextResponse.json({ error: "User not found" }, { status: 404 });
+            }
+
+            targetUserId = targetUser.id;
+        }
 
         // Get current user
         const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
+            where: { id: targetUserId },
             select: {
                 currentDay: true,
                 programStartDate: true,
@@ -62,7 +94,7 @@ export async function POST(request: Request) {
 
         // Also shift all entries back by the same amount so firstEntry logic holds up
         if (daysToSubtract > 0) {
-            const entries = await prisma.entry.findMany({ where: { userId: session.user.id } });
+            const entries = await prisma.entry.findMany({ where: { userId: targetUserId } });
             for (const entry of entries) {
                 const newDate = new Date(entry.entryDate);
                 newDate.setDate(newDate.getDate() - daysToSubtract);
@@ -84,7 +116,7 @@ export async function POST(request: Request) {
 
         // Update user
         const updatedUser = await prisma.user.update({
-            where: { id: session.user.id },
+            where: { id: targetUserId },
             data: {
                 currentDay: newTotalDays,
                 programStartDate: newStartDate,
@@ -97,12 +129,31 @@ export async function POST(request: Request) {
             },
         });
 
+        await logDebugAction({
+            action: "time-travel",
+            actorUserId: guard.actor.id,
+            actorEmail: guard.actor.email,
+            targetUserId,
+            targetEmail: targetEmail || guard.actor.email,
+            metadata: {
+                action,
+                days,
+                targetDay,
+                targetStreak,
+                targetTotalDays,
+                graceTokens: body.graceTokens,
+                lastGraceResetDate: body.lastGraceResetDate,
+            },
+            request,
+        });
+
         return NextResponse.json({
             success: true,
             previousDay: user.currentDay,
             newDay: updatedUser.currentDay,
             newRank: updatedUser.currentRank,
             streakCount: updatedUser.streakCount,
+            email: targetEmail || guard.actor.email,
         });
     } catch (error) {
         console.error("Time travel error:", error);

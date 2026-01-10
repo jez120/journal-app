@@ -3,12 +3,19 @@
 import { useState, useEffect } from "react";
 import { getClientNow } from "@/lib/time-client";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
+import { clearAllEntries } from "@/lib/localDb";
+import { BoltIcon } from "@/components/JournalIcons";
 
-export function DevTools() {
+// Inner component that uses useSession
+function DevToolsInner() {
     const { data: session } = useSession();
     const [isVisible, setIsVisible] = useState(false);
     const [virtualDate, setVirtualDate] = useState<Date | null>(null);
+    const [targetEmail, setTargetEmail] = useState("");
+    const [resetting, setResetting] = useState(false);
+    const [resetMessage, setResetMessage] = useState<string | null>(null);
+    const [clearLocal, setClearLocal] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -20,6 +27,12 @@ export function DevTools() {
             setVirtualDate(now);
         }
     }, []);
+
+    useEffect(() => {
+        if (!targetEmail && session?.user?.email) {
+            setTargetEmail(session.user.email);
+        }
+    }, [session?.user?.email, targetEmail]);
 
     const updateCookie = (date: Date | null) => {
         if (date) {
@@ -54,8 +67,46 @@ export function DevTools() {
         updateCookie(null);
     };
 
-    if (process.env.NODE_ENV !== "development" && !session?.user?.isAdmin) {
-        return null; // Hide in production unless admin
+    const handleResetUser = async () => {
+        const email = targetEmail.trim().toLowerCase();
+        if (!email) {
+            setResetMessage("Enter a target email.");
+            return;
+        }
+
+        const confirmed = window.confirm(`Reset progress for ${email}? This will delete entries and reset counters.`);
+        if (!confirmed) return;
+
+        setResetting(true);
+        setResetMessage(null);
+
+        try {
+            const res = await fetch("/api/debug/reset-user", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, confirm: true }),
+            });
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok) {
+                throw new Error(data?.error || "Reset failed");
+            }
+
+            if (clearLocal) {
+                await clearAllEntries();
+            }
+
+            setResetMessage(`Reset complete for ${email}.`);
+        } catch (err) {
+            console.error("Reset user error:", err);
+            setResetMessage(err instanceof Error ? err.message : "Reset failed");
+        } finally {
+            setResetting(false);
+        }
+    };
+
+    if (!session?.user?.isAdmin) {
+        return null;
     }
 
     return (
@@ -66,7 +117,7 @@ export function DevTools() {
                 className="fixed bottom-4 right-4 z-50 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full backdrop-blur-md transition-all border border-white/10"
                 title="Time Travel DevTools"
             >
-                ⚡️
+                <BoltIcon className="w-5 h-5" />
             </button>
 
             {/* Panel */}
@@ -120,9 +171,48 @@ export function DevTools() {
                         <p className="text-[9px] text-white/30 text-center">
                             Refreshes page on change
                         </p>
+
+                        <div className="border-t border-white/10 pt-3 space-y-2">
+                            <p className="text-[10px] text-white/50 uppercase tracking-wide">User tools</p>
+                            <input
+                                type="email"
+                                value={targetEmail}
+                                onChange={(e) => setTargetEmail(e.target.value)}
+                                placeholder="target@email.com"
+                                className="w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#06B6D4]/60"
+                            />
+                            <label className="flex items-center gap-2 text-[10px] text-white/60">
+                                <input
+                                    type="checkbox"
+                                    checked={clearLocal}
+                                    onChange={(e) => setClearLocal(e.target.checked)}
+                                    className="accent-[#06B6D4]"
+                                />
+                                Clear local entries on this device
+                            </label>
+                            <button
+                                onClick={handleResetUser}
+                                disabled={resetting || !targetEmail.trim()}
+                                className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-300 text-xs py-2 rounded-lg transition-colors border border-red-500/20 disabled:opacity-50"
+                            >
+                                {resetting ? "Resetting..." : "Reset user to Day 0"}
+                            </button>
+                            {resetMessage && (
+                                <p className="text-[10px] text-white/60">{resetMessage}</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
         </>
+    );
+}
+
+// Exported wrapper with SessionProvider
+export function DevTools() {
+    return (
+        <SessionProvider>
+            <DevToolsInner />
+        </SessionProvider>
     );
 }

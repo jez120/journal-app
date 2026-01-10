@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getAllEntries } from "@/lib/localDb";
 import { getClientNow } from "@/lib/time-client";
+import { BackIcon } from "@/components/JournalIcons";
 
 interface ProgressData {
     currentDay: number;
@@ -80,9 +81,7 @@ export default function StatsPage() {
             {/* Header */}
             <div className="flex items-center gap-4">
                 <Link href="/history" className="p-2 -ml-2 text-[var(--secondary-label)] hover:text-white transition-colors">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
+                    <BackIcon className="w-6 h-6" />
                 </Link>
                 <h1 className="text-2xl font-bold">Insights</h1>
             </div>
