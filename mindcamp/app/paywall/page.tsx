@@ -49,8 +49,8 @@ function PaywallContent() {
     };
 
     return (
-        <div className="min-h-screen flex items-start justify-center p-4 pt-10 pb-12 bg-[var(--system-background)]">
-            <div className="w-full max-w-md">
+        <div className="min-h-screen px-4 pt-10 pb-12 bg-[var(--system-background)]">
+            <div className="w-full max-w-md mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 mb-4">
@@ -92,7 +92,10 @@ function PaywallContent() {
                     </div>
 
                     {/* Yearly - Recommended */}
-                    <div className="card p-5 border-2 border-[var(--accent-color)] relative overflow-visible pt-7">
+                    <div
+                        className="card p-5 border-2 border-[var(--accent-color)] relative pt-7"
+                        style={{ overflow: "visible" }}
+                    >
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                             <span className="bg-[var(--accent-color)] text-white text-xs font-semibold px-3 py-1 rounded-full">
                                 SAVE 40%
@@ -120,7 +123,7 @@ function PaywallContent() {
 
                 {/* Features */}
                 <div className="mt-8 space-y-3">
-                    <h4 className="font-medium text-center mb-4">What you&apos;ll get:</h4>
+                    <h4 className="font-medium text-left mb-4">What you&apos;ll get:</h4>
                     <FeatureItem icon={<WriteIcon className="w-6 h-6" />} text="Unlimited daily journaling" />
                     <FeatureItem icon={<UnderstandIcon className="w-6 h-6" />} text="Personal insights & patterns" />
                     <FeatureItem icon={<FireIcon className="w-6 h-6" />} text="Streak tracking & motivation" />
