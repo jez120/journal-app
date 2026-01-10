@@ -182,26 +182,35 @@ Table: Entry (server only stores DATE, not content)
 
 ## 6. Rank Progression System
 
-| Rank | Days | Features Unlocked |
-|------|------|-------------------|
+> **IMPORTANT**: Rank is based on **current consecutive streak**, NOT calendar days since signup.
+
+| Rank | Streak Required | Features Unlocked |
+|------|-----------------|-------------------|
 | Guest | 0-3 | Basic journaling, history |
 | Member | 4-14 | Week comparison |
 | Regular | 15-30 | Keyword tracking |
 | Veteran | 31-56 | Month comparison, sentiment |
 | Final Week | 57-63 | Challenge prompts |
-| Master | 64+ | Lifetime access |
+| Master | 64+ | All features unlocked |
 
-### Rank Calculation
+### Rank Calculation (Streak-Based)
 ```javascript
-function calculateRank(day) {
-  if (day >= 64) return "master";
-  if (day >= 57) return "finalweek";
-  if (day >= 31) return "veteran";
-  if (day >= 15) return "regular";
-  if (day >= 4) return "member";
+function calculateRankFromStreak(streak) {
+  if (streak >= 64) return "master";
+  if (streak >= 57) return "finalweek";
+  if (streak >= 31) return "veteran";
+  if (streak >= 15) return "regular";
+  if (streak >= 4) return "member";
   return "guest";
 }
 ```
+
+### Key Behavior
+- **Miss a day** → Streak resets to 0 → Rank drops (unless grace token used)
+- **Use grace token** → Streak preserved → Rank maintained
+- **Two metrics shown in UI**:
+  - **Current Streak**: Consecutive days (drives rank)
+  - **Total Completed Days**: Lifetime completions (never decreases)
 
 ---
 

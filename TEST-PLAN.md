@@ -1,9 +1,29 @@
-# Clarity Journal — Test Plan v1.3
+# Clarity Journal — Test Plan v2.0
 
-> **Version:** 1.3  
-> **Last Updated:** January 9, 2026  
+> **Version:** 2.0  
+> **Last Updated:** January 10, 2026  
 > **Status:** Ready for execution  
 > **Owner:** QA Lead
+
+---
+
+## App Mechanics (Canonical)
+
+> **IMPORTANT**: Rank is based on **current consecutive streak**, NOT calendar days since signup.
+
+| Rank | Streak Required |
+|------|----------------|
+| Guest | 0-3 |
+| Member | 4-14 |
+| Regular | 15-30 |
+| Veteran | 31-56 |
+| Final Week | 57-63 |
+| Master | 64+ |
+
+**Key Rules:**
+- **Miss a day** → Streak resets to 0 → Rank drops
+- **Use grace token** → Streak preserved → Rank maintained
+- **Two UI metrics**: Current Streak (drives rank) + Total Completed Days (lifetime)
 
 ---
 
@@ -248,23 +268,25 @@ npm run test:release-gate
 | Large entry | 50,000 chars |
 | Backup filename | `clarity-journal-backup-YYYY-MM-DD.json` |
 
-### 3.2 Seed Test Accounts
+### 3.2 Seed Test Accounts (Streak-Based)
 
-| ID | Email | Day | Rank | Streak | Grace | Subscription | Purpose |
-|----|-------|-----|------|--------|-------|--------------|---------|
-| S01 | `test-day0@test.dev` | 0 | Guest | 0 | 2 | trial | Fresh signup |
-| S02 | `test-day2@test.dev` | 2 | Guest | 2 | 2 | trial | Mid-trial |
-| S03 | `test-day3@test.dev` | 3 | Guest | 3 | 2 | trial | Last trial day |
-| S04 | `test-day4@test.dev` | 4 | Guest | 3 | 2 | none | Paywall state |
-| S05 | `test-day5@test.dev` | 5 | Member | 5 | 2 | active | New subscriber |
-| S06 | `test-day15@test.dev` | 15 | Regular | 15 | 2 | active | Mid-journey |
-| S07 | `test-day31@test.dev` | 31 | Veteran | 31 | 2 | active | Veteran |
-| S08 | `test-day56@test.dev` | 56 | Veteran | 56 | 2 | active | Pre-Final |
-| S09 | `test-day57@test.dev` | 57 | Final Week | 57 | 2 | active | Challenge start |
-| S10 | `test-day63@test.dev` | 63 | Final Week | 63 | 2 | active | Challenge end |
-| S11 | `test-day64@test.dev` | 64 | Master | 64 | 2 | active | Just completed |
-| S12 | `test-day100@test.dev` | 100 | Master | 100 | 2 | active | Long-term |
-| S13 | `test-broken@test.dev` | 20 | Regular | 0 | 0 | active | Broken streak |
+> **Note**: Rank is determined by **Streak**, not Day (Total Completed Days).
+
+| ID | Email | Total Days | Rank | Streak | Grace | Subscription | Purpose |
+|----|-------|------------|------|--------|-------|--------------|---------|
+| S01 | `test-streak0@test.dev` | 0 | Guest | 0 | 2 | trial | Fresh signup |
+| S02 | `test-streak2@test.dev` | 2 | Guest | 2 | 2 | trial | Mid-trial |
+| S03 | `test-streak3@test.dev` | 3 | Guest | 3 | 2 | trial | Last trial day |
+| S04 | `test-streak4@test.dev` | 4 | Member | 4 | 2 | active | Just ranked up |
+| S05 | `test-streak10@test.dev` | 10 | Member | 10 | 2 | active | Mid-Member |
+| S06 | `test-streak15@test.dev` | 15 | Regular | 15 | 2 | active | Just Regular |
+| S07 | `test-streak31@test.dev` | 31 | Veteran | 31 | 2 | active | Just Veteran |
+| S08 | `test-streak56@test.dev` | 56 | Veteran | 56 | 2 | active | Pre-Final Week |
+| S09 | `test-streak57@test.dev` | 57 | Final Week | 57 | 2 | active | Challenge start |
+| S10 | `test-streak63@test.dev` | 63 | Final Week | 63 | 2 | active | Challenge end |
+| S11 | `test-streak64@test.dev` | 64 | Master | 64 | 2 | active | Just Master |
+| S12 | `test-streak100@test.dev` | 100 | Master | 100 | 2 | active | Long-term Master |
+| S13 | `test-broken@test.dev` | 20 | Guest | 0 | 0 | active | Broken streak (rank dropped) |
 | S14 | `test-1token@test.dev` | 25 | Regular | 20 | 1 | active | One grace used |
 | S15 | `test-0token@test.dev` | 25 | Regular | 20 | 0 | active | No grace left |
 | S16 | `test-readonly@test.dev` | 10 | Guest | 3 | 2 | expired | Read-only |
