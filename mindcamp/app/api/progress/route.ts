@@ -88,6 +88,8 @@ export async function GET() {
         // Get activity data for heatmap (last 365 days)
         const oneYearAgo = new Date();
         oneYearAgo.setDate(oneYearAgo.getDate() - 365);
+        const todayForHeatmap = new Date();
+        todayForHeatmap.setUTCHours(0, 0, 0, 0);
 
         const entries = await prisma.entry.findMany({
             where: {
@@ -105,7 +107,16 @@ export async function GET() {
         const activityMap: Record<string, number> = {};
         entries.forEach((entry: { entryDate: Date; wordCount: number | null }) => {
             const dateStr = entry.entryDate.toISOString().split("T")[0];
-            activityMap[dateStr] = 3; // 3 = complete entry
+            activityMap[dateStr] = 3; // 3 = entry logged
+        });
+
+        // Overlay grace days so users can see gaps vs tokens used
+        graceDays.forEach((graceDay) => {
+            if (graceDay.date < oneYearAgo || graceDay.date > todayForHeatmap) return;
+            const dateStr = graceDay.date.toISOString().split("T")[0];
+            if (!activityMap[dateStr]) {
+                activityMap[dateStr] = 2; // 2 = grace used
+            }
         });
 
         // Calculate consecutive streak from today backwards (on-the-fly)

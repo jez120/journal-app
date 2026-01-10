@@ -15,33 +15,51 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
 
     const today = new Date();
 
-    // Fetch entry dates from local IndexedDB
+    // Fetch entry dates from local IndexedDB and grace days from server
     useEffect(() => {
+        let isMounted = true;
         async function fetchEntries() {
             try {
-                const entries = await getAllEntries();
                 const map = new Map<string, number>();
 
-                // Mark dates that have entries
+                // Server-side activity map (entries + grace days)
+                try {
+                    const progressRes = await fetch("/api/progress");
+                    if (progressRes.ok) {
+                        const data = await progressRes.json();
+                        const activityMap = data?.activityMap || {};
+                        for (const [date, level] of Object.entries(activityMap)) {
+                            map.set(date, Number(level));
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error fetching activity from server:", err);
+                }
+
+                // Local entries override any server grace-day markers
+                const entries = await getAllEntries();
                 for (const entry of entries) {
-                    // Level 3 = complete (any entry counts as complete)
+                    // Level 3 = entry logged
                     map.set(entry.date, 3);
                 }
 
-                setActivityData(map);
+                if (isMounted) setActivityData(map);
             } catch (err) {
                 console.error("Error fetching entries for heatmap:", err);
             }
         }
 
         fetchEntries();
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const getLevelColor = (level: number) => {
         switch (level) {
             case 0: return "bg-white/10";
             case 1: return "bg-[#E05C4D]/40";
-            case 2: return "bg-[#E05C4D]/70";
+            case 2: return "bg-[#FF9500]";
             case 3: return "bg-[#E05C4D]";
             default: return "bg-white/10";
         }
@@ -51,8 +69,8 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
         switch (level) {
             case 0: return "No activity";
             case 1: return "Partial";
-            case 2: return "Good";
-            case 3: return "Complete";
+            case 2: return "Grace used";
+            case 3: return "Entry logged";
             default: return "No activity";
         }
     };
@@ -286,6 +304,10 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
                 <div className="flex items-center gap-1">
                     <div className={`w-3 h-3 rounded-[2px] ${getLevelColor(0)}`} />
                     <span>No entry</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <div className={`w-3 h-3 rounded-[2px] ${getLevelColor(2)}`} />
+                    <span>Grace used</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <div className={`w-3 h-3 rounded-[2px] ${getLevelColor(3)}`} />
