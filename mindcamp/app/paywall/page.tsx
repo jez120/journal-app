@@ -85,7 +85,7 @@ function PaywallContent() {
                         <button
                             onClick={() => handleSubscribe("monthly")}
                             disabled={isLoading !== null}
-                            className="w-full bg-transparent border border-white/30 text-white font-semibold py-3.5 rounded-xl transition-all hover:border-white/50 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="w-full bg-transparent border border-white/50 text-white/80 font-semibold py-3.5 rounded-xl transition-all hover:border-white/70 hover:text-white hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             {isLoading === "monthly" ? "Loading..." : "Choose Monthly"}
                         </button>
@@ -156,7 +156,7 @@ function PaywallContent() {
 
 function FeatureItem({ icon, text }: { icon: React.ReactNode; text: string }) {
     return (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center gap-3">
             <span className="text-lg flex-shrink-0">{icon}</span>
             <span className="text-sm">{text}</span>
         </div>
