@@ -88,6 +88,10 @@ For each day below, perform one valid entry save and verify rank, streak, and pr
 | 62 | Final Week | 2 | 62/64 |
 | 63 | Final Week | 1 | 63/64 |
 | 64 | Master | 0 | 64/64 |
+| 65 | Master | 0 | 65/64 (bar capped at 100%) |
+| 66 | Master | 0 | 66/64 (bar capped at 100%) |
+| 67 | Master | 0 | 67/64 (bar capped at 100%) |
+| 68 | Master | 0 | 68/64 (bar capped at 100%) |
 
 ## Core Test Steps (Repeat for Day 1-64)
 1. Log in as test user.
