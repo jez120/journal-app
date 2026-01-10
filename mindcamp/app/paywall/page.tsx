@@ -123,7 +123,7 @@ function PaywallContent() {
 
                 {/* Features */}
                 <div className="mt-8 space-y-3">
-                    <h4 className="font-medium text-left mb-4">What you&apos;ll get:</h4>
+                    <h4 className="font-medium text-center mb-4">What you&apos;ll get:</h4>
                     <FeatureItem icon={<WriteIcon className="w-6 h-6" />} text="Unlimited daily journaling" />
                     <FeatureItem icon={<UnderstandIcon className="w-6 h-6" />} text="Personal insights & patterns" />
                     <FeatureItem icon={<FireIcon className="w-6 h-6" />} text="Streak tracking & motivation" />
