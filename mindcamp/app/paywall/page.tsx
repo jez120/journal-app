@@ -68,6 +68,15 @@ function PaywallContent() {
                     </div>
                 )}
 
+                {/* Founding Member Badge */}
+                <div className="text-center mb-4">
+                    <div className="inline-block bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/30 rounded-lg px-4 py-2">
+                        <p className="text-xs font-medium text-[var(--accent-color)]">
+                            🎯 Join as a Founding Member to lock in this price forever
+                        </p>
+                    </div>
+                </div>
+
                 {/* Pricing Cards */}
                 <div className="space-y-4">
                     {/* Monthly */}
@@ -136,11 +145,6 @@ function PaywallContent() {
 
                 {/* Footer */}
                 <div className="mt-8 text-center space-y-3">
-                    <div className="inline-block bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/30 rounded-lg px-4 py-2 mb-3">
-                        <p className="text-xs font-medium text-[var(--accent-color)]">
-                            🎯 Join as a Founding Member to lock in this price forever
-                        </p>
-                    </div>
                     <p className="text-xs text-[var(--secondary-label)]">
                         Cancel anytime. No questions asked.
                     </p>
