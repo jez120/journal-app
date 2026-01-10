@@ -85,7 +85,7 @@ function PaywallContent() {
                         <button
                             onClick={() => handleSubscribe("monthly")}
                             disabled={isLoading !== null}
-                            className="w-full bg-white/10 text-[#06B6D4] font-semibold py-3.5 rounded-xl transition-opacity hover:opacity-85 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="w-full bg-transparent border border-white/30 text-white font-semibold py-3.5 rounded-xl transition-all hover:border-white/50 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             {isLoading === "monthly" ? "Loading..." : "Choose Monthly"}
                         </button>
@@ -122,18 +122,25 @@ function PaywallContent() {
                 </div>
 
                 {/* Features */}
-                <div className="mt-8 space-y-3">
-                    <h4 className="font-medium text-center mb-4">What you&apos;ll get:</h4>
-                    <FeatureItem icon={<WriteIcon className="w-6 h-6" />} text="Unlimited daily journaling" />
-                    <FeatureItem icon={<UnderstandIcon className="w-6 h-6" />} text="Personal insights & patterns" />
-                    <FeatureItem icon={<FireIcon className="w-6 h-6" />} text="Streak tracking & motivation" />
-                    <FeatureItem icon={<TrackIcon className="w-6 h-6" />} text="Progress visualization" />
-                    <FeatureItem icon={<ReflectIcon className="w-6 h-6" />} text="Personalized prompts" />
-                    <FeatureItem icon={<YesterdayIcon className="w-6 h-6" />} text="Export your data anytime" />
+                <div className="mt-8">
+                    <h4 className="font-medium text-center mb-6">Unlock your full potential</h4>
+                    <div className="max-w-[320px] mx-auto space-y-4">
+                        <FeatureItem icon={<WriteIcon className="w-6 h-6" />} text="Unlimited daily journaling" />
+                        <FeatureItem icon={<UnderstandIcon className="w-6 h-6" />} text="Personal insights & patterns" />
+                        <FeatureItem icon={<FireIcon className="w-6 h-6" />} text="Streak tracking & motivation" />
+                        <FeatureItem icon={<TrackIcon className="w-6 h-6" />} text="Progress visualization" />
+                        <FeatureItem icon={<ReflectIcon className="w-6 h-6" />} text="Personalized prompts" />
+                        <FeatureItem icon={<YesterdayIcon className="w-6 h-6" />} text="Export your data anytime" />
+                    </div>
                 </div>
 
                 {/* Footer */}
                 <div className="mt-8 text-center space-y-3">
+                    <div className="inline-block bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/30 rounded-lg px-4 py-2 mb-3">
+                        <p className="text-xs font-medium text-[var(--accent-color)]">
+                            🎯 Join as a Founding Member to lock in this price forever
+                        </p>
+                    </div>
                     <p className="text-xs text-[var(--secondary-label)]">
                         Cancel anytime. No questions asked.
                     </p>
