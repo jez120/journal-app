@@ -82,22 +82,28 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
         if (viewMode === "month") {
             return MONTHS[today.getMonth()] + " " + today.getFullYear();
         } else {
+            // Rolling 365 days - show year range if crossing years
+            const startDate = new Date(today);
+            startDate.setDate(today.getDate() - 364);
+            if (startDate.getFullYear() !== today.getFullYear()) {
+                return `${startDate.getFullYear()} - ${today.getFullYear()}`;
+            }
             return today.getFullYear().toString();
         }
     };
 
-    // ========== YEAR VIEW ==========
+    // ========== YEAR VIEW (Rolling 365 days, GitHub-style) ==========
     const renderYearView = () => {
         const weeks: Date[][] = [];
-        const currentYear = today.getFullYear();
 
-        // Start from Jan 1 of current year
-        const startDate = new Date(currentYear, 0, 1);
+        // Start from 52 weeks ago (364 days), aligned to start of week
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - 364);
         // Adjust to start of week (Sunday)
         startDate.setDate(startDate.getDate() - startDate.getDay());
 
-        // End at Dec 31 of current year or today, whichever is earlier
-        const endDate = new Date(currentYear, 11, 31);
+        // End at today
+        const endDate = new Date(today);
 
         let currentDate = new Date(startDate);
         while (currentDate <= endDate) {
@@ -109,15 +115,19 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
             weeks.push(week);
         }
 
-        // Build month labels (left to right, Jan to Dec)
+        // Build month labels (track when month changes)
         const monthLabels: { label: string; weekIndex: number }[] = [];
+        let lastMonth = -1;
         weeks.forEach((week, weekIndex) => {
             const firstDayOfWeek = week[0];
+            const month = firstDayOfWeek.getMonth();
+            const year = firstDayOfWeek.getFullYear();
             // Show label at start of each month
-            if (firstDayOfWeek.getDate() <= 7 && firstDayOfWeek.getFullYear() === currentYear) {
-                const monthName = MONTHS[firstDayOfWeek.getMonth()];
-                const label = firstDayOfWeek.getMonth() === 0 ? `${monthName} ${currentYear}` : monthName;
+            if (month !== lastMonth && firstDayOfWeek.getDate() <= 7) {
+                const monthName = MONTHS[month];
+                const label = monthLabels.length === 0 || month === 0 ? `${monthName} ${year}` : monthName;
                 monthLabels.push({ label, weekIndex });
+                lastMonth = month;
             }
         });
 
