@@ -6,7 +6,17 @@ export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
     // Public paths - no auth required
-    const publicPaths = ["/", "/login", "/signup", "/privacy", "/terms", "/paywall", "/onboarding"];
+    const publicPaths = [
+        "/",
+        "/login",
+        "/signup",
+        "/privacy",
+        "/terms",
+        "/paywall",
+        "/onboarding",
+        "/forgot-password",
+        "/reset-password",
+    ];
 
     // Check if path is public
     if (publicPaths.includes(path)) {
