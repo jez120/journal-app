@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from "next/image";
 
 // --- SHARED PROPS & WRAPPER ---
 // All icons use this wrapper for consistent sizing and 2px stroke style.
@@ -29,15 +30,18 @@ const SvgIcon: React.FC<IconProps> = ({ size = 24, color = "currentColor", child
 // BRANDING & CORE (Identity)
 // ============================================================================
 
-export const AppLogo = (props: IconProps) => (
-    <SvgIcon {...props} color="#3B82F6"> {/* Bright Blue */}
-        {/* A stylized letter 'A' or upward arrow indicating growth */}
-        <path d="M12 3L4 21H20L12 3Z" fill="#DBEAFE" stroke="none" /> {/* Light fill for weight */}
-        <path d="M12 3L4 21H20L12 3Z" />
-        <path d="M8 13H16" />
-        <path d="M12 8V3" />
-    </SvgIcon>
-);
+export function AppLogo({ className = "w-10 h-10" }: { className?: string }) {
+    return (
+        <Image
+            src="/icons/AppLogo.png"
+            alt="Clarity Journal"
+            width={40}
+            height={40}
+            className={`${className} rounded-lg`}
+            unoptimized
+        />
+    );
+}
 
 export const SparkleIcon = (props: IconProps) => (
     <SvgIcon {...props} color="#FBBF24"> {/* Warm Yellow */}
