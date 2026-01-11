@@ -7,7 +7,8 @@ import {
   TodayIcon,
   TrackIcon,
   ReflectIcon,
-  CheckIcon
+  CheckIcon,
+  AppLogo
 } from "@/components/JournalIcons";
 export default function LandingPage() {
   const [isVisible, setIsVisible] = useState(false);
@@ -23,7 +24,7 @@ export default function LandingPage() {
         <div className="container-app">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <img src="/icons/AppLogo.png" alt="Clarity Journal" className="w-8 h-8" />
+              <AppLogo className="w-8 h-8" />
               <span className="font-semibold text-xl text-white">Clarity Journal</span>
             </div>
             <div className="flex items-center gap-4">
@@ -50,7 +51,7 @@ export default function LandingPage() {
           >
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium mb-6">
-              <span className="mb-0.5"><ReflectIcon className="w-5 h-5" /></span>
+              <span className="mb-0.5"><ReflectIcon className="w-8 h-8" /></span>
               <span>Build lasting habits</span>
             </div>
 
@@ -79,19 +80,19 @@ export default function LandingPage() {
             {/* Trust indicators */}
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/70">
               <div className="flex items-center gap-2">
-                <CheckIcon className="w-5 h-5" />
+                <CheckIcon className="w-6 h-6" />
                 <span>3 days free</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckIcon className="w-5 h-5" />
+                <CheckIcon className="w-6 h-6" />
                 <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckIcon className="w-5 h-5" />
+                <CheckIcon className="w-6 h-6" />
                 <span>Cancel anytime</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckIcon className="w-5 h-5" />
+                <CheckIcon className="w-6 h-6" />
                 <span>2 minutes per day</span>
               </div>
             </div>
@@ -108,17 +109,17 @@ export default function LandingPage() {
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               <FeatureCard
-                icon={<YesterdayIcon className="w-10 h-10" />}
+                icon={<YesterdayIcon className="w-16 h-16" />}
                 title="Yesterday's Entry"
                 description="Start each session by reading what you wrote yesterday. This builds continuity and self-awareness."
               />
               <FeatureCard
-                icon={<TodayIcon className="w-10 h-10" />}
+                icon={<TodayIcon className="w-16 h-16" />}
                 title="Write today"
                 description="Answer a simple prompt with 2-3 sentences. Takes under 2 minutes. Consistency over quantity."
               />
               <FeatureCard
-                icon={<TrackIcon className="w-10 h-10" />}
+                icon={<TrackIcon className="w-16 h-16" />}
                 title="See patterns"
                 description="Over time, discover insights from your own words. What themes keep appearing? What's changing?"
               />
@@ -191,7 +192,7 @@ export default function LandingPage() {
         <div className="container-app">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src="/icons/AppLogo.png" alt="Clarity Journal" className="w-6 h-6" />
+              <AppLogo className="w-6 h-6" />
               <span className="font-semibold text-white">Clarity Journal</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-white/60">

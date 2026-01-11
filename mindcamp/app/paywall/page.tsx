@@ -134,12 +134,12 @@ function PaywallContent() {
                 <div className="mt-8">
                     <h4 className="font-medium text-center mb-6">Unlock your full potential</h4>
                     <div className="max-w-[320px] mx-auto space-y-4">
-                        <FeatureItem icon={<WriteIcon className="w-6 h-6" />} text="Unlimited daily journaling" />
-                        <FeatureItem icon={<UnderstandIcon className="w-6 h-6" />} text="Personal insights & patterns" />
-                        <FeatureItem icon={<FireIcon className="w-6 h-6" />} text="Streak tracking & motivation" />
-                        <FeatureItem icon={<TrackIcon className="w-6 h-6" />} text="Progress visualization" />
-                        <FeatureItem icon={<ReflectIcon className="w-6 h-6" />} text="Personalized prompts" />
-                        <FeatureItem icon={<YesterdayIcon className="w-6 h-6" />} text="Export your data anytime" />
+                        <FeatureItem icon={<WriteIcon className="w-10 h-10" />} text="Unlimited daily journaling" />
+                        <FeatureItem icon={<UnderstandIcon className="w-10 h-10" />} text="Personal insights & patterns" />
+                        <FeatureItem icon={<FireIcon className="w-10 h-10" />} text="Streak tracking & motivation" />
+                        <FeatureItem icon={<TrackIcon className="w-10 h-10" />} text="Progress visualization" />
+                        <FeatureItem icon={<ReflectIcon className="w-10 h-10" />} text="Personalized prompts" />
+                        <FeatureItem icon={<YesterdayIcon className="w-10 h-10" />} text="Export your data anytime" />
                     </div>
                 </div>
 

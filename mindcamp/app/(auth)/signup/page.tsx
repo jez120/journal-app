@@ -70,7 +70,7 @@ export default function SignupPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <img src="/icons/AppLogo.png" alt="Clarity Journal" className="w-10 h-10" />
+                        <AppLogo className="w-10 h-10" />
                         <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </Link>
                 </div>
@@ -130,15 +130,15 @@ export default function SignupPage() {
                     {/* Trust indicators */}
                     <div className="flex flex-col gap-2 mt-5 pt-5 border-t border-white/15">
                         <div className="flex items-center gap-2 text-sm text-white/85">
-                            <CheckIcon className="w-4 h-4" />
+                            <CheckIcon className="w-5 h-5" />
                             <span>3 days free, full access</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-white/85">
-                            <CheckIcon className="w-4 h-4" />
+                            <CheckIcon className="w-5 h-5" />
                             <span>No credit card required</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-white/60">
-                            <CheckIcon className="w-4 h-4" />
+                            <CheckIcon className="w-5 h-5" />
                             <span>Cancel anytime</span>
                         </div>
                     </div>
