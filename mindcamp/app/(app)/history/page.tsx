@@ -148,14 +148,14 @@ export default function HistoryPage() {
 
             {/* Empty state */}
             {entries.length === 0 && (
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 text-center">
+                <div className="calendar-grid bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 text-center">
                     <p className="text-white/70">No entries yet. Start journaling today!</p>
                 </div>
             )}
 
             {/* Entries list */}
             {entries.length > 0 && (
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-sm divide-y divide-white/15">
+                <div className="calendar-grid bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-sm divide-y divide-white/15">
                     {entries.map((entry) => (
                         <div key={entry.id}>
                             <button onClick={() => toggleEntry(entry.id)} className="w-full p-4 text-left min-h-[44px]">

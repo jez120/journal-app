@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 
 /**
@@ -118,13 +119,21 @@ test.describe('Features & PWA Suite', () => {
 
     // --- SUBSECTION P: ACCESSIBILITY ---
 
-    test('A11Y-001: Axe checks (Skipped - Dependency missing)', async ({ page }) => {
-        test.skip();
+    test('A11Y-001: Axe checks (basic)', async ({ page }) => {
+        await page.goto('/today');
+        const results = await new AxeBuilder({ page })
+            .withTags(['wcag2a', 'wcag2aa'])
+            .analyze();
+        expect(results.violations).toEqual([]);
     });
 
     test('A11Y-002: Keyboard navigation (Focus trapping)', async ({ page }) => {
-        // Manual skip
-        test.skip();
+        await page.goto('/settings');
+        await page.keyboard.press('Tab');
+        await page.waitForTimeout(100);
+        const focusedTag = await page.evaluate(() => document.activeElement?.tagName || '');
+        expect(focusedTag).not.toBe('');
+        expect(['A', 'BUTTON', 'INPUT', 'TEXTAREA', 'SELECT']).toContain(focusedTag);
     });
 
 });

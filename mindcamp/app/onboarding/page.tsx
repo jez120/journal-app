@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
     AppLogo,
     HabitIcon,
@@ -26,9 +27,33 @@ const goals = [
 ];
 
 export default function OnboardingPage() {
+    const router = useRouter();
     const [step, setStep] = useState<Step>("goal");
     const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+
+        async function checkOnboardingStatus() {
+            try {
+                const res = await fetch("/api/user");
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!active) return;
+                if (data?.user?.onboardingCompleted) {
+                    router.replace("/today");
+                }
+            } catch {
+                // Ignore; onboarding will continue as normal.
+            }
+        }
+
+        checkOnboardingStatus();
+        return () => {
+            active = false;
+        };
+    }, [router]);
 
     const handleContinue = () => {
         if (step === "goal" && selectedGoal) {

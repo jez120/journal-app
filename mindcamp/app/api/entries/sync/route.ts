@@ -17,10 +17,14 @@ export async function POST(request: Request) {
 
         const userId = session.user.id;
         const body = await request.json();
-        const { date, wordCount, meetsMinimum } = body; // YYYY-MM-DD format
+        const { date, wordCount, meetsMinimum, draft } = body; // YYYY-MM-DD format
 
         if (!date) {
             return NextResponse.json({ error: "Date is required" }, { status: 400 });
+        }
+
+        if (draft === true) {
+            return NextResponse.json({ success: true, draft: true });
         }
 
         // Parse date and set to UTC midnight

@@ -1,15 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
   YesterdayIcon,
   TodayIcon,
   TrackIcon,
   ReflectIcon,
-  CheckIcon,
-  AppLogo
+  CheckIcon
 } from "@/components/JournalIcons";
 export default function LandingPage() {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,7 +23,7 @@ export default function LandingPage() {
         <div className="container-app">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <AppLogo className="w-8 h-8" />
+              <img src="/icon.png" alt="Clarity Journal" className="w-8 h-8" />
               <span className="font-semibold text-xl text-white">Clarity Journal</span>
             </div>
             <div className="flex items-center gap-4">
@@ -83,6 +81,10 @@ export default function LandingPage() {
               <div className="flex items-center gap-2">
                 <CheckIcon className="w-5 h-5" />
                 <span>3 days free</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckIcon className="w-5 h-5" />
+                <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckIcon className="w-5 h-5" />
@@ -189,7 +191,7 @@ export default function LandingPage() {
         <div className="container-app">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <AppLogo className="w-6 h-6" />
+              <img src="/icon.png" alt="Clarity Journal" className="w-6 h-6" />
               <span className="font-semibold text-white">Clarity Journal</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-white/60">

@@ -70,14 +70,14 @@ export default function SignupPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <AppLogo className="w-10 h-10" />
+                        <img src="/icon.png" alt="Clarity Journal" className="w-10 h-10" />
                         <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </Link>
                 </div>
 
                 {/* Signup Card */}
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-2xl shadow-xl">
-                    <h1 className="text-xl font-bold text-center mb-1 text-white">Start your 3-day assessment</h1>
+                    <h1 className="text-xl font-bold text-center mb-1 text-white">Start your journey</h1>
                     <p className="text-sm text-white/85 text-center mb-6">
                         See if journaling works for you
                     </p>
@@ -132,6 +132,10 @@ export default function SignupPage() {
                         <div className="flex items-center gap-2 text-sm text-white/85">
                             <CheckIcon className="w-4 h-4" />
                             <span>3 days free, full access</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-white/85">
+                            <CheckIcon className="w-4 h-4" />
+                            <span>No credit card required</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-white/60">
                             <CheckIcon className="w-4 h-4" />

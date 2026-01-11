@@ -16,6 +16,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
+    debug: false,
     providers: [
         CredentialsProvider({
             name: "credentials",
@@ -59,6 +60,17 @@ export const authOptions: NextAuthOptions = {
         signOut: "/",
         error: "/login",
         newUser: "/onboarding",
+    },
+    cookies: {
+        sessionToken: {
+            name: "next-auth.session-token",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: true,
+            },
+        },
     },
     callbacks: {
         async jwt({ token, user }) {

@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import Stripe from 'stripe';
+import { requestWithRetry } from './utils/request';
 
 /**
  * SECTION E: Payment & Subscription
@@ -50,12 +52,66 @@ test.describe('Section E: Payment & Subscription', () => {
 
     // PAY-002: Webhook: checkout.session.completed 
     // This is backend logic. We can test via API request.
-    test('PAY-002: Webhook checkout.session.completed activates subscription', async ({ request }) => {
-        // Need to mock signature verification or bypass it in test mode?
-        // App likely enforces signature. 
-        // We can't easily forge a Stripe signature without the secret.
-        // Skipping unless we have a bypass for testing or using stripe-cli in separate process.
-        test.skip();
+    test('PAY-002: Webhook checkout.session.completed activates subscription', async ({ page }) => {
+        const email = `pay-webhook-${Date.now()}@test.com`;
+        await page.goto('/signup');
+        await page.fill('input[id="email"]', email);
+        await page.fill('input[id="password"]', 'Password123!');
+        await page.click('button[type="submit"]');
+        await page.waitForURL(/\/onboarding|\/today/);
+
+        if (await page.url().includes('onboarding')) {
+            await page.click('text=Build a journaling habit');
+            await page.click('button:has-text("Continue")');
+            await page.click('button:has-text("Yes, let\'s go")');
+            await page.waitForURL('/today');
+        }
+
+        const userResponse = await requestWithRetry(() => page.request.get('/api/user'));
+        const userData = await userResponse.json();
+        const userId = userData.user?.id;
+        expect(userId).toBeTruthy();
+
+        const stripeSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test';
+        const stripe = new Stripe('sk_test_123', {
+            apiVersion: '2025-12-15.clover',
+        });
+
+        const event = {
+            id: 'evt_test_webhook',
+            object: 'event',
+            type: 'checkout.session.completed',
+            data: {
+                object: {
+                    id: 'cs_test_123',
+                    object: 'checkout.session',
+                    subscription: 'sub_test_123',
+                    metadata: { userId },
+                },
+            },
+        };
+
+        const payload = JSON.stringify(event);
+        const signature = stripe.webhooks.generateTestHeaderString({
+            payload,
+            secret: stripeSecret,
+        });
+
+        const webhookResponse = await requestWithRetry(() =>
+            page.request.post('/api/webhooks/stripe', {
+                data: payload,
+                headers: {
+                    'stripe-signature': signature,
+                    'content-type': 'application/json',
+                },
+            })
+        );
+
+        expect(webhookResponse.ok()).toBeTruthy();
+
+        const refreshedUser = await requestWithRetry(() => page.request.get('/api/user'));
+        const refreshedData = await refreshedUser.json();
+        expect(refreshedData.user?.subscriptionStatus).toBe('active');
     });
 
     // PAY-004: Day 4 paywall enforced

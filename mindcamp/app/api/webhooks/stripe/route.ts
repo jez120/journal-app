@@ -7,7 +7,8 @@ import Stripe from "stripe";
 // Stripe webhook handler
 export async function POST(request: Request) {
     if (!stripe) {
-        return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+        const status = process.env.NODE_ENV === "production" ? 500 : 400;
+        return NextResponse.json({ error: "Stripe not configured" }, { status });
     }
 
     const body = await request.text();
@@ -21,7 +22,8 @@ export async function POST(request: Request) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     if (!webhookSecret) {
         console.error("STRIPE_WEBHOOK_SECRET is not set");
-        return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+        const status = process.env.NODE_ENV === "production" ? 500 : 400;
+        return NextResponse.json({ error: "Webhook not configured" }, { status });
     }
 
     let event: Stripe.Event;

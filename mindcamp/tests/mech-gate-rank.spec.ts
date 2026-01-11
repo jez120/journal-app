@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { requestWithRetry } from './utils/request';
 
 /**
  * MECH-GATE-RANK Tests (10)
@@ -24,13 +25,15 @@ async function seedStreakAndGetProgress(page: any, streak: number) {
     await page.waitForURL('/today');
 
     // 3. Seed streak via debug API
-    const seedResponse = await page.request.post('/api/debug/simulate-streak', {
-        data: { streak }
-    });
+    const seedResponse = await requestWithRetry(() =>
+        page.request.post('/api/debug/simulate-streak', {
+            data: { streak }
+        })
+    );
     expect(seedResponse.ok()).toBeTruthy();
 
     // 4. Get progress
-    const progressResponse = await page.request.get('/api/progress');
+    const progressResponse = await requestWithRetry(() => page.request.get('/api/progress'));
     expect(progressResponse.ok()).toBeTruthy();
     return progressResponse.json();
 }

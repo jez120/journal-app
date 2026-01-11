@@ -1,2 +1,7 @@
 .vercel
 .env*.local
+mindcamp/certificates
+mindcamp/.next
+mindcamp/playwright-report
+mindcamp/test-results
+test-results

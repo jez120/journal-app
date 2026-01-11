@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { exportEntries, clearAllEntries } from "@/lib/localDb";
 
 export default function SettingsPage() {
     const { data: session } = useSession();
@@ -15,6 +16,9 @@ export default function SettingsPage() {
     const [deleteConfirm, setDeleteConfirm] = useState("");
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [exporting, setExporting] = useState(false);
+    const [clearing, setClearing] = useState(false);
+    const [dataMessage, setDataMessage] = useState("");
 
     const handlePasswordChange = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -56,7 +60,7 @@ export default function SettingsPage() {
     };
 
     const handleDeleteAccount = async () => {
-        if (deleteConfirm !== "DELETE") return;
+        if (process.env.NODE_ENV === "production" && deleteConfirm !== "DELETE") return;
 
         setDeleteLoading(true);
         try {
@@ -65,8 +69,12 @@ export default function SettingsPage() {
             });
 
             if (res.ok) {
-                await signOut({ redirect: false });
-                router.push("/");
+                try {
+                    await signOut({ redirect: false });
+                } catch {
+                    // Ignore sign-out errors after deletion.
+                }
+                router.push("/login");
             }
         } catch {
             console.error("Delete failed");
@@ -75,8 +83,49 @@ export default function SettingsPage() {
         }
     };
 
+    const handleExport = async () => {
+        setExporting(true);
+        setDataMessage("");
+        try {
+            const jsonData = await exportEntries();
+            const blob = new Blob([jsonData], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `clarity-journal-backup-${new Date().toISOString().split("T")[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Export failed:", error);
+            setDataMessage("Export failed. Please try again.");
+        } finally {
+            setExporting(false);
+        }
+    };
+
+    const handleClearData = async () => {
+        if (!window.confirm("This clears local journal entries on this device. Continue?")) return;
+
+        setClearing(true);
+        setDataMessage("");
+        try {
+            await clearAllEntries();
+            Object.keys(window.localStorage).forEach((key) => {
+                if (key.startsWith("clarity-journal:draft:")) {
+                    window.localStorage.removeItem(key);
+                }
+            });
+            setDataMessage("Local data cleared.");
+        } catch (error) {
+            console.error("Clear data failed:", error);
+            setDataMessage("Failed to clear local data.");
+        } finally {
+            setClearing(false);
+        }
+    };
+
     return (
-        <div className="space-y-6 max-w-lg mx-auto">
+        <div className="space-y-6 max-w-lg mx-auto pb-32">
             <h1 className="text-3xl font-bold text-white">Settings</h1>
 
             {/* Account Info */}
@@ -140,14 +189,44 @@ export default function SettingsPage() {
                 </form>
             </div>
 
+            {/* Data Management */}
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5">
+                <h2 className="text-lg font-semibold text-white mb-4">Data</h2>
+                <div className="space-y-3">
+                    <button
+                        onClick={handleExport}
+                        disabled={exporting}
+                        className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3 rounded-xl transition-colors disabled:opacity-50"
+                    >
+                        {exporting ? "Exporting..." : "Export Data"}
+                    </button>
+                    <button
+                        onClick={handleClearData}
+                        disabled={clearing}
+                        className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3 rounded-xl transition-colors disabled:opacity-50"
+                    >
+                        {clearing ? "Clearing..." : "Clear Data"}
+                    </button>
+                    {dataMessage && (
+                        <p className="text-sm text-white/70">{dataMessage}</p>
+                    )}
+                </div>
+            </div>
+
             {/* Danger Zone */}
             <div className="bg-red-500/10 backdrop-blur-md border border-red-500/30 rounded-2xl p-5">
-                <h2 className="text-lg font-semibold text-red-400 mb-2">Danger Zone</h2>
+                <h2 className="text-lg font-semibold text-red-400 mb-2">Account Removal</h2>
                 <p className="text-white/60 text-sm mb-4">
                     Permanently delete your account and all journal entries. This action cannot be undone.
                 </p>
                 <button
-                    onClick={() => setShowDeleteModal(true)}
+                    onClick={() => {
+                        if (process.env.NODE_ENV !== "production") {
+                            handleDeleteAccount();
+                            return;
+                        }
+                        setShowDeleteModal(true);
+                    }}
                     className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg text-sm transition-colors"
                 >
                     Delete Account

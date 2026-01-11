@@ -27,6 +27,8 @@ export async function GET() {
                 programStartDate: true,
                 lastEntryDate: true,
                 lastGraceReset: true,
+                subscriptionStatus: true,
+                trialEndsAt: true,
             },
         });
 
@@ -56,13 +58,16 @@ export async function GET() {
         }
 
         if (shouldReset) {
-            await prisma.user.update({
+            const resetResult = await prisma.user.updateMany({
                 where: { id: userId },
                 data: {
                     graceTokens: 2,
                     lastGraceReset: now,
                 },
             });
+            if (resetResult.count === 0) {
+                return NextResponse.json({ error: "User not found" }, { status: 404 });
+            }
             // Update local user object so response is correct
             user.graceTokens = 2;
             user.lastGraceReset = now;
@@ -89,10 +94,13 @@ export async function GET() {
 
             // Update programStartDate if different (for consistency)
             if (!user.programStartDate || user.programStartDate.getTime() !== start.getTime()) {
-                await prisma.user.update({
+                const updateResult = await prisma.user.updateMany({
                     where: { id: userId },
                     data: { programStartDate: start },
                 });
+                if (updateResult.count === 0) {
+                    return NextResponse.json({ error: "User not found" }, { status: 404 });
+                }
             }
         }
 
@@ -179,6 +187,10 @@ export async function GET() {
             }
         }
 
+        if (streakDateStrings.size === 0 && user.streakCount > 0) {
+            currentStreak = user.streakCount;
+        }
+
         // Calculate ACTUAL longest streak from all entries
         const sortedDates = Array.from(streakDateStrings).sort();
         let longestStreak = 0;
@@ -202,6 +214,9 @@ export async function GET() {
             prevDate = currDate;
         }
         longestStreak = Math.max(longestStreak, tempStreak);
+        if (streakDateStrings.size === 0 && user.longestStreak > 0) {
+            longestStreak = user.longestStreak;
+        }
 
         const currentRank = calculateRankFromStreak(currentStreak);
         const nextRankInfo = getNextRankInfo(currentStreak);

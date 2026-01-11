@@ -48,6 +48,7 @@ type DebugConfig = {
     rateWindowMs: number;
     auditToDb: boolean;
     auditToConsole: boolean;
+    allowAll: boolean;
 };
 
 const AUDIT_TABLE_NAME = "debug_audit_logs";
@@ -84,6 +85,7 @@ function getDebugConfig(): DebugConfig {
 
     const auditToDb = process.env.DEBUG_TOOLS_AUDIT_DB === "true";
     const auditToConsole = process.env.DEBUG_TOOLS_AUDIT_CONSOLE !== "false";
+    const allowAll = process.env.DEBUG_TOOLS_ALLOW_ALL === "true";
 
     return {
         enabled: debugEnabled,
@@ -94,6 +96,7 @@ function getDebugConfig(): DebugConfig {
         rateWindowMs,
         auditToDb,
         auditToConsole,
+        allowAll,
     };
 }
 
@@ -155,7 +158,8 @@ export function enforceDebugGuard(options: DebugGuardOptions): DebugGuardSuccess
         };
     }
 
-    if (options.session.user.isAdmin !== true) {
+    const allowAll = config.allowAll && process.env.NODE_ENV !== "production";
+    if (!allowAll && options.session.user.isAdmin !== true) {
         return {
             ok: false,
             response: NextResponse.json({ error: "Forbidden" }, { status: 403 }),

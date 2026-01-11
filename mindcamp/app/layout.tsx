@@ -3,6 +3,7 @@ import "./globals.css";
 import { InteractionGlow } from "@/components/InteractionGlow";
 import { FixedBackground } from "@/components/FixedBackground";
 import { DevTools } from "@/components/DevTools";
+import { ClientNetworkGuard } from "@/components/ClientNetworkGuard";
 
 export const metadata: Metadata = {
   title: "Clarity Journal - Build the habit of knowing yourself",
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     icon: "/icon.png",
     apple: "/icon.png",
   },
+  manifest: "/manifest.json",
   openGraph: {
     title: "Clarity Journal - Build the habit of knowing yourself",
     description: "A simple daily journal for reflection and self-discovery.",
@@ -27,7 +29,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
       <body className="font-sans antialiased">
+        <ClientNetworkGuard />
         <FixedBackground />
         <InteractionGlow />
         {children}

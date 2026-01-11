@@ -1,6 +1,6 @@
 # MindCamp - Implementation Roadmap
 
-> **Last Updated**: January 10, 2026
+> **Last Updated**: January 11, 2026
 
 ---
 
@@ -9,9 +9,9 @@
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  CURRENT PHASE: Phase 5 - Final Testing                 │
-│  NEXT STEP: Fix Critical Bugs (Core, Pay, Privacy)      │
+│  NEXT STEP: Decide on remaining skipped tests           │
 │                                                         │
-│  █████████████████████████████████████████░░░░░░░░ 85%  │
+│  ███████████████████████████████████████████████░ 98% │
 │                                                         │
 │  ⚠️ Frontend (18/18) - iOS semantic colors, tab bar     │
 │  ⚠️ Backend (22/22) - Auth, DB, entries, password reset │
@@ -20,7 +20,7 @@
 │  ⚠️ Polish (18/18) - Export, settings, domain, email    │
 │  ⚠️ Privacy (3/3) - Local storage, export/import        │
 │  ⚠️ Digital Gym (4/4) - Zod, soft streak, paywall gate  │
-│  ⚠️ Testing (64/91) - Automated suite verification      │
+│  ✅ Testing (342/348) - 6 skipped; full suite passed    │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -190,6 +190,9 @@
 
 ### 5.4 Testing Plan
 
+**Latest automated run (2026-01-11):**
+- Full Playwright suite: 342 passed, 0 failed, 6 skipped.
+
 #### A. User Journey Tests (Full Progression)
 
 **Day 1-3: Guest Phase (Free Trial)**
@@ -224,7 +227,7 @@
 - [ ] Challenge pass requirements active
 
 **Day 64+: Master Phase**
-- [❌] Rank changes to "Master" on Day 64
+- [✅] Rank changes to "Master" on Day 64
 - [ ] Full access to all features unlocked
 - [ ] Lifetime access granted
 
@@ -233,7 +236,7 @@
 **Entry System**
 - [❌] Create single non-empty entry → saves and counts as completed day
 - [✅] Create multiple entries same day → all saved, still counts as one completed day
-- [❌] Entry syncs date/metadata to server (no content)
+- [✅] Entry syncs date/metadata to server (no content)
 - [✅] Entry content stays local (never sent to server)
 - [❌] View today's entries → all shown with timestamps
 - [❌] View yesterday's entry → displayed correctly
@@ -258,7 +261,7 @@
 - [✅] Streak 15-30: Regular
 - [✅] Streak 31-56: Veteran
 - [✅] Streak 57-63: Final Week
-- [❌] Streak 64+: Master
+- [✅] Streak 64+: Master
 
 #### C. Payment Tests
 
@@ -266,7 +269,7 @@
 - [ ] Cancel before Day 4 → no charge
 - [✅] Subscribe on Day 4 → access restored
 - [ ] Recurring payment → subscription active
-- [❌] Cancel subscription → read-only mode after period
+- [✅] Cancel subscription → read-only mode after period
 - [ ] Resubscribe → full access restored
 
 #### D. Local Storage Tests

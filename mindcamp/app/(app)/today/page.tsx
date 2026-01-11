@@ -38,12 +38,30 @@ export default function TodayPage() {
     const [entry, setEntry] = useState("");
     const [reflection, setReflection] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [error, setError] = useState("");
     const [yesterdayEntry, setYesterdayEntry] = useState<Entry | null>(null);
     const [todayEntries, setTodayEntries] = useState<Entry[]>([]);
-    const [userProgress, setUserProgress] = useState<{ currentDay: number; streakCount: number; currentRank: string } | null>(null);
+    const [userProgress, setUserProgress] = useState<{
+        currentDay: number;
+        streakCount: number;
+        currentRank: string;
+        subscriptionStatus?: string | null;
+        trialEndsAt?: string | null;
+    } | null>(null);
     const [insights, setInsights] = useState<Insight[]>([]);
+    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+    const [isReadOnly, setIsReadOnly] = useState(false);
+
+    const persistDraft = (nextEntry: string, nextReflection: string) => {
+        try {
+            const todayStr = getTodayDateString();
+            const draftKey = `clarity-journal:draft:${todayStr}`;
+            const payload = { content: nextEntry, reflection: nextReflection };
+            window.localStorage.setItem(draftKey, JSON.stringify(payload));
+        } catch {
+            // Ignore local draft errors.
+        }
+    };
 
     // Use deterministic prompt based on date to prevent hydration mismatch
     const [currentPrompt] = useState(() => {
@@ -69,6 +87,19 @@ export default function TodayPage() {
                     createdAt: e.createdAt,
                 })));
 
+                // Load any draft from local storage
+                try {
+                    const draftKey = `clarity-journal:draft:${todayStr}`;
+                    const rawDraft = window.localStorage.getItem(draftKey);
+                    if (rawDraft) {
+                        const parsed = JSON.parse(rawDraft) as { content?: string; reflection?: string };
+                        if (parsed.content) setEntry(parsed.content);
+                        if (parsed.reflection) setReflection(parsed.reflection);
+                    }
+                } catch {
+                    // Ignore local draft errors.
+                }
+
                 // Fetch yesterday's entries from local IndexedDB
                 const yesterday = getClientNow();
                 yesterday.setDate(yesterday.getDate() - 1);
@@ -83,6 +114,21 @@ export default function TodayPage() {
                         entryDate: first.date,
                         createdAt: first.createdAt,
                     });
+                } else {
+                    // Fallback to server entry if debug tools injected data
+                    const res = await fetch("/api/entries/yesterday");
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data?.entry?.content && data.entry.content !== "[stored locally]") {
+                            setYesterdayEntry({
+                                id: data.entry.id,
+                                content: data.entry.content,
+                                reflection: data.entry.reflection ?? undefined,
+                                entryDate: data.entry.entryDate,
+                                createdAt: data.entry.createdAt,
+                            });
+                        }
+                    }
                 }
 
                 // Fetch user progress from server (metadata only)
@@ -91,17 +137,20 @@ export default function TodayPage() {
                     const data = await progressRes.json();
                     setUserProgress(data);
 
-                    // Check paywall: Day 4+ users without subscription need to pay
-                    if (data.currentDay >= 4 && data.subscriptionStatus !== 'active') {
-                        // Check if trial is still active
-                        const trialEndsAt = data.trialEndsAt ? new Date(data.trialEndsAt) : null;
-                        const now = getClientNow();
+                    const now = getClientNow();
+                    const subscriptionStatus = data.subscriptionStatus || "guest";
+                    const shouldCheckPaywall = data.currentDay >= 4;
+                    const isTrialActive = subscriptionStatus === "trial" && data.currentDay < 4;
+                    const isMaster = data.currentRank === "master";
+                    const isActive = subscriptionStatus === "active" || isTrialActive || isMaster;
+                    const shouldReadOnly = ["canceled", "cancelled", "past_due"].includes(subscriptionStatus);
 
-                        if (!trialEndsAt || trialEndsAt <= now) {
-                            router.push('/paywall');
-                            return;
-                        }
+                    if (shouldCheckPaywall && !isActive && !shouldReadOnly) {
+                        router.push("/paywall");
+                        return;
                     }
+
+                    setIsReadOnly(shouldCheckPaywall && shouldReadOnly);
                 }
             } catch (err) {
                 console.error("Error fetching data:", err);
@@ -113,6 +162,52 @@ export default function TodayPage() {
         }
     }, [session, router]);
 
+    useEffect(() => {
+        if (!session || isReadOnly) return;
+
+        const hasDraft = entry.trim().length > 0 || reflection.trim().length > 0;
+        if (!hasDraft) {
+            setSaveStatus("idle");
+            return;
+        }
+
+        setSaveStatus("saving");
+        const timeout = window.setTimeout(async () => {
+            const todayStr = getTodayDateString();
+            const draftKey = `clarity-journal:draft:${todayStr}`;
+            const draftPayload = { content: entry, reflection };
+
+            try {
+                window.localStorage.setItem(draftKey, JSON.stringify(draftPayload));
+            } catch {
+                // Ignore local draft errors.
+            }
+
+            const wordCount = entry.trim().split(/\s+/).filter(Boolean).length;
+            const meetsMinimum = wordCount >= minWords;
+            try {
+                await fetch("/api/entries/sync", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        date: todayStr,
+                        wordCount,
+                        meetsMinimum,
+                        ...(meetsMinimum ? {} : { draft: true }),
+                    }),
+                });
+            } catch {
+                // Draft sync failures are non-blocking.
+            }
+
+            setSaveStatus("saved");
+        }, 600);
+
+        return () => {
+            window.clearTimeout(timeout);
+        };
+    }, [entry, reflection, session, isReadOnly]);
+
     const wordCount = entry.trim().split(/\s+/).filter(Boolean).length;
     const minWords = MIN_WORDS;
     const isShort = wordCount > 0 && wordCount < minWords;
@@ -120,7 +215,7 @@ export default function TodayPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!hasContent) return;
+        if (!hasContent || isReadOnly) return;
 
         setIsSubmitting(true);
         setError("");
@@ -152,9 +247,16 @@ export default function TodayPage() {
                 console.warn("Failed to sync entry date to server");
             }
 
-            // Clear form
+            // Clear form and draft
+            try {
+                const draftKey = `clarity-journal:draft:${todayStr}`;
+                window.localStorage.removeItem(draftKey);
+            } catch {
+                // Ignore local draft errors.
+            }
             setEntry("");
             setReflection("");
+            setSaveStatus("saved");
 
             // Add new entry to list
             setTodayEntries(prev => [{
@@ -318,7 +420,12 @@ export default function TodayPage() {
                     <p className="text-lg font-medium text-white mb-3">{currentPrompt}</p>
                     <textarea
                         value={entry}
-                        onChange={(e) => setEntry(e.target.value)}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setEntry(value);
+                            persistDraft(value, reflection);
+                        }}
+                        disabled={isReadOnly}
                         className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[140px] resize-none"
                         placeholder="Write your thoughts here..."
                     />
@@ -328,9 +435,17 @@ export default function TodayPage() {
                         ) : (
                             <span className="text-white/70">Write freely...</span>
                         )}
-                        <span className={wordCount >= minWords ? "text-[#34C759]" : "text-white/70"}>
-                            {wordCount} words {wordCount >= minWords && "✓"}
-                        </span>
+                        <div className="flex items-center gap-2">
+                            {saveStatus === "saving" && (
+                                <span className="text-white/60">Saving...</span>
+                            )}
+                            {saveStatus === "saved" && (
+                                <span className="text-[#34C759]">Saved</span>
+                            )}
+                            <span className={wordCount >= minWords ? "text-[#34C759]" : "text-white/70"}>
+                                {wordCount} words {wordCount >= minWords && "✓"}
+                            </span>
+                        </div>
                     </div>
                 </section>
 
@@ -344,15 +459,20 @@ export default function TodayPage() {
                         <p className="text-sm text-white/85 mb-2">How does today compare to yesterday?</p>
                         <textarea
                             value={reflection}
-                            onChange={(e) => setReflection(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setReflection(value);
+                                persistDraft(entry, value);
+                            }}
+                            disabled={isReadOnly}
                             className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition-all min-h-[80px] resize-none"
                             placeholder="Your reflection..."
                         />
                     </section>
                 )}
 
-                <button type="submit" disabled={!hasContent || isSubmitting} className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    {isSubmitting ? "Saving..." : "Save Entry"}
+                <button type="submit" disabled={!hasContent || isSubmitting || isReadOnly} className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isReadOnly ? "Read-only" : isSubmitting ? "Saving..." : "Save Entry"}
                 </button>
             </form>
         </div>

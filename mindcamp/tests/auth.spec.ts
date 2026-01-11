@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { requestWithRetry } from './utils/request';
 
 /**
  * SECTION B: Authentication
@@ -140,17 +141,68 @@ test.describe('Section B: Authentication', () => {
     });
 
     // AUTH-008: Password reset — expired token
-    // NOTE: This usually requires email flow or DB token manipulation. 
-    // Skipping or mocking if possible. Marking TODO/Manual if not easily mockable.
-    // We can try to test the UI for "Expired Token" if we have a way to generate one.
-    // Skipping for automated run unless we have a backdoor.
-    test.skip('AUTH-008: Password reset — expired token', async ({ page }) => {
-        // Requires generating real token and waiting expiry or mocking DB
+    test('AUTH-008: Password reset — expired token', async ({ page }) => {
+        const email = `auth-reset-expired-${Date.now()}@test.com`;
+
+        await page.goto('/signup');
+        await page.fill('input[id="email"]', email);
+        await page.fill('input[id="password"]', 'Password123!');
+        await page.click('button[type="submit"]');
+        await page.waitForURL(/\/onboarding|\/today/);
+
+        const tokenResponse = await requestWithRetry(() =>
+            page.request.post('/api/debug/password-reset', {
+                data: { expired: true }
+            })
+        );
+        const tokenData = await tokenResponse.json();
+
+        const resetResponse = await requestWithRetry(() =>
+            page.request.post('/api/auth/reset-password', {
+                data: { token: tokenData.token, password: 'NewPass123!' }
+            })
+        );
+
+        expect(resetResponse.status()).toBe(400);
+        const resetBody = await resetResponse.json();
+        expect(resetBody.error).toMatch(/expired|invalid/i);
     });
 
     // AUTH-009: Password reset — success
-    test.skip('AUTH-009: Password reset — success', async ({ page }) => {
-        // Requires real email link or mocking
+    test('AUTH-009: Password reset — success', async ({ page }) => {
+        const email = `auth-reset-ok-${Date.now()}@test.com`;
+        const oldPassword = 'Password123!';
+        const newPassword = 'NewPass123!';
+
+        await page.goto('/signup');
+        await page.fill('input[id="email"]', email);
+        await page.fill('input[id="password"]', oldPassword);
+        await page.click('button[type="submit"]');
+        await page.waitForURL(/\/onboarding|\/today/);
+
+        const tokenResponse = await requestWithRetry(() =>
+            page.request.post('/api/debug/password-reset', {
+                data: { expired: false }
+            })
+        );
+        const tokenData = await tokenResponse.json();
+
+        const resetResponse = await requestWithRetry(() =>
+            page.request.post('/api/auth/reset-password', {
+                data: { token: tokenData.token, password: newPassword }
+            })
+        );
+        expect(resetResponse.ok()).toBeTruthy();
+
+        await page.goto('/api/auth/signout');
+        await page.waitForURL('/');
+
+        await page.goto('/login');
+        await page.fill('input[id="email"]', email);
+        await page.fill('input[id="password"]', newPassword);
+        await page.click('button[type="submit"]');
+
+        await expect(page).toHaveURL(/\/today|\/onboarding/);
     });
 
     // AUTH-010: Login rate limiting (5 attempts)

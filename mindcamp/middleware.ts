@@ -24,12 +24,31 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check for auth token
-    const token = await getToken({
-        req: request,
-        secret: process.env.NEXTAUTH_SECRET,
-    });
+    const secret =
+        process.env.NEXTAUTH_SECRET ||
+        (process.env.NODE_ENV !== "production" ? "dev-secret" : undefined);
+    const cookieNames = ["next-auth.session-token", "__Secure-next-auth.session-token"];
+    let token = null;
 
-    // Redirect to login if not authenticated
+    for (const cookieName of cookieNames) {
+        token = await getToken({
+            req: request,
+            secret,
+            cookieName,
+        });
+        if (token) {
+            break;
+        }
+    }
+
+    if (path.startsWith("/api/")) {
+        if (!token) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        return NextResponse.next();
+    }
+
+    // Redirect to login if not authenticated (pages)
     if (!token) {
         const loginUrl = new URL("/login", request.url);
         loginUrl.searchParams.set("callbackUrl", path);

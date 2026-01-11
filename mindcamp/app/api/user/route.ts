@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -6,8 +7,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
+        const cookieStore = await cookies();
+        const hasSessionCookie =
+            cookieStore.has("next-auth.session-token") ||
+            cookieStore.has("__Secure-next-auth.session-token");
 
-        if (!session?.user) {
+        if (!session?.user || !hasSessionCookie) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
