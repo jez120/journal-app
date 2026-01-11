@@ -205,9 +205,9 @@ export default function LandingPage() {
               <Link href="/contact" className="hover:text-white transition-colors">
                 Contact
               </Link>
-              <Link href="/st-francis/index.html" className="hover:text-white transition-colors opacity-50 text-xs" target="_blank">
+              {/* <Link href="/st-francis/index.html" className="hover:text-white transition-colors opacity-50 text-xs" target="_blank">
                 St Francis Demo
-              </Link>
+              </Link> */}
             </div>
             <p className="text-sm text-white/60">
               © 2026 Clarity Journal
