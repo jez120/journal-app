@@ -175,13 +175,13 @@ export default function LandingPage() {
             className={`mt-24 text-center transition-all duration-700 delay-400 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
           >
-            <p className="text-white/70 mb-8">
-              Join thousands building lasting journaling habits
+            <p className="text-white/70 mb-8 max-w-2xl mx-auto">
+              A private space for your thoughts. No ads, no tracking, just you.
             </p>
             <div className="flex flex-wrap justify-center gap-8 md:gap-16">
-              <Stat value="10K+" label="Active users" />
-              <Stat value="2.5M" label="Entries written" />
-              <Stat value="68%" label="Complete journey" />
+              <Stat value="Private" label="Data stays on device" />
+              <Stat value="Offline" label="No internet required" />
+              <Stat value="Guided" label="64-day habit path" />
             </div>
           </div>
         </div>
