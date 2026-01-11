@@ -1,5 +1,7 @@
 "use client";
 
+import { SettingsIcon, UserIcon, EditIcon, DeleteIcon, ExportIcon } from "@/components/JournalIcons";
+
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -126,11 +128,17 @@ export default function SettingsPage() {
 
     return (
         <div className="space-y-6 max-w-lg mx-auto pb-32">
-            <h1 className="text-3xl font-bold text-white">Settings</h1>
+            <div className="flex items-center gap-3">
+                <SettingsIcon className="w-8 h-8" />
+                <h1 className="text-3xl font-bold text-white">Settings</h1>
+            </div>
 
             {/* Account Info */}
             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5">
-                <h2 className="text-lg font-semibold text-white mb-4">Account</h2>
+                <div className="flex items-center gap-2 mb-4">
+                    <UserIcon className="w-5 h-5" />
+                    <h2 className="text-lg font-semibold text-white">Account</h2>
+                </div>
                 <div className="space-y-3">
                     <div>
                         <label className="text-sm text-white/60">Email</label>
@@ -141,7 +149,10 @@ export default function SettingsPage() {
 
             {/* Change Password */}
             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5">
-                <h2 className="text-lg font-semibold text-white mb-4">Change Password</h2>
+                <div className="flex items-center gap-2 mb-4">
+                    <EditIcon className="w-5 h-5" />
+                    <h2 className="text-lg font-semibold text-white">Change Password</h2>
+                </div>
                 <form onSubmit={handlePasswordChange} className="space-y-4">
                     <div>
                         <label className="text-sm text-white/60 block mb-1">Current Password</label>
@@ -191,13 +202,17 @@ export default function SettingsPage() {
 
             {/* Data Management */}
             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5">
-                <h2 className="text-lg font-semibold text-white mb-4">Data</h2>
+                <div className="flex items-center gap-2 mb-4">
+                    <SettingsIcon className="w-5 h-5" />
+                    <h2 className="text-lg font-semibold text-white">Data</h2>
+                </div>
                 <div className="space-y-3">
                     <button
                         onClick={handleExport}
                         disabled={exporting}
-                        className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3 rounded-xl transition-colors disabled:opacity-50"
+                        className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
+                        <ExportIcon className="w-5 h-5" />
                         {exporting ? "Exporting..." : "Export Data"}
                     </button>
                     <button
@@ -227,8 +242,9 @@ export default function SettingsPage() {
                         }
                         setShowDeleteModal(true);
                     }}
-                    className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg text-sm transition-colors"
+                    className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2"
                 >
+                    <DeleteIcon className="w-4 h-4" />
                     Delete Account
                 </button>
             </div>

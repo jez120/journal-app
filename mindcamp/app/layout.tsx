@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/lib/ThemeContext";
 import { InteractionGlow } from "@/components/InteractionGlow";
 import { FixedBackground } from "@/components/FixedBackground";
 import { DevTools } from "@/components/DevTools";
@@ -34,11 +35,13 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="font-sans antialiased">
-        <ClientNetworkGuard />
-        <FixedBackground />
-        <InteractionGlow />
-        {children}
-        <DevTools />
+        <ThemeProvider>
+          <ClientNetworkGuard />
+          <FixedBackground />
+          <InteractionGlow />
+          {children}
+          <DevTools />
+        </ThemeProvider>
       </body>
     </html>
   );

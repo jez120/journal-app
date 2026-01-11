@@ -37,6 +37,26 @@
   --quaternary-fill: rgba(120, 120, 128, 0.12);
 }
 
+/* Midnight Theme Overrides */
+[data-theme='midnight'] {
+  --system-background: #000000;
+  --brand-navy: #000000;
+  --secondary-system-background: #1C1C1E;
+  --tertiary-system-background: #2C2C2E;
+
+  --label: #FFFFFF;
+  --secondary-label: rgba(235, 235, 245, 0.6);
+  --tertiary-label: rgba(235, 235, 245, 0.3);
+
+  --separator: #38383A;
+
+  --tertiary-fill: rgba(118, 118, 128, 0.24);
+  --quaternary-fill: rgba(116, 116, 128, 0.18);
+
+  /* Adjust accent for better contrast on black if needed, keeping cyan for now */
+  --accent-color: #06B6D4;
+}
+
 /* Base Styles */
 @theme inline {
   --color-background: var(--system-background);
@@ -51,6 +71,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+  /* Font size controlled via JS inline style on root */
 }
 
 body {
@@ -59,6 +80,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Typography */

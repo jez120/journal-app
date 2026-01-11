@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SessionProvider, useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { AppearanceControls } from "@/components/AppearanceControls";
 
 function AppLayoutInner({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -60,6 +61,8 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                             <span className="text-sm font-semibold text-[#FFC107]">{streakCount}</span>
                         </div>
 
+                        <AppearanceControls />
+
                         {/* Profile */}
                         <button
                             onClick={() => signOut({ callbackUrl: "/" })}
@@ -89,9 +92,8 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                             <Link
                                 key={tab.href}
                                 href={tab.href}
-                                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                                    isActive ? "text-[#06B6D4]" : "text-white/50 hover:text-white/80"
-                                }`}
+                                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${isActive ? "text-[#06B6D4]" : "text-white/50 hover:text-white/80"
+                                    }`}
                             >
                                 <tab.Icon className={isActive ? "w-7 h-7" : "w-6 h-6 grayscale opacity-70"} />
                                 <span className="text-[10px] font-medium">{tab.label}</span>

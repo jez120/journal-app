@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ChevronDownIcon, TrackIcon } from "@/components/JournalIcons";
+import { ChevronDownIcon, TrackIcon, ExportIcon } from "@/components/JournalIcons";
 import { getAllEntries, exportEntries, importEntries, LocalEntry } from "@/lib/localDb";
 
 interface Entry {
@@ -129,8 +129,9 @@ export default function HistoryPage() {
                     <button
                         onClick={handleExport}
                         disabled={exporting || entries.length === 0}
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] disabled:opacity-50"
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] disabled:opacity-50 flex items-center gap-2"
                     >
+                        <ExportIcon className="w-4 h-4" />
                         {exporting ? "..." : "Export"}
                     </button>
                     <label className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] cursor-pointer flex items-center">

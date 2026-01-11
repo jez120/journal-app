@@ -152,3 +152,31 @@ export const CheckIcon = ({ size, className }: IconProps) => (
 export const WarningIcon = ({ size, className }: IconProps) => (
     <IconImage src="/icons/WarningIcon.png" alt="Warning" size={size} className={className} />
 );
+
+// ============================================================================
+// SYSTEM & ACTIONS
+// ============================================================================
+
+export const SettingsIcon = ({ size, className }: IconProps) => (
+    <IconImage src="/icons/SettingsIcon.png" alt="Settings" size={size} className={className} />
+);
+
+export const EditIcon = ({ size, className }: IconProps) => (
+    <IconImage src="/icons/EditIcon.png" alt="Edit" size={size} className={className} />
+);
+
+export const DeleteIcon = ({ size, className }: IconProps) => (
+    <IconImage src="/icons/DeleteIcon.png" alt="Delete" size={size} className={className} />
+);
+
+export const ExportIcon = ({ size, className }: IconProps) => (
+    <IconImage src="/icons/ExportIcon.png" alt="Export" size={size} className={className} />
+);
+
+export const UserIcon = ({ size, className }: IconProps) => (
+    <IconImage src="/icons/UserIcon.png" alt="User" size={size} className={className} />
+);
+
+export const ThemeIcon = ({ size, className }: IconProps) => (
+    <IconImage src="/icons/LightbulbIcon.png" alt="Theme" size={size} className={className} />
+);
