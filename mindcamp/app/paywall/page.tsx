@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider, useSession, signOut } from "next-auth/react";
 import {
     AppLogo,
     WriteIcon,
@@ -18,6 +18,7 @@ function PaywallContent() {
     const { data: session } = useSession();
     const [isLoading, setIsLoading] = useState<"monthly" | "yearly" | null>(null);
     const [error, setError] = useState("");
+    const isAuthenticated = Boolean(session?.user);
 
     const handleSubscribe = async (priceType: "monthly" | "yearly") => {
         setIsLoading(priceType);
@@ -52,6 +53,27 @@ function PaywallContent() {
     return (
         <div className="min-h-screen px-4 pt-10 pb-12 bg-[var(--system-background)]">
             <div className="w-full max-w-md mx-auto">
+                <div className="flex items-center justify-between mb-6 text-sm text-[var(--secondary-label)]">
+                    <Link
+                        href={isAuthenticated ? "/history" : "/login"}
+                        className="hover:text-white transition-colors"
+                    >
+                        {isAuthenticated ? "Back to app" : "Back to login"}
+                    </Link>
+                    {isAuthenticated ? (
+                        <button
+                            type="button"
+                            onClick={() => signOut({ callbackUrl: "/" })}
+                            className="hover:text-white transition-colors"
+                        >
+                            Sign out
+                        </button>
+                    ) : (
+                        <Link href="/" className="hover:text-white transition-colors">
+                            Go to home
+                        </Link>
+                    )}
+                </div>
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 mb-4">
