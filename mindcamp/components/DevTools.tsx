@@ -15,7 +15,7 @@ function DevToolsInner() {
     const [targetEmail, setTargetEmail] = useState("");
     const [resetting, setResetting] = useState(false);
     const [resetMessage, setResetMessage] = useState<string | null>(null);
-    const [clearLocal, setClearLocal] = useState(false);
+    const [clearLocal, setClearLocal] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
@@ -94,9 +94,19 @@ function DevToolsInner() {
 
             if (clearLocal) {
                 await clearAllEntries();
+                try {
+                    Object.keys(window.localStorage).forEach((key) => {
+                        if (key.startsWith("clarity-journal:draft:")) {
+                            window.localStorage.removeItem(key);
+                        }
+                    });
+                } catch {
+                    // Ignore local draft cleanup errors.
+                }
             }
 
-            setResetMessage(`Reset complete for ${email}.`);
+            setResetMessage(`Reset complete for ${email}. Reloading...`);
+            window.location.reload();
         } catch (err) {
             console.error("Reset user error:", err);
             setResetMessage(err instanceof Error ? err.message : "Reset failed");
