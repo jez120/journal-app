@@ -191,10 +191,6 @@ export default function LandingPage() {
       <footer className="border-t border-white/20 py-8">
         <div className="container-app">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <AppLogo className="w-6 h-6" />
-              <span className="font-semibold text-white">Clarity Journal</span>
-            </div>
             <div className="flex items-center gap-6 text-sm text-white/60">
               <Link href="/privacy" className="hover:text-white transition-colors">
                 Privacy
