@@ -23,7 +23,7 @@ export default function LandingPage() {
         <div className="container-app">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <img src="/icons/AppIcon.png" alt="Clarity Journal" className="w-8 h-8" />
+              <img src="/icons/AppLogo.png" alt="Clarity Journal" className="w-8 h-8" />
               <span className="font-semibold text-xl text-white">Clarity Journal</span>
             </div>
             <div className="flex items-center gap-4">
@@ -191,7 +191,7 @@ export default function LandingPage() {
         <div className="container-app">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src="/icons/AppIcon.png" alt="Clarity Journal" className="w-6 h-6" />
+              <img src="/icons/AppLogo.png" alt="Clarity Journal" className="w-6 h-6" />
               <span className="font-semibold text-white">Clarity Journal</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-white/60">

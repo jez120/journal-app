@@ -33,7 +33,7 @@ const SvgIcon: React.FC<IconProps> = ({ size = 24, color = "currentColor", child
 export function AppLogo({ className = "w-10 h-10" }: { className?: string }) {
     return (
         <Image
-            src="/icons/AppIcon.png"
+            src="/icons/AppLogo.png"
             alt="Clarity Journal"
             width={40}
             height={40}

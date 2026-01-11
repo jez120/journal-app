@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   keywords: ["journal", "journaling", "clarity", "self-improvement", "habit", "daily journal", "reflect"],
   authors: [{ name: "Clarity Journal" }],
   icons: {
-    icon: "/icons/AppIcon.png",
-    apple: "/icons/AppIcon.png",
+    icon: "/icons/AppLogo.png",
+    apple: "/icons/AppLogo.png",
   },
   manifest: "/manifest.json",
   openGraph: {
