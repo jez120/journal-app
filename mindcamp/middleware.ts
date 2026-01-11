@@ -33,6 +33,11 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // St Francis Demo is public
+    if (path.startsWith("/st-francis")) {
+        return NextResponse.next();
+    }
+
     // Check for auth token
     const secret =
         process.env.NEXTAUTH_SECRET ||
