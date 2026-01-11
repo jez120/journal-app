@@ -70,7 +70,7 @@ export default function SignupPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <img src="/icon.png" alt="Clarity Journal" className="w-10 h-10" />
+                        <img src="/icons/AppIcon.png" alt="Clarity Journal" className="w-10 h-10" />
                         <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </Link>
                 </div>
