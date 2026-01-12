@@ -221,7 +221,7 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
         return (
             <div className="space-y-2">
                 {/* Day headers */}
-                <div className="grid grid-cols-7 gap-1 text-center">
+                <div className="grid grid-cols-7 gap-[2px] text-center">
                     {DAYS.map((day) => (
                         <div key={day} className="text-xs text-white/40 py-1">
                             {day.charAt(0)}
@@ -231,7 +231,7 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
 
                 {/* Calendar grid */}
                 {weeks.map((week, weekIndex) => (
-                    <div key={weekIndex} className="grid grid-cols-7 gap-1">
+                    <div key={weekIndex} className="grid grid-cols-7 gap-[2px]">
                         {week.map((date, dayIndex) => {
                             if (!date) {
                                 return <div key={dayIndex} className="aspect-square" />;
@@ -245,9 +245,9 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
                             return (
                                 <div
                                     key={dayIndex}
-                                    className={`aspect-square rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all
+                                    className={`aspect-square rounded-[2px] flex flex-col items-center justify-center cursor-pointer transition-all
                                         ${isFuture ? "bg-white/5" : getLevelColor(level)}
-                                        ${isToday ? "ring-2 ring-[#06B6D4]" : ""}
+                                        ${isToday ? "ring-1 ring-white/50" : ""}
                                         hover:scale-105`}
                                     onMouseEnter={(e) => {
                                         if (!isFuture) {
@@ -266,7 +266,7 @@ export function ActivityHeatmap({ title = "Activity" }: { title?: string }) {
                                     }}
                                     onMouseLeave={() => setHoveredDay(null)}
                                 >
-                                    <span className={`text-sm font-medium ${isFuture ? "text-white/30" : "text-white"}`}>
+                                    <span className={`text-[10px] font-medium ${isFuture ? "text-white/30" : "text-white/80"}`}>
                                         {date.getDate()}
                                     </span>
                                 </div>
