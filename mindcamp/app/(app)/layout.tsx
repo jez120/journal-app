@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SessionProvider, useSession, signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppearanceControls } from "@/components/AppearanceControls";
 
 function AppLayoutInner({ children }: { children: React.ReactNode }) {
@@ -18,23 +18,39 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession();
     const [streakCount, setStreakCount] = useState(0);
 
-    useEffect(() => {
-        async function fetchProgress() {
-            try {
-                const res = await fetch("/api/progress");
-                if (res.ok) {
-                    const data = await res.json();
-                    setStreakCount(data.streakCount || 0);
-                }
-            } catch (err) {
-                console.error("Error fetching progress:", err);
+    const fetchProgress = useCallback(async () => {
+        if (!session) return;
+        try {
+            const res = await fetch("/api/progress");
+            if (res.ok) {
+                const data = await res.json();
+                setStreakCount(data.streakCount || 0);
             }
+        } catch (err) {
+            console.error("Error fetching progress:", err);
         }
+    }, [session]);
 
-        if (session) {
+    useEffect(() => {
+        fetchProgress();
+    }, [fetchProgress, pathname]);
+
+    useEffect(() => {
+        if (!session) return;
+        const handleProgressUpdate = (event: Event) => {
+            const customEvent = event as CustomEvent<{ streakCount?: number }>;
+            if (typeof customEvent.detail?.streakCount === "number") {
+                setStreakCount(customEvent.detail.streakCount);
+                return;
+            }
             fetchProgress();
-        }
-    }, [session, pathname]);
+        };
+
+        window.addEventListener("clarity:progress-updated", handleProgressUpdate);
+        return () => {
+            window.removeEventListener("clarity:progress-updated", handleProgressUpdate);
+        };
+    }, [fetchProgress, session]);
 
     const tabs = [
         { href: "/today", label: "Today", Icon: TodayIcon },

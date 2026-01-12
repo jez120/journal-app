@@ -272,6 +272,11 @@ export default function TodayPage() {
             if (progressRes.ok) {
                 const data = await progressRes.json();
                 setUserProgress(data);
+                window.dispatchEvent(
+                    new CustomEvent("clarity:progress-updated", {
+                        detail: { streakCount: data.streakCount },
+                    })
+                );
             }
 
             // Generate insights
