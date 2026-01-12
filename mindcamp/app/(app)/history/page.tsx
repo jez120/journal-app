@@ -116,7 +116,7 @@ export default function HistoryPage() {
     return (
         <div className="space-y-4">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-y-4">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-1">History</h1>
                     <p className="text-white/85">{entries.length} entries</p>
@@ -124,7 +124,7 @@ export default function HistoryPage() {
                 <div className="flex gap-2">
                     <Link href="/history/stats" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] flex items-center gap-2">
                         <TrackIcon className="w-4 h-4" />
-                        <span>Insights</span>
+                        <span className="hidden sm:inline">Insights</span>
                     </Link>
                     <button
                         onClick={handleExport}
@@ -132,10 +132,11 @@ export default function HistoryPage() {
                         className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] disabled:opacity-50 flex items-center gap-2"
                     >
                         <ExportIcon className="w-4 h-4" />
-                        {exporting ? "..." : "Export"}
+                        <span className="hidden sm:inline">{exporting ? "..." : "Export"}</span>
                     </button>
-                    <label className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] cursor-pointer flex items-center">
-                        {importing ? "..." : "Import"}
+                    <label className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] cursor-pointer flex items-center gap-2">
+                        <span className="hidden sm:inline">{importing ? "..." : "Import"}</span>
+                        {!importing && <span className="sm:hidden">Import</span>}
                         <input
                             type="file"
                             accept=".json"
@@ -156,7 +157,7 @@ export default function HistoryPage() {
 
             {/* Entries list */}
             {entries.length > 0 && (
-                <div className="calendar-grid bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-sm divide-y divide-white/15">
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-sm divide-y divide-white/15">
                     {entries.map((entry) => (
                         <div key={entry.id}>
                             <button onClick={() => toggleEntry(entry.id)} className="w-full p-4 text-left min-h-[44px]">
