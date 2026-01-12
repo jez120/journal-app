@@ -17,14 +17,14 @@ export function AppearanceControls() {
             {/* Theme Toggle Button */}
             <button
                 onClick={toggleTheme}
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all border border-white/10"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all border border-white/10"
                 title={`Switch to ${theme === "ocean" ? "Dark" : "Light"} Mode`}
             >
                 {/* 
                   Using ThemeIcon (Lightbulb) as a generic "Mode" indicator for now. 
                   Ideally, this would swap between a Sun and Moon icon.
                 */}
-                <ThemeIcon className="w-4 h-4" />
+                <ThemeIcon className="w-8 h-8" />
             </button>
 
             {/* Font Config Button */}
