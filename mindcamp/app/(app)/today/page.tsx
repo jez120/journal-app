@@ -357,33 +357,7 @@ export default function TodayPage() {
                 />
             )}
 
-            {/* Today's previous entries */}
-            {todayEntries.length > 0 && (
-                <section>
-                    <div className="flex items-center gap-2 mb-2">
-                        <TodayIcon className="w-6 h-6" />
-                        <h2 className="text-sm font-semibold text-white/85 uppercase tracking-wide">Today&apos;s Entries</h2>
-                        <span className="text-xs text-white/50">({todayEntries.length})</span>
-                    </div>
-                    <div className="space-y-3">
-                        {todayEntries.map((e) => (
-                            <div key={e.id} className="bg-white/10 backdrop-blur-sm border border-white/20 p-4 rounded-xl">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs text-white/50">{formatTime(e.createdAt)}</span>
-                                </div>
-                                <p className="text-white/90 text-[15px] leading-relaxed">
-                                    {e.content}
-                                </p>
-                                {e.reflection && (
-                                    <div className="pt-2 mt-2 border-t border-white/10">
-                                        <p className="text-sm text-white/70 italic">{e.reflection}</p>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
+
 
             {/* Yesterday's entry */}
             {yesterdayEntry && (
