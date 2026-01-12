@@ -69,12 +69,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.setAttribute("data-theme", theme);
 
         // Apply font size
-        // standard is 100% (16px). 
-        // Small = 87.5% (14px)
-        // Large = 112.5% (18px)
-        let scale = "100%";
-        if (fontSize === "small") scale = "87.5%";
-        if (fontSize === "large") scale = "112.5%";
+        // standard is 100% (16px).
+        // Small = 95% (~15.2px)
+        // Medium = 108% (~17.3px) - Default, closer to WhatsApp/iOS large
+        // Large = 125% (20px)
+        let scale = "108%"; // Default to Medium (108%)
+        if (fontSize === "small") scale = "95%";
+        if (fontSize === "medium") scale = "108%";
+        if (fontSize === "large") scale = "125%";
 
         root.style.fontSize = scale;
     }, [theme, fontSize, mounted]);
