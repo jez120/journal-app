@@ -70,25 +70,10 @@ export default function HistoryPage() {
         setImporting(true);
         try {
             const text = await file.text();
-            const data = JSON.parse(text);
 
-            // Validate basic structure
-            if (!Array.isArray(data)) throw new Error("Invalid format");
-
-            // Add entries
-            let importedCount = 0;
-            for (const entry of data) {
-                if (entry.content && entry.date) {
-                    await addEntry({
-                        date: entry.date,
-                        content: entry.content,
-                        reflection: entry.reflection,
-                        createdAt: entry.createdAt,
-                        wordCount: entry.wordCount
-                    });
-                    importedCount++;
-                }
-            }
+            // Use standard import function which handles the correct schema and IDs
+            // This fixes the build error by not using addEntry manually with createdAt
+            const importedCount = await importEntries(text);
 
             await loadEntries();
             alert(`Successfully imported ${importedCount} entries!`);
@@ -174,7 +159,11 @@ export default function HistoryPage() {
         }
     };
 
-    // Formatting Helpers
+    const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' });
+    };
+
     const formatTime = (dateStr: string) => {
         if (!dateStr) return "";
         return new Date(dateStr).toLocaleTimeString("en-US", {
@@ -182,11 +171,6 @@ export default function HistoryPage() {
             minute: "2-digit",
             hour12: true
         });
-    };
-
-    const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' });
     };
 
     if (loading) {
