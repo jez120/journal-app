@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { BackIcon, CheckIcon, CloseIcon, ForwardIcon } from "@/components/JournalIcons";
+import { BackIcon, CheckIcon, CloseIcon, ForwardIcon, AppLogo } from "@/components/JournalIcons";
 
 function ResetPasswordForm() {
     const searchParams = useSearchParams();
@@ -142,7 +142,7 @@ function ResetPasswordForm() {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full py-3 bg-white text-black font-medium rounded-xl hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#E05C4D] hover:bg-[#d04a3b] text-white font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isLoading ? "Resetting..." : "Reset Password"}
                 </button>
@@ -153,20 +153,31 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#1E3A5F] to-[#06B6D4]">
             <div className="w-full max-w-sm">
-                <Suspense fallback={<div className="text-center text-white/60">Loading...</div>}>
-                    <ResetPasswordForm />
-                </Suspense>
-
-                <div className="mt-6 text-center">
-                    <Link
-                        href="/login"
-                        className="text-white/60 hover:text-white/80 text-sm transition-colors inline-flex items-center gap-2"
-                    >
-                        <BackIcon className="w-4 h-4" />
-                        <span>Back to Login</span>
+                {/* Logo */}
+                <div className="text-center mb-8">
+                    <Link href="/" className="inline-flex items-center gap-3">
+                        <AppLogo className="w-10 h-10" />
+                        <span className="text-2xl font-semibold text-white">Clarity Journal</span>
                     </Link>
+                </div>
+
+                {/* Card */}
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-2xl shadow-xl">
+                    <Suspense fallback={<div className="text-center text-white/60">Loading...</div>}>
+                        <ResetPasswordForm />
+                    </Suspense>
+
+                    <div className="mt-6 pt-6 border-t border-white/15 text-center">
+                        <Link
+                            href="/login"
+                            className="text-[#22D3EE] font-medium hover:text-[#67E8F9] transition-colors inline-flex items-center gap-2 text-sm"
+                        >
+                            <BackIcon className="w-4 h-4" />
+                            <span>Back to Login</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
