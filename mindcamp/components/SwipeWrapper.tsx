@@ -28,10 +28,11 @@ export function SwipeWrapper({ children }: { children: React.ReactNode }) {
         const distanceX = touchStartX.current - touchEndX;
         const distanceY = touchStartY.current - touchEndY;
 
-        const isHorizontalSwipe = Math.abs(distanceX) > minSwipeDistance;
-        const isVerticalScroll = Math.abs(distanceY) > maxVerticalDistance;
+        const absX = Math.abs(distanceX);
+        const absY = Math.abs(distanceY);
 
-        if (isHorizontalSwipe && !isVerticalScroll) {
+        // Check if horizontal swipe is dominant and exceeds minimum distance
+        if (absX > minSwipeDistance && absX > absY) {
             handleSwipe(distanceX > 0 ? "left" : "right");
         }
 
@@ -56,7 +57,7 @@ export function SwipeWrapper({ children }: { children: React.ReactNode }) {
         <div
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
-            className="min-h-full w-full"
+            className="w-full flex-1 flex flex-col"
         >
             {children}
         </div>

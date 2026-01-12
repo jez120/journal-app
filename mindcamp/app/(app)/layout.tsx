@@ -93,8 +93,9 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             </header>
 
             {/* Main content */}
+            {/* Main content */}
             <main
-                className="pb-36 min-h-screen container-app"
+                className="pb-36 min-h-screen container-app flex flex-col"
                 style={{ paddingTop: "100px" }}
             >
                 <SwipeWrapper>{children}</SwipeWrapper>
