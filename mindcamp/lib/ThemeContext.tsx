@@ -77,7 +77,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         if (fontSize === "large") scale = "112.5%";
 
         root.style.fontSize = scale;
-
     }, [theme, fontSize, mounted]);
 
     // Avoid hydration mismatch by rendering children only after mount, 

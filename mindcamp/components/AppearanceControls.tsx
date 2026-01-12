@@ -13,7 +13,7 @@ export function AppearanceControls() {
     };
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center gap-2">
             {/* Theme Toggle Button */}
             <button
                 onClick={toggleTheme}
@@ -26,64 +26,56 @@ export function AppearanceControls() {
 
             {/* Font Config Button */}
             <button
-                onClick={() => setShowFontModal(true)}
+                onClick={() => setShowFontModal(!showFontModal)}
                 className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all border border-white/10"
                 title="Change Text Size"
             >
                 <SettingsIcon className="w-5 h-5" />
             </button>
 
-            {/* Font Size Modal */}
+            {/* Font Size Popover */}
             {showFontModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-[var(--brand-navy)] border border-white/20 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
-                        {/* Close Button */}
+                <>
+                    {/* Invisible Dropdown Backdrop for closing */}
+                    <div className="fixed inset-0 z-40" onClick={() => setShowFontModal(false)} />
+
+                    {/* Modern Floating Island UI */}
+                    <div className="absolute top-12 right-0 z-50 w-auto bg-[var(--brand-navy)]/90 backdrop-blur-xl border border-white/20 rounded-full shadow-2xl p-1.5 animate-fade-in flex items-center gap-1">
+
+                        {/* Small */}
                         <button
-                            onClick={() => setShowFontModal(false)}
-                            className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
+                            onClick={() => setFontSize("small")}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${fontSize === "small"
+                                ? "bg-white text-[var(--brand-navy)] shadow-lg"
+                                : "text-white/60 hover:text-white hover:bg-white/10"
+                                }`}
                         >
-                            <CloseIcon size={20} />
+                            <span className="text-xs font-medium">A</span>
                         </button>
 
-                        <h3 className="text-lg font-bold text-white mb-6 text-center">Text Size</h3>
-
-                        <div className="flex items-end justify-center gap-6 bg-white/5 rounded-xl p-6">
-                            {/* Small */}
-                            <button
-                                onClick={() => setFontSize("small")}
-                                className={`flex flex-col items-center gap-2 transition-all ${fontSize === "small" ? "text-[#06B6D4]" : "text-white/50 hover:text-white"}`}
-                            >
-                                <span className="text-sm font-medium">A</span>
-                                <span className="text-xs opacity-60">Small</span>
-                            </button>
-
-                            {/* Medium */}
-                            <button
-                                onClick={() => setFontSize("medium")}
-                                className={`flex flex-col items-center gap-2 transition-all ${fontSize === "medium" ? "text-[#06B6D4]" : "text-white/50 hover:text-white"}`}
-                            >
-                                <span className="text-lg font-medium">A</span>
-                                <span className="text-xs opacity-60">Medium</span>
-                            </button>
-
-                            {/* Large */}
-                            <button
-                                onClick={() => setFontSize("large")}
-                                className={`flex flex-col items-center gap-2 transition-all ${fontSize === "large" ? "text-[#06B6D4]" : "text-white/50 hover:text-white"}`}
-                            >
-                                <span className="text-2xl font-bold">A</span>
-                                <span className="text-xs opacity-60">Large</span>
-                            </button>
-                        </div>
-
+                        {/* Medium */}
                         <button
-                            onClick={() => setShowFontModal(false)}
-                            className="mt-6 w-full bg-white/10 hover:bg-white/20 text-white font-medium py-3 rounded-xl transition-colors"
+                            onClick={() => setFontSize("medium")}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${fontSize === "medium"
+                                ? "bg-white text-[var(--brand-navy)] shadow-lg"
+                                : "text-white/60 hover:text-white hover:bg-white/10"
+                                }`}
                         >
-                            Done
+                            <span className="text-base font-medium">A</span>
+                        </button>
+
+                        {/* Large */}
+                        <button
+                            onClick={() => setFontSize("large")}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${fontSize === "large"
+                                ? "bg-white text-[var(--brand-navy)] shadow-lg"
+                                : "text-white/60 hover:text-white hover:bg-white/10"
+                                }`}
+                        >
+                            <span className="text-xl font-bold">A</span>
                         </button>
                     </div>
-                </div>
+                </>
             )}
         </div>
     );
