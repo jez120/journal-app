@@ -68,7 +68,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                 <div className="h-full container-app flex items-center justify-between">
                     <Link href="/today" className="flex items-center gap-3">
                         <AppLogo className="w-8 h-8" />
-                        <span className="font-semibold text-xl text-white">Clarity Journal</span>
+                        <span className="font-semibold text-xl text-white hidden sm:inline">Clarity Journal</span>
                     </Link>
 
                     <div className="flex items-center gap-3">
