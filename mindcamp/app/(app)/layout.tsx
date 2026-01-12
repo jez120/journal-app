@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 import { SessionProvider, useSession, signOut } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 import { AppearanceControls } from "@/components/AppearanceControls";
+import { SwipeWrapper } from "@/components/SwipeWrapper";
 
 function AppLayoutInner({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -96,7 +97,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                 className="pb-36 min-h-screen container-app"
                 style={{ paddingTop: "100px" }}
             >
-                {children}
+                <SwipeWrapper>{children}</SwipeWrapper>
             </main>
 
             {/* iOS Tab Bar */}
