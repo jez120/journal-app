@@ -72,7 +72,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
 
                     <div className="flex items-center gap-3">
                         {/* Streak indicator */}
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 border border-white/10">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 border border-white/10 h-9">
                             <FireIcon className="w-4 h-4" />
                             <span className="text-sm font-semibold text-[#FFC107]">{streakCount}</span>
                         </div>
@@ -82,7 +82,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                         {/* Profile */}
                         <button
                             onClick={() => signOut({ callbackUrl: "/" })}
-                            className="w-8 h-8 rounded-full bg-[#E05C4D] text-white flex items-center justify-center text-sm font-semibold ring-2 ring-white/10 hover:ring-white/30 transition-all"
+                            className="w-9 h-9 rounded-full bg-[#E05C4D] text-white flex items-center justify-center text-sm font-semibold ring-2 ring-white/10 hover:ring-white/30 transition-all"
                             title="Sign out"
                         >
                             {userInitial}
