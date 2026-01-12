@@ -125,25 +125,25 @@ export default function HistoryPage() {
                     <Link
                         href="/history/stats"
                         title="Analytics"
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-2.5 py-1 rounded-full text-[13px] font-semibold transition-colors flex items-center gap-1.5"
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors flex items-center gap-[0.375rem]"
                     >
-                        <ChartIcon className="w-3.5 h-3.5" />
+                        <ChartIcon className="w-[0.875rem] h-[0.875rem]" />
                         <span className="hidden sm:inline">Insights</span>
                     </Link>
                     <button
                         onClick={handleExport}
                         disabled={exporting || entries.length === 0}
                         title="Export"
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-2.5 py-1 rounded-full text-[13px] font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors disabled:opacity-50 flex items-center gap-[0.375rem]"
                     >
-                        <ExportIcon className="w-3.5 h-3.5" />
+                        <ExportIcon className="w-[0.875rem] h-[0.875rem]" />
                         <span className="hidden sm:inline">{exporting ? "..." : "Export"}</span>
                     </button>
                     <label
                         title="Import"
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-2.5 py-1 rounded-full text-[13px] font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors cursor-pointer flex items-center gap-[0.375rem]"
                     >
-                        <DownloadIcon className="w-3.5 h-3.5" />
+                        <DownloadIcon className="w-[0.875rem] h-[0.875rem]" />
                         <span className="hidden sm:inline">{importing ? "..." : "Import"}</span>
                         {!importing && <span className="sm:hidden">Import</span>}
                         <input
