@@ -12,7 +12,7 @@ import {
     CircleIcon,
     DeleteIcon
 } from "@/components/JournalIcons";
-import { getAllEntries, exportEntries, importEntries, LocalEntry, addEntry } from "@/lib/localDb";
+import { getAllEntries, exportEntries, importEntries, LocalEntry, addEntry, deleteEntry } from "@/lib/localDb";
 
 interface Entry {
     id: string;
@@ -328,7 +328,21 @@ export default function HistoryPage() {
                             disabled={selectedEntries.size === 0}
                             className="bg-red-500/20 hover:bg-red-500/30 text-red-300 p-3 rounded-full transition-colors disabled:opacity-50"
                             title="Delete Selected"
-                            onClick={() => alert("Delete not implemented yet for safety.")}
+                            onClick={async () => {
+                                if (window.confirm(`Are you sure you want to delete ${selectedEntries.size} entries? This cannot be undone.`)) {
+                                    try {
+                                        for (const id of selectedEntries) {
+                                            await deleteEntry(id);
+                                        }
+                                        await loadEntries();
+                                        setIsSelectionMode(false);
+                                        setSelectedEntries(new Set());
+                                    } catch (err) {
+                                        console.error("Failed to delete entries:", err);
+                                        alert("Failed to delete some entries.");
+                                    }
+                                }
+                            }}
                         >
                             <DeleteIcon className="w-5 h-5" />
                         </button>
