@@ -215,3 +215,16 @@ export const ChartIcon = ({ size = 24, className }: IconProps) => (
         <line x1="6" y1="20" x2="6" y2="14" />
     </svg>
 );
+
+export const CircleIcon = ({ size = 24, className }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <circle cx="12" cy="12" r="9" />
+    </svg>
+);
+
+export const CheckCircleIcon = ({ size = 24, className }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+);
