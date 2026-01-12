@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ChevronDownIcon, TrackIcon, ExportIcon } from "@/components/JournalIcons";
+import { ChevronDownIcon, ChartIcon, ExportIcon, DownloadIcon } from "@/components/JournalIcons";
 import { getAllEntries, exportEntries, importEntries, LocalEntry } from "@/lib/localDb";
 
 interface Entry {
@@ -122,19 +122,28 @@ export default function HistoryPage() {
                     <p className="text-white/85">{entries.length} entries</p>
                 </div>
                 <div className="flex gap-2">
-                    <Link href="/history/stats" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] flex items-center gap-2">
-                        <TrackIcon className="w-4 h-4" />
+                    <Link
+                        href="/history/stats"
+                        title="Analytics"
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] flex items-center gap-2"
+                    >
+                        <ChartIcon className="w-7 h-7" />
                         <span className="hidden sm:inline">Insights</span>
                     </Link>
                     <button
                         onClick={handleExport}
                         disabled={exporting || entries.length === 0}
+                        title="Export"
                         className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] disabled:opacity-50 flex items-center gap-2"
                     >
-                        <ExportIcon className="w-4 h-4" />
+                        <ExportIcon className="w-7 h-7" />
                         <span className="hidden sm:inline">{exporting ? "..." : "Export"}</span>
                     </button>
-                    <label className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] cursor-pointer flex items-center gap-2">
+                    <label
+                        title="Import"
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] cursor-pointer flex items-center gap-2"
+                    >
+                        <DownloadIcon className="w-7 h-7" />
                         <span className="hidden sm:inline">{importing ? "..." : "Import"}</span>
                         {!importing && <span className="sm:hidden">Import</span>}
                         <input
