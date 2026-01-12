@@ -21,7 +21,7 @@ export function AppearanceControls() {
                 className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all border border-white/10"
                 title={`Switch to ${theme === "ocean" ? "Dark" : "Light"} Mode`}
             >
-                <ThemeIcon size={20} className="w-5 h-5" />
+                <ThemeIcon size={20} className="w-5 h-5 scale-125 translate-x-[-1px] translate-y-[2px]" />
             </button>
 
             {/* Font Config Button */}
@@ -36,7 +36,7 @@ export function AppearanceControls() {
             {/* Font Size Modal */}
             {showFontModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-[#1E3A5F] border border-white/20 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
+                    <div className="bg-[var(--brand-navy)] border border-white/20 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
                         {/* Close Button */}
                         <button
                             onClick={() => setShowFontModal(false)}

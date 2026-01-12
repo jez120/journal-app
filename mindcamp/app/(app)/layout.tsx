@@ -63,7 +63,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen">
             {/* Navigation Bar */}
-            <header className="fixed top-0 left-0 right-0 z-50 bg-[#1E3A5F]/80 backdrop-blur-lg border-b border-white/10 h-[60px]">
+            <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--brand-navy)]/80 backdrop-blur-lg border-b border-white/10 h-[60px]">
                 <div className="h-full container-app flex items-center justify-between">
                     <Link href="/today" className="flex items-center gap-3">
                         <AppLogo className="w-8 h-8" />
@@ -100,7 +100,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             </main>
 
             {/* iOS Tab Bar */}
-            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#1E3A5F]/80 backdrop-blur-lg border-t border-white/10 pb-safe">
+            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--brand-navy)]/80 backdrop-blur-lg border-t border-white/10 pb-safe">
                 <div className="flex items-center justify-around h-[60px] max-w-md mx-auto">
                     {tabs.map((tab) => {
                         const isActive = pathname === tab.href;
