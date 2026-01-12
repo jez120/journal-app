@@ -181,7 +181,7 @@ export default function ProgressPage() {
                                     <div className="flex items-center gap-2">
                                         <span className={`font-medium text-sm ${isActive ? "text-[#E05C4D]" : "text-white"}`}>{rank.name}</span>
                                         <span className="text-xs text-white/70">{rank.days}</span>
-                                        {isActive && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#E05C4D]/20 text-[#E05C4D] font-medium">NOW</span>}
+                                        {isActive && <span className="text-[0.625rem] px-1.5 py-0.5 rounded-full bg-[#E05C4D]/20 text-[#E05C4D] font-medium">NOW</span>}
                                     </div>
                                     <p className="text-xs text-white/80">Unlocks: {rank.unlocks}</p>
                                 </div>

@@ -266,8 +266,8 @@ export default function HistoryPage() {
                         <div
                             key={group.id}
                             className={`relative overflow-hidden transition-all duration-200 ${isSelectionMode && selectedEntries.has(group.id)
-                                    ? "bg-white/20 border-white/40 translate-x-1"
-                                    : "bg-white/10 border-white/20"
+                                ? "bg-white/20 border-white/40 translate-x-1"
+                                : "bg-white/10 border-white/20"
                                 } border p-4 rounded-xl flex items-start gap-3 select-none touch-manipulation`}
                             onClick={() => handleEntryClick(group.id)}
                             onTouchStart={() => handleTouchStart(group.id)}
@@ -289,13 +289,13 @@ export default function HistoryPage() {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-white/90 font-medium text-[15px]">
+                                        <span className="text-white/90 font-medium text-sm">
                                             {formatDate(group.entryDate)}
                                         </span>
                                         <span className="text-xs text-white/50">{formatTime(group.createdAt)}</span>
                                     </div>
                                 </div>
-                                <p className="text-white/90 text-[15px] leading-relaxed line-clamp-3">
+                                <p className="text-white/90 text-sm leading-relaxed line-clamp-3">
                                     {group.content}
                                 </p>
                                 {group.reflection && (

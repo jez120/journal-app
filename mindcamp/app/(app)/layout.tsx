@@ -114,7 +114,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                                     }`}
                             >
                                 <tab.Icon className={isActive ? "w-7 h-7" : "w-6 h-6 grayscale opacity-70"} />
-                                <span className="text-[10px] font-medium">{tab.label}</span>
+                                <span className="text-[0.625rem] font-medium">{tab.label}</span>
                             </Link>
                         );
                     })}

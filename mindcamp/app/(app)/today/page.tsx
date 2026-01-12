@@ -367,7 +367,7 @@ export default function TodayPage() {
                         <h2 className="text-sm font-semibold text-white/85 uppercase tracking-wide">Yesterday</h2>
                     </div>
                     <div className="bg-white/10 backdrop-blur-sm border border-white/20 p-4 rounded-xl">
-                        <p className="text-white/90 text-[15px] leading-relaxed mb-3">
+                        <p className="text-white/90 text-sm leading-relaxed mb-3">
                             &quot;{yesterdayEntry.content}&quot;
                         </p>
                         {yesterdayEntry.reflection && (
