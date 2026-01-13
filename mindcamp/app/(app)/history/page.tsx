@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Link from 'next/link';
 import {
@@ -26,6 +26,7 @@ interface Entry {
 export default function HistoryPage() {
     const { data: session } = useSession();
     const [entries, setEntries] = useState<Entry[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const [exporting, setExporting] = useState(false);
     const [importing, setImporting] = useState(false);
@@ -62,6 +63,16 @@ export default function HistoryPage() {
             setLoading(false);
         }
     };
+
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const filteredEntries = useMemo(() => {
+        if (!normalizedQuery) return entries;
+        return entries.filter((entry) => {
+            const contentMatch = entry.content.toLowerCase().includes(normalizedQuery);
+            const reflectionMatch = entry.reflection?.toLowerCase().includes(normalizedQuery);
+            return contentMatch || reflectionMatch;
+        });
+    }, [entries, normalizedQuery]);
 
     const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -184,71 +195,87 @@ export default function HistoryPage() {
     return (
         <div className="space-y-6 pb-32">
             {/* Header */}
-            <div className="flex items-center justify-between sticky top-0 bg-[#1A3A5F]/95 backdrop-blur-md z-10 py-4 -mx-4 px-4 border-b border-white/5 transition-all duration-200">
-                <div>
-                    <h1 className="text-3xl font-bold text-white mb-1">History</h1>
-                    <p className="text-white/70 text-sm">
-                        {isSelectionMode ? `${selectedEntries.size} selected` : `${entries.length} entries`}
-                    </p>
+            <div className="sticky top-0 bg-[#1A3A5F]/95 backdrop-blur-md z-10 py-4 -mx-4 px-4 border-b border-white/5 transition-all duration-200">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-white mb-1">History</h1>
+                        <p className="text-white/70 text-sm">
+                            {isSelectionMode
+                                ? `${selectedEntries.size} selected`
+                                : normalizedQuery
+                                    ? `${filteredEntries.length} result${filteredEntries.length === 1 ? "" : "s"}`
+                                    : `${entries.length} entries`}
+                        </p>
+                    </div>
+
+                    {isSelectionMode ? (
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    setIsSelectionMode(false);
+                                    setSelectedEntries(new Set());
+                                }}
+                                className="text-white font-semibold text-base px-4 py-2"
+                            >
+                                Done
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex flex-wrap gap-2 justify-end">
+                            <button
+                                onClick={() => setIsSelectionMode(true)}
+                                className="sm:hidden bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors"
+                            >
+                                Select
+                            </button>
+                            <Link
+                                href="/history/stats"
+                                title="Analytics"
+                                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors flex items-center gap-[0.375rem]"
+                            >
+                                <ChartIcon className="w-[0.875rem] h-[0.875rem]" />
+                                <span className="hidden sm:inline">Insights</span>
+                            </Link>
+                            {/* Desktop Actions */}
+                            <div className="hidden sm:flex gap-2">
+                                <button
+                                    onClick={handleExport}
+                                    disabled={exporting || entries.length === 0}
+                                    title="Export"
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors disabled:opacity-50 flex items-center gap-[0.375rem]"
+                                >
+                                    <ExportIcon className="w-[0.875rem] h-[0.875rem]" />
+                                    <span className="hidden sm:inline">{exporting ? "..." : "Export"}</span>
+                                </button>
+                                <label
+                                    title="Import"
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors cursor-pointer flex items-center gap-[0.375rem]"
+                                >
+                                    <DownloadIcon className="w-[0.875rem] h-[0.875rem]" />
+                                    <span className="hidden sm:inline">{importing ? "..." : "Import"}</span>
+                                    {!importing && <span className="sm:hidden">Import</span>}
+                                    <input
+                                        type="file"
+                                        accept=".json"
+                                        onChange={handleImport}
+                                        className="hidden"
+                                        disabled={importing}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {isSelectionMode ? (
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => {
-                                setIsSelectionMode(false);
-                                setSelectedEntries(new Set());
-                            }}
-                            className="text-white font-semibold text-base px-4 py-2"
-                        >
-                            Done
-                        </button>
-                    </div>
-                ) : (
-                    <div className="flex flex-wrap gap-2 justify-end">
-                        <button
-                            onClick={() => setIsSelectionMode(true)}
-                            className="sm:hidden bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors"
-                        >
-                            Select
-                        </button>
-                        <Link
-                            href="/history/stats"
-                            title="Analytics"
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors flex items-center gap-[0.375rem]"
-                        >
-                            <ChartIcon className="w-[0.875rem] h-[0.875rem]" />
-                            <span className="hidden sm:inline">Insights</span>
-                        </Link>
-                        {/* Desktop Actions */}
-                        <div className="hidden sm:flex gap-2">
-                            <button
-                                onClick={handleExport}
-                                disabled={exporting || entries.length === 0}
-                                title="Export"
-                                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors disabled:opacity-50 flex items-center gap-[0.375rem]"
-                            >
-                                <ExportIcon className="w-[0.875rem] h-[0.875rem]" />
-                                <span className="hidden sm:inline">{exporting ? "..." : "Export"}</span>
-                            </button>
-                            <label
-                                title="Import"
-                                className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-[0.625rem] py-[0.25rem] rounded-full text-[0.8125rem] font-semibold transition-colors cursor-pointer flex items-center gap-[0.375rem]"
-                            >
-                                <DownloadIcon className="w-[0.875rem] h-[0.875rem]" />
-                                <span className="hidden sm:inline">{importing ? "..." : "Import"}</span>
-                                {!importing && <span className="sm:hidden">Import</span>}
-                                <input
-                                    type="file"
-                                    accept=".json"
-                                    onChange={handleImport}
-                                    className="hidden"
-                                    disabled={importing}
-                                />
-                            </label>
-                        </div>
-                    </div>
-                )}
+                <div className="mt-3">
+                    <input
+                        type="search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search entries"
+                        className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-white/40"
+                    />
+                </div>
             </div>
 
             {/* Entry List */}
@@ -260,9 +287,17 @@ export default function HistoryPage() {
                     <p className="text-white/50 text-base">No entries yet.</p>
                     <p className="text-white/30 text-sm mt-1">Start writing in the Today tab!</p>
                 </div>
+            ) : filteredEntries.length === 0 ? (
+                <div className="text-center py-12">
+                    <div className="bg-white/5 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <TodayIcon className="w-8 h-8 text-white/30" />
+                    </div>
+                    <p className="text-white/50 text-base">No matches found.</p>
+                    <p className="text-white/30 text-sm mt-1">Try a different keyword.</p>
+                </div>
             ) : (
                 <div className="space-y-3">
-                    {entries.map((group) => (
+                    {filteredEntries.map((group) => (
                         <div
                             key={group.id}
                             className={`relative overflow-hidden transition-all duration-200 ${isSelectionMode && selectedEntries.has(group.id)
